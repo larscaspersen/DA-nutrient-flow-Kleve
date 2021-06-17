@@ -5,11 +5,11 @@
 library(decisionSupport)
 
 #read input table
-input <- read.csv('data/input-table.csv')
+#input <- read.csv('data/input-table.csv')
 
-x <- input$median
-as.numeric(x[1])
-input$variable
+#x <- input$median
+#as.numeric(x[1])
+#input$variable
 
 
 make_median <- function(est){
@@ -17,8 +17,126 @@ make_median <- function(est){
   for(i in 1:length(est$variable)) assign(est$variable[i],
                                as.numeric(x[i]),envir=.GlobalEnv)
 }
-make_median(input)
+#make_median(input)
 
+animal_input <- read.csv('data/input-animal.csv')
+make_median(animal_input)
+
+#detailed_input <- read.csv('data/input-table-detailed.csv')
+#make_median(detailed_input)
+
+
+
+#function for animal subsystem flows
+calc_animal <- function(){
+  
+  #prepare slaughter df with all the inputs
+  
+  animal <- c('dairy_cattle', 'female_cattle', 'bull', 'oxen', 'youngstock_youngage',
+              'youngstock_midage', 'pig', 'poultry', 'lamb', 'sheep', 'goat', 
+              'horse')
+  
+  n_slaughter <- c(n_slaughter_dairy_cattle, n_slaughter_female_cattle,
+                   n_slaughter_bulls, n_slaughter_oxes, n_slaughter_younstock_youngage,
+                   n_slaughter_younstock_midage, n_slaughter_pig,
+                   n_slaughter_poultry, n_slaughter_lamb,
+                   n_slaughter_sheep, n_slaughter_goat, n_slaughter_horse)
+  
+  n_import <- c(n_slaughter_import_dairy_cattle, n_slaughter_import_female_cattle,
+                n_slaughter_import_bulls, n_slaughter_import_oxes,
+                n_slaughter_import_younstock_youngage,
+                n_slaughter_import_younstock_midage,
+                n_slaughter_import_pig,n_slaughter_import_poultry,
+                n_slaughter_import_lamb, n_slaughter_import_sheep,
+                n_slaughter_import_goat, n_slaughter_import_horse)
+  
+  slaughter_weight <- c(slaughter_weight_dairy_cattle, slaughter_weight_female_cattle,
+                        slaughter_weight_bulls, slaughter_weight_oxes, 
+                        slaughter_weight_younstock_youngage, slaughter_weight_younstock_midage,
+                        slaughter_weight_pig, slaughter_weight_poultry,
+                        slaughter_weight_lamb, slaughter_weight_sheep,
+                        slaughter_weight_goat,slaughter_weight_horse)
+  
+  slaughter_weight_fraction <- c(rep(slaughter_weight_fraction_cattle, 6),
+                                 slaughter_weight_fraction_pig, slaughter_weight_fraction_poultry,
+                                 rep(slaughter_weight_fraction_others,4))
+  
+  edible_fraction <- c(rep(edible_fraction_cattle,6),
+                       edible_fraction_pig, edible_fraction_poultry,
+                       rep(edible_fraction_other,4))
+  
+  N_content <- c(rep(N_content_female_cattle,2),
+                 rep(N_content_male_cattle,2),
+                 rep(N_content_female_cattle,2),
+                 N_content_pig, N_content_poultry,
+                 rep(N_content_sheep, 3),
+                 N_content_horse)
+  
+  slaughter_df <- data.frame(animal, n_slaughter, n_import,slaughter_weight,
+                             slaughter_weight_fraction, edible_fraction,
+                             N_content)
+  
+  #calculate total weight of animal type that goes to food processing:
+  #first get weight of individuum when slaughtered: slaughter_weight / slaughter_fraction
+  #second multiply by number of individuals (in NRW and imported)
+  
+  #total weight which goes to the slaughter house
+  slaughter_df$total_weight <- (slaughter_df$slaughter_weight / slaughter_df$slaughter_weight_fraction) * (slaughter_df$n_slaughter + slaughter_df$n_import)
+  
+  #total amount of Nitrogen that goes to the slaughterhouse
+  slaughter_df$N_to_slaughter <- slaughter_df$total_weight / 100 * slaughter_df$N_content 
+  
+  #total amount of N that can be consumed by customers
+  slaughter_df$N_meat_consumption <- slaughter_df$total_weight * slaughter_df$edible_fraction / 100 * slaughter_df$N_content
+  
+  #total amount of meat comming out of the slaughter house
+  slaughter_df$total_slaughter <- slaughter_df$slaughter_weight * (slaughter_df$n_slaughter + slaughter_df$n_import)
+  
+  #total amount of slaughter waste comming out of the slaughter house
+  slaughter_df$total_slaughter_waste <- slaughter_df$total_weight - (slaughter_df$total_weight * slaughter_df$edible_fraction)
+  
+  #total amount of N in the slaughter waster
+  slaughter_df$N_slaughter_waste <- slaughter_df$total_slaughter_waste / 100 * slaughter_df$N_content
+  
+  return(c(sum(slaughter_df$N_to_slaughter),sum(slaughter_df$N_meat_consumption), sum(slaughter_df$N_slaughter_waste)))
+  
+}
+
+
+
+
+#function to calcualte consumption rate of products
+calc_consume <- function(){
+  consumed_N_beef <- consume_beef * N_content_beef * population
+  consumed_N_butter <- consume_butter * N_content_butter * population
+  consumed_N_cheese <- consume_cheese * N_content_cheese * population
+  consumed_N_citrus_fruits <- consume_citrus_fruits * N_content_citrus_fruits * population
+  consumed_N_cocoa <- consume_cocoa * N_content_cocoa * population
+  consumed_N_condensed_milk <- consume_condensed_milk * N_content_condensed_milk * population
+  consumed_N_cream <- consume_cream * N_content_cream * population
+  consumed_N_dried_fruit <- consume_dried_fruit * N_content_dried_fruit * population
+  consumed_N_egg <- consume_egg * N_content_egg * population
+  consumed_N_fish <- consume_fish * N_content_fish * population
+  consumed_N_honey <- consume_honey * N_content_honey * population
+  consumed_N_legumes <- consume_legumes * N_content_legumes * population
+  consumed_N_margarine <- consume_margarine * N_content_margarine * population
+  consumed_N_milk <- consume_milk * N_content_milk * population
+  consumed_N_nuts <- consume_nuts * N_content_nuts * population
+  consumed_N_offal <- consume_offal * N_contente_offal * population
+  consumed_N_other_meat <- consume_other_meat * N_content_other_meat * population
+  consumed_N_pork <- consume_pork * N_content_pork * population
+  consumed_N_potato <- consume_potato * N_content_potato * population
+  consumed_N_potato_starch <- consume_potato_starch * N_content_potato_starch * population
+  consumed_N_poultry <- consume_poultry * N_content_poultry * population
+  consumed_N_rice <- consume_rice * N_content_rice * population
+  consumed_N_rye <- consume_rye * N_content_rye * population
+  consumed_N_sheep <- consume_sheep * N_content_sheep * population
+  consumed_N_sugar <- consume_sugar * N_content_sugar * population
+  consumed_N_tree_fruits <- consume_tree_fruits * N_content_tree_fruits * population
+  consumed_N_vegetable_fat <- consume_vegetable_fat * N_content_vegetables * population
+  consumed_N_vegetable <- consume_vegetables * N_content_vegetables * population
+  consumed_N_wheat <- consume_wheat * N_content_wheat * population
+}
 
 
 #function to draw random variables of e.g. input data set to make a run of the model
