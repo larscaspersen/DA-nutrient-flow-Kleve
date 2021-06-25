@@ -172,42 +172,42 @@ calc_animal <- function(){
   
 }
 
-nitrogen_mc_simulation <- mcSimulation(estimate = as.estimate(animal_input),
-                                       model_function = calc_animal,
-                                       numberOfModelRuns = 10000,
-                                       functionSyntax = "plainNames")
-
-plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
-                   vars = c("N_to_slaughter"),
-                   method = "smooth_simple_overlay",
-                   old_names = c('N_to_slaughter'),
-                   x_axis_name = 'kg N  / year')
-
-plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
-                   vars = c("N_meat_local_to_consumption"),
-                   method = "smooth_simple_overlay",
-                   old_names = c('N_meat_local_to_consumption'),
-                   x_axis_name = 'kg N  / year')
-#the meat still needs to be compared with local consumption rates and then is split
-#between consumption and export, same goes with milk and eggs
-
-plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
-                   vars = c("N_housing_loss"),
-                   method = "smooth_simple_overlay",
-                   old_names = c('N_housing_loss'),
-                   x_axis_name = 'kg N  / year')
-
-plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
-                   vars = c("N_biogas_input_animal"),
-                   method = "smooth_simple_overlay",
-                   old_names = c('N_biogas_input_animal'),
-                   x_axis_name = 'kg N  / year')
-
-plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
-                   vars = c("N_manure_to_crop"),
-                   method = "smooth_simple_overlay",
-                   old_names = c('N_manure_to_crop'),
-                   x_axis_name = 'kg N  / year')
+# nitrogen_mc_simulation <- mcSimulation(estimate = as.estimate(animal_input),
+#                                        model_function = calc_animal,
+#                                        numberOfModelRuns = 10000,
+#                                        functionSyntax = "plainNames")
+# 
+# plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
+#                    vars = c("N_to_slaughter"),
+#                    method = "smooth_simple_overlay",
+#                    old_names = c('N_to_slaughter'),
+#                    x_axis_name = 'kg N  / year')
+# 
+# plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
+#                    vars = c("N_meat_local_to_consumption"),
+#                    method = "smooth_simple_overlay",
+#                    old_names = c('N_meat_local_to_consumption'),
+#                    x_axis_name = 'kg N  / year')
+# #the meat still needs to be compared with local consumption rates and then is split
+# #between consumption and export, same goes with milk and eggs
+# 
+# plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
+#                    vars = c("N_housing_loss"),
+#                    method = "smooth_simple_overlay",
+#                    old_names = c('N_housing_loss'),
+#                    x_axis_name = 'kg N  / year')
+# 
+# plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
+#                    vars = c("N_biogas_input_animal"),
+#                    method = "smooth_simple_overlay",
+#                    old_names = c('N_biogas_input_animal'),
+#                    x_axis_name = 'kg N  / year')
+# 
+# plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
+#                    vars = c("N_manure_to_crop"),
+#                    method = "smooth_simple_overlay",
+#                    old_names = c('N_manure_to_crop'),
+#                    x_axis_name = 'kg N  / year')
 
 
 

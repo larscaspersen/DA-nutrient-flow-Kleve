@@ -186,81 +186,81 @@ crop_function <- function(){
               share_summer_wheat = share_summer_wheat, share_triticale = share_triticale,
               share_winter_barley = share_winter_barley, share_winter_wheat = share_winter_wheat))
 }
-
-nitrogen_mc_simulation <- mcSimulation(estimate = as.estimate(crop_input),
-                                       model_function = crop_function,
-                                       numberOfModelRuns = 10000,
-                                       functionSyntax = "plainNames")
-
-#exchange the share values of the inputs of the mc_simulation object,
-#because they were altered in the function to yield together 1
-
-
-nitrogen_mc_simulation$x$share_winter_wheat = nitrogen_mc_simulation$y$share_winter_wheat
-nitrogen_mc_simulation$x$share_summer_wheat = nitrogen_mc_simulation$y$share_summer_wheat
-nitrogen_mc_simulation$x$share_rye = nitrogen_mc_simulation$y$share_rye
-nitrogen_mc_simulation$x$share_winter_barley = nitrogen_mc_simulation$y$share_winter_barley
-nitrogen_mc_simulation$x$share_summer_barley = nitrogen_mc_simulation$y$share_summer_barley
-nitrogen_mc_simulation$x$share_oat = nitrogen_mc_simulation$y$share_oat
-nitrogen_mc_simulation$x$share_triticale = nitrogen_mc_simulation$y$share_triticale
-nitrogen_mc_simulation$x$share_corn = nitrogen_mc_simulation$y$share_corn
-nitrogen_mc_simulation$x$share_fodder_peas = nitrogen_mc_simulation$y$share_fodder_peas
-nitrogen_mc_simulation$x$share_beans = nitrogen_mc_simulation$y$share_beans
-nitrogen_mc_simulation$x$share_oilseed_rape = nitrogen_mc_simulation$y$share_oilseed_rape
-nitrogen_mc_simulation$x$share_potato = nitrogen_mc_simulation$y$share_potato
-nitrogen_mc_simulation$x$share_sugar_beat = nitrogen_mc_simulation$y$share_sugar_beat
-nitrogen_mc_simulation$x$share_mais_silage = nitrogen_mc_simulation$y$share_mais_silage
-
-
-plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
-                   vars = c("N_crop_main",'N_crop_rest'),
-                   method = "smooth_simple_overlay",
-                   old_names = c("N_crop_main",'N_crop_rest'),
-                   x_axis_name = 't N  / year')
-
-plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
-                   vars = c('N_straw'),
-                   method = "smooth_simple_overlay",
-                   old_names = c('N_straw'),
-                   x_axis_name = 't N  / year')
-
-plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
-                   vars = c('N_crop_human_consumption_unprocessed'),
-                   method = "smooth_simple_overlay",
-                   old_names = c('N_crop_human_consumption_unprocessed'),
-                   x_axis_name = 't N  / year')
-
-plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
-                   vars = c('N_crop_human_consumption_processed'),
-                   method = "smooth_simple_overlay",
-                   old_names = c('N_crop_human_consumption_processed'),
-                   x_axis_name = 't N  / year')
-
-plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
-                   vars = c('N_crop_animal_feeding_processed','N_crop_animal_feeding_unprocessed'),
-                   method = "smooth_simple_overlay",
-                   old_names = c('N_crop_animal_feeding_processed','N_crop_animal_feeding_unprocessed'),
-                   x_axis_name = 't N  / year')
-
-plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
-                   vars = c('N_crop_biogas'),
-                   method = "smooth_simple_overlay",
-                   old_names = c('N_crop_biogas'),
-                   x_axis_name = 't N  / year')
-
-plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
-                   vars = c('N_grassland'),
-                   method = "smooth_simple_overlay",
-                   old_names = c('N_grassland'),
-                   x_axis_name = 't N  / year')
-
-
-pls_result <- plsr.mcSimulation(object = nitrogen_mc_simulation,
-                                resultName = names(nitrogen_mc_simulation$y['N_crop_main']), ncomp = 1)
-
-plot_pls(pls_result, input = crop_input, threshold = 0.8)
-mcSimulation_table <- data.frame(nitrogen_mc_simulation$x, nitrogen_mc_simulation$y[c('N_crop_main')]
-)
-
-#evpi <- multi_EVPI(mc = mcSimulation_table, first_out_var = "N_crop_main")
-#plot_evpi(evpi, decision_vars = "N_crop_main")
+# 
+# nitrogen_mc_simulation <- mcSimulation(estimate = as.estimate(crop_input),
+#                                        model_function = crop_function,
+#                                        numberOfModelRuns = 10000,
+#                                        functionSyntax = "plainNames")
+# 
+# #exchange the share values of the inputs of the mc_simulation object,
+# #because they were altered in the function to yield together 1
+# 
+# 
+# nitrogen_mc_simulation$x$share_winter_wheat = nitrogen_mc_simulation$y$share_winter_wheat
+# nitrogen_mc_simulation$x$share_summer_wheat = nitrogen_mc_simulation$y$share_summer_wheat
+# nitrogen_mc_simulation$x$share_rye = nitrogen_mc_simulation$y$share_rye
+# nitrogen_mc_simulation$x$share_winter_barley = nitrogen_mc_simulation$y$share_winter_barley
+# nitrogen_mc_simulation$x$share_summer_barley = nitrogen_mc_simulation$y$share_summer_barley
+# nitrogen_mc_simulation$x$share_oat = nitrogen_mc_simulation$y$share_oat
+# nitrogen_mc_simulation$x$share_triticale = nitrogen_mc_simulation$y$share_triticale
+# nitrogen_mc_simulation$x$share_corn = nitrogen_mc_simulation$y$share_corn
+# nitrogen_mc_simulation$x$share_fodder_peas = nitrogen_mc_simulation$y$share_fodder_peas
+# nitrogen_mc_simulation$x$share_beans = nitrogen_mc_simulation$y$share_beans
+# nitrogen_mc_simulation$x$share_oilseed_rape = nitrogen_mc_simulation$y$share_oilseed_rape
+# nitrogen_mc_simulation$x$share_potato = nitrogen_mc_simulation$y$share_potato
+# nitrogen_mc_simulation$x$share_sugar_beat = nitrogen_mc_simulation$y$share_sugar_beat
+# nitrogen_mc_simulation$x$share_mais_silage = nitrogen_mc_simulation$y$share_mais_silage
+# 
+# 
+# plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
+#                    vars = c("N_crop_main",'N_crop_rest'),
+#                    method = "smooth_simple_overlay",
+#                    old_names = c("N_crop_main",'N_crop_rest'),
+#                    x_axis_name = 't N  / year')
+# 
+# plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
+#                    vars = c('N_straw'),
+#                    method = "smooth_simple_overlay",
+#                    old_names = c('N_straw'),
+#                    x_axis_name = 't N  / year')
+# 
+# plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
+#                    vars = c('N_crop_human_consumption_unprocessed'),
+#                    method = "smooth_simple_overlay",
+#                    old_names = c('N_crop_human_consumption_unprocessed'),
+#                    x_axis_name = 't N  / year')
+# 
+# plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
+#                    vars = c('N_crop_human_consumption_processed'),
+#                    method = "smooth_simple_overlay",
+#                    old_names = c('N_crop_human_consumption_processed'),
+#                    x_axis_name = 't N  / year')
+# 
+# plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
+#                    vars = c('N_crop_animal_feeding_processed','N_crop_animal_feeding_unprocessed'),
+#                    method = "smooth_simple_overlay",
+#                    old_names = c('N_crop_animal_feeding_processed','N_crop_animal_feeding_unprocessed'),
+#                    x_axis_name = 't N  / year')
+# 
+# plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
+#                    vars = c('N_crop_biogas'),
+#                    method = "smooth_simple_overlay",
+#                    old_names = c('N_crop_biogas'),
+#                    x_axis_name = 't N  / year')
+# 
+# plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
+#                    vars = c('N_grassland'),
+#                    method = "smooth_simple_overlay",
+#                    old_names = c('N_grassland'),
+#                    x_axis_name = 't N  / year')
+# 
+# 
+# pls_result <- plsr.mcSimulation(object = nitrogen_mc_simulation,
+#                                 resultName = names(nitrogen_mc_simulation$y['N_crop_main']), ncomp = 1)
+# 
+# plot_pls(pls_result, input = crop_input, threshold = 0.8)
+# mcSimulation_table <- data.frame(nitrogen_mc_simulation$x, nitrogen_mc_simulation$y[c('N_crop_main')]
+# )
+# 
+# #evpi <- multi_EVPI(mc = mcSimulation_table, first_out_var = "N_crop_main")
+# #plot_evpi(evpi, decision_vars = "N_crop_main")
