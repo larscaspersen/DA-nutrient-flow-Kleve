@@ -16,50 +16,92 @@ crop_input$upper <- as.numeric(crop_input$upper)
 
 make_variables(as.estimate(crop_input),n=1)
 
-crop_function <- function(){
+crop_function <- function(share_beans, share_corn, share_fodder_peas, 
+                            share_mais_silage, share_oat, 
+                            share_oilseed_rape, share_potato, share_rye,
+                            share_sugar_beet, share_summer_barley,
+                            share_summer_wheat, share_triticale,
+                            share_winter_barley, share_winter_wheat,
+                            share_crop_land,
+                            yield_beans, yield_corn, yield_fodder_peas,
+                            yield_mais_silage, yield_oat, yield_oilseed_rape,
+                            yield_potato, yield_rye, yield_sugar_beet,
+                            yield_summer_barley, yield_summer_wheat,
+                            yield_triticale, yield_winter_barley,
+                            yield_winter_wheat,
+                          N_yield_beans,N_yield_corn,N_yield_fodder_peas,
+                          N_yield_mais_silage,N_yield_oat,
+                          N_yield_oilseed_rape,N_yield_potato,
+                          N_yield_rye,N_yield_sugar_beet,N_yield_summer_barley,
+                          N_yield_summer_weat,N_yield_triticale,
+                          N_yield_winter_barley,N_yield_winter_weat,
+                          N_leftover_beans,N_leftover_corn,
+                          N_leftover_foder_peas,N_leftover_mais_silage,
+                          N_leftover_oat,N_leftover_oilseed_rape,
+                          N_leftover_potato,N_leftover_rye,
+                          N_leftover_sugar_beet,N_leftover_summer_barley,
+                          N_leftover_summer_wheat,N_leftover_triticale,
+                          N_leftover_winter_barley,N_leftover_winter_wheat,
+                          straw_share,
+                          beans_to_animal,corn_to_animal,fodder_peas_to_animal,
+                          mais_silage_to_animal,oat_to_animal, oilseed_rape_to_animal,
+                          potato_to_animal, rye_to_animal, sugar_beet_to_animal,
+                          summer_barley_to_animal, summer_wheat_to_animal,
+                          triticale_to_animal, winter_barley_to_animal,
+                          winter_wheat_to_animal,
+                          beans_to_consumption, corn_to_consumption,fodder_peas_to_consumption,
+                          mais_silage_to_consumption, oat_to_consumption,
+                          oilseed_rape_to_consumption, potato_to_ponsumption,
+                          rye_to_consumption, sugar_beet_to_sunsumption,
+                          summer_barley_to_consumption, summer_wheat_to_consumption,
+                          triticale_to_consumption, winter_barley_to_consumption,
+                          winter_wheat_to_consumption,
+                          mais_silage_to_biogas,
+                          area_grassland, share_grazing, N_yield_grazing,
+                          N_yield_mowing){
 
   estimated_crop_land <- share_beans + share_corn + share_fodder_peas + 
     share_mais_silage + share_oat + 
-    share_oilseed_rape + share_potato +share_rye + share_sugar_beat + 
+    share_oilseed_rape + share_potato +share_rye + share_sugar_beet + 
     share_summer_barley + share_summer_wheat + 
     share_triticale + share_winter_barley + share_winter_wheat
   
   correction_factor <- share_crop_land / estimated_crop_land
   
-  share_beans <- share_beans * correction_factor
-  share_corn <- correction_factor * share_corn
-  share_fodder_peas <- correction_factor * share_fodder_peas
-  share_mais_silage <- correction_factor * share_mais_silage
-  share_oat <- correction_factor * share_oat
-  share_oilseed_rape <- correction_factor * share_oilseed_rape
-  share_potato <- correction_factor * share_potato
-  share_rye <- correction_factor * share_rye
-  share_sugar_beat <- correction_factor * share_sugar_beat
-  share_summer_barley <- correction_factor * share_summer_barley
-  share_summer_wheat <- correction_factor * share_summer_wheat
-  share_triticale <- correction_factor * share_triticale
-  share_winter_barley <- correction_factor *  share_winter_barley
-  share_winter_wheat <- correction_factor * share_winter_wheat
+  new_share_beans <- share_beans * correction_factor
+  new_share_corn <- correction_factor * share_corn
+  new_share_fodder_peas <- correction_factor * share_fodder_peas
+  new_share_mais_silage <- correction_factor * share_mais_silage
+  new_share_oat <- correction_factor * share_oat
+  new_share_oilseed_rape <- correction_factor * share_oilseed_rape
+  new_share_potato <- correction_factor * share_potato
+  new_share_rye <- correction_factor * share_rye
+  new_share_sugar_beet <- correction_factor * share_sugar_beet
+  new_share_summer_barley <- correction_factor * share_summer_barley
+  new_share_summer_wheat <- correction_factor * share_summer_wheat
+  new_share_triticale <- correction_factor * share_triticale
+  new_share_winter_barley <- correction_factor *  share_winter_barley
+  new_share_winter_wheat <- correction_factor * share_winter_wheat
   
   #####
   #I wonder if this correctio pushes values outside their upper and lower limits? 
   #####
   
-  round(sum(share_beans, share_corn, share_fodder_peas, share_mais_silage, 
-            share_oat, share_oilseed_rape, share_potato, share_rye, 
-            share_sugar_beat, share_summer_barley, share_summer_wheat, 
-            share_triticale, share_winter_barley, share_winter_wheat),3) == share_crop_land
+  round(sum(new_share_beans, new_share_corn, new_share_fodder_peas, new_share_mais_silage, 
+            new_share_oat, new_share_oilseed_rape, new_share_potato, new_share_rye, 
+            new_share_sugar_beet, new_share_summer_barley, new_share_summer_wheat, 
+            new_share_triticale, new_share_winter_barley, new_share_winter_wheat),3) == share_crop_land
   
   #bind to data frame
   crop_df <- data.frame(crop = c('bean','corn', 'fodder_peas', 'mais_silage', 'oat',
                                   'oilseed_rape', 'potato', 'rye', 'sugar_beet', 
                                   'summer_barley', 'summer_wheat', 'triticale', 
                                   'winter_barley', 'winter_wheat'),
-                        land_share = c(share_beans,share_corn, share_fodder_peas,
-                          share_mais_silage, share_oat, share_oilseed_rape,
-                          share_potato, share_rye, share_sugar_beat,
-                          share_summer_barley, share_summer_wheat,
-                          share_triticale, share_winter_barley, share_winter_wheat),
+                        land_share = c(new_share_beans,new_share_corn, new_share_fodder_peas,
+                          new_share_mais_silage, new_share_oat, new_share_oilseed_rape,
+                          new_share_potato, new_share_rye, new_share_sugar_beet,
+                          new_share_summer_barley, new_share_summer_wheat,
+                          new_share_triticale, new_share_winter_barley, new_share_winter_wheat),
                         yield = c(yield_beans, yield_corn, yield_fodder_peas,
                                   yield_mais_silage, yield_oat, yield_oilseed_rape,
                                   yield_potato, yield_rye, yield_sugar_beet,
@@ -178,20 +220,22 @@ crop_function <- function(){
               N_crop_animal_feeding_unprocessed = N_crop_animal_feeding_unprocessed,
               N_crop_biogas = N_crop_biogas,
               N_grassland = N_grassland,
-              share_beans = share_beans, share_corn = share_corn,
-              share_fodder_peas = share_fodder_peas, share_mais_silage = share_mais_silage,
-              share_oat = share_oat, share_oilseed_rape = share_oilseed_rape,
-              share_potato = share_potato, share_rye = share_rye, 
-              share_sugar_beat = share_sugar_beat, share_summer_barley = share_summer_barley,
-              share_summer_wheat = share_summer_wheat, share_triticale = share_triticale,
-              share_winter_barley = share_winter_barley, share_winter_wheat = share_winter_wheat))
+              share_beans = new_share_beans, share_corn = new_share_corn,
+              share_fodder_peas = new_share_fodder_peas, share_mais_silage = new_share_mais_silage,
+              share_oat = new_share_oat, share_oilseed_rape = new_share_oilseed_rape,
+              share_potato = new_share_potato, share_rye = new_share_rye, 
+              share_sugar_beet = new_share_sugar_beet, share_summer_barley = new_share_summer_barley,
+              share_summer_wheat = new_share_summer_wheat, share_triticale = new_share_triticale,
+              share_winter_barley = new_share_winter_barley, share_winter_wheat = new_share_winter_wheat))
 }
-# 
+
 # nitrogen_mc_simulation <- mcSimulation(estimate = as.estimate(crop_input),
 #                                        model_function = crop_function,
-#                                        numberOfModelRuns = 10000,
+#                                        numberOfModelRuns = 100,
 #                                        functionSyntax = "plainNames")
 # 
+# nitrogen_mc_simulation$x$share_beans
+
 # #exchange the share values of the inputs of the mc_simulation object,
 # #because they were altered in the function to yield together 1
 # 
@@ -208,7 +252,7 @@ crop_function <- function(){
 # nitrogen_mc_simulation$x$share_beans = nitrogen_mc_simulation$y$share_beans
 # nitrogen_mc_simulation$x$share_oilseed_rape = nitrogen_mc_simulation$y$share_oilseed_rape
 # nitrogen_mc_simulation$x$share_potato = nitrogen_mc_simulation$y$share_potato
-# nitrogen_mc_simulation$x$share_sugar_beat = nitrogen_mc_simulation$y$share_sugar_beat
+# nitrogen_mc_simulation$x$share_sugar_beet = nitrogen_mc_simulation$y$share_sugar_beet
 # nitrogen_mc_simulation$x$share_mais_silage = nitrogen_mc_simulation$y$share_mais_silage
 # 
 # 
