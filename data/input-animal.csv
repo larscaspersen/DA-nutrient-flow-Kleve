@@ -1,66 +1,87 @@
 ﻿description,variable,unit,lower,median,upper,distribution
-Dairy cattle 4,n_slaughter_dairy_cattle,individuals,,254,,
-Oxes,n_slaughter_oxes,individuals,,94,,
-Bulls,n_slaughter_bulls,individuals,,573,,
-Female cattle (before calving),n_slaughter_female_cattle,individuals,,1404,,
-Younstock ≤ 8 months,n_slaughter_younstock_youngage,individuals,,177,,
-Younstock ≥ 8 and ≤ 12 months 15,n_slaughter_younstock_midage,individuals,,28,,
-,n_slaughter_pig,individuals,,723164,,
-,n_slaughter_poultry,individuals,,2101,,
-,n_slaughter_lamb,individuals,,0,,
-,n_slaughter_sheep,individuals,,2242,,
-,n_slaughter_goat,individuals,,18,,
-,n_slaughter_horse,individuals,,16,,
-,n_slaughter_import_dairy_cattle,individuals,,3,,
-,n_slaughter_import_oxes,individuals,,0,,
-,n_slaughter_import_bulls,individuals,,0,,
-,n_slaughter_import_female_cattle,individuals,,0,,
-,n_slaughter_import_younstock_youngage,individuals,,0,,
-,n_slaughter_import_younstock_midage,individuals,,0,,
-,n_slaughter_import_pig,individuals,,142865,,
-,n_slaughter_import_poultry,individuals,,0,,
-,n_slaughter_import_lamb,individuals,,0,,
-,n_slaughter_import_sheep,individuals,,0,,
-,n_slaughter_import_goat,individuals,,0,,
-,n_slaughter_import_horse,individuals,,0,,
-Dairy cattle 4,slaughter_weight_dairy_cattle,kg,,290.8940106,,
-Oxes,slaughter_weight_oxes,kg,,340.1609364,,
-Bulls,slaughter_weight_bulls,kg,,401.1475436,,
-Female cattle (before calving),slaughter_weight_female_cattle,kg,,271.1563536,,
-Younstock ≤ 8 months,slaughter_weight_younstock_youngage,kg,,151.0706973,,
-Younstock ≥ 8 and ≤ 12 months 15,slaughter_weight_younstock_midage,kg,,176.4484928,,
-,slaughter_weight_pig,kg,,96.3031742,,
-,slaughter_weight_poultry,kg,,2,,
-,slaughter_weight_lamb,kg,,18.00207039,,
-,slaughter_weight_sheep,kg,,29.99222999,,
-,slaughter_weight_goat,kg,,17.76198934,,
-,slaughter_weight_horse,kg,,264.0480087,,
-,slaughter_weight_fraction_cattle,,,0.58,,
-,slaughter_weight_fraction_pig,,,0.75,,
-,slaughter_weight_fraction_poultry,,,0.71,,
-,slaughter_weight_fraction_others,,,0.62,,
-,edible_fraction_cattle,,,0.52,,
-,edible_fraction_pig,,,0.68,,
-,edible_fraction_poultry,,,0.64,,
-,edible_fraction_other,,,0.56,,
-,N_content_female_cattle,gr N / 100 gram product,,2.5,,
-,N_content_male_cattle,gr N / 100 gram product,,2.7,,
-,N_content_pig,gr N / 100 gram product,,2.56,,
-,N_content_poultry,gr N / 100 gram product,,3.25,,
-,N_content_sheep,gr N / 100 gram product,,2.6,,
-,N_content_horse,gr N / 100 gram product,,3,,
-number of chicken in Kleve (assuming that the number of eggs in correct),n_chicken,individuals,,194946,,
-egg laying rate (consumable eggs),egg_per_chicken,egg per chicken,,280,,
-weight of average egg,egg-weight,g,,62.9,,
-gr N / 100 gram product,N_content_egg,gr N / 100 gram product,,2,,
-calculated based on total milk,N_content_milk,gr N / 100 gram product,,0.52,,
-calculated based on total milk,share_milk_to_factory,,,0.769,,
-calculated based on total milk,share_milk_fed_farm,,,0.012,,
-calculated based on total milk,share_milk_direct_sale,,,0.004,,
-calculated based on total milk,share_milk_other_use,,,0.215,,
-taken IT.NRW for 2016,n_dairy_cow,individuals,," 56,794 ",,
-calculated based on cow number and milk output,milk_per_cow,kg per cow ,,7671.4,,
-calculated on LLU units in Nährstoffreport,n_other_poultry,individuals,,435440,,
-weeks until turkey is slaughtered,weeks_to_grow,weeks,19,20,22,
-,,,,,,
-,,,,,,
+Dairy cattle 4,n_slaughter_dairy_cattle,individuals,215.9,254,292.1,posnorm
+Oxes,n_slaughter_oxes,individuals,79.9,94,108.1,posnorm
+Bulls,n_slaughter_bulls,individuals,487.05,573,658.95,posnorm
+Female cattle (before calving),n_slaughter_female_cattle,individuals,1193.4,1404,1614.6,posnorm
+Younstock ≤ 8 months,n_slaughter_younstock_youngage,individuals,150.45,177,203.55,posnorm
+Younstock ≥ 8 and ≤ 12 months 15,n_slaughter_younstock_midage,individuals,23.8,28,32.2,posnorm
+,n_slaughter_pig,individuals,614689.4,723164,831638.6,posnorm
+,n_slaughter_poultry,individuals,1785.85,2101,2416.15,posnorm
+,n_slaughter_lamb,individuals,0,0,0,const
+,n_slaughter_sheep,individuals,1905.7,2242,2578.3,posnorm
+,n_slaughter_goat,individuals,15.3,18,20.7,posnorm
+,n_slaughter_horse,individuals,13.6,16,18.4,posnorm
+,n_slaughter_import_dairy_cattle,individuals,2.55,3,3.45,posnorm
+,n_slaughter_import_oxes,individuals,0,0,0,const
+,n_slaughter_import_bulls,individuals,0,0,0,const
+,n_slaughter_import_female_cattle,individuals,0,0,0,const
+,n_slaughter_import_younstock_youngage,individuals,0,0,0,const
+,n_slaughter_import_younstock_midage,individuals,0,0,0,const
+,n_slaughter_import_pig,individuals,121435.25,142865,164294.75,posnorm
+,n_slaughter_import_poultry,individuals,0,0,0,const
+,n_slaughter_import_lamb,individuals,0,0,0,const
+,n_slaughter_import_sheep,individuals,0,0,0,const
+,n_slaughter_import_goat,individuals,0,0,0,const
+,n_slaughter_import_horse,individuals,0,0,0,const
+Dairy cattle 4,slaughter_weight_dairy_cattle,kg,247.259909,290.8940106,334.5281122,posnorm
+Oxes,slaughter_weight_oxes,kg,289.1367959,340.1609364,391.1850769,posnorm
+Bulls,slaughter_weight_bulls,kg,340.9754121,401.1475436,461.3196751,posnorm
+Female cattle (before calving),slaughter_weight_female_cattle,kg,230.4829006,271.1563536,311.8298066,posnorm
+Younstock ≤ 8 months,slaughter_weight_younstock_youngage,kg,128.4100927,151.0706973,173.7313019,posnorm
+Younstock ≥ 8 and ≤ 12 months 15,slaughter_weight_younstock_midage,kg,149.9812189,176.4484928,202.9157667,posnorm
+,slaughter_weight_pig,kg,81.85769807,96.3031742,110.7486503,posnorm
+,slaughter_weight_poultry,kg,1.7,2,2.3,posnorm
+,slaughter_weight_lamb,kg,15.30175983,18.00207039,20.70238095,posnorm
+,slaughter_weight_sheep,kg,25.49339549,29.99222999,34.49106449,posnorm
+,slaughter_weight_goat,kg,15.09769094,17.76198934,20.42628774,posnorm
+,slaughter_weight_horse,kg,224.4408074,264.0480087,303.65521,posnorm
+,slaughter_weight_fraction_cattle,share,0.493,0.58,0.667,tnorm_0_1
+,slaughter_weight_fraction_pig,share,0.6375,0.75,0.8625,tnorm_0_1
+,slaughter_weight_fraction_poultry,share,0.6035,0.71,0.8165,tnorm_0_1
+,slaughter_weight_fraction_others,share,0.527,0.62,0.713,tnorm_0_1
+,edible_fraction_cattle,share,0.442,0.52,0.598,tnorm_0_1
+,edible_fraction_pig,share,0.578,0.68,0.782,tnorm_0_1
+,edible_fraction_poultry,share,0.544,0.64,0.736,tnorm_0_1
+,edible_fraction_other,share,0.476,0.56,0.644,tnorm_0_1
+,N_content_female_cattle,gr N / 100 gram product,2.125,2.5,2.875,posnorm
+,N_content_male_cattle,gr N / 100 gram product,2.295,2.7,3.105,posnorm
+,N_content_pig,gr N / 100 gram product,2.176,2.56,2.944,posnorm
+,N_content_poultry,gr N / 100 gram product,2.7625,3.25,3.7375,posnorm
+,N_content_sheep,gr N / 100 gram product,2.21,2.6,2.99,posnorm
+,N_content_horse,gr N / 100 gram product,2.55,3,3.45,posnorm
+number of chicken in Kleve (assuming that the number of eggs in correct),n_chicken,individuals,165704.1,194946,224187.9,posnorm
+egg laying rate (consumable eggs),egg_per_chicken,egg per chicken,238,280,322,posnorm
+weight of average egg,egg-weight,g,53.465,62.9,72.335,posnorm
+gr N / 100 gram product,N_content_egg,gr N / 100 gram product,1.7,2,2.3,posnorm
+calculated based on total milk,N_content_milk,gr N / 100 gram product,0.442,0.52,0.598,posnorm
+calculated based on total milk,share_milk_to_factory,share,0.65365,0.769,0.88435,tnorm_0_1
+calculated based on total milk,share_milk_fed_farm,share,0.0102,0.012,0.0138,tnorm_0_1
+calculated based on total milk,share_milk_direct_sale,share,0.0034,0.004,0.0046,tnorm_0_1
+calculated based on total milk,share_milk_other_use,share,0.18275,0.215,0.24725,tnorm_0_1
+taken IT.NRW for 2016,n_dairy_cow,individuals,48274.9,"56,794",65313.1,posnorm
+calculated based on cow number and milk output,milk_per_cow,kg per cow ,6520.69,7671.4,8822.11,posnorm
+calculated on LLU units in Nährstoffreport,n_other_poultry,individuals,370124,435440,500756,posnorm
+weeks until turkey is slaughtered,weeks_to_grow,weeks,17,20,23,posnorm
+export of organic fertilizer,export_org_fertilizer,kg N,1598357,1880420,2162483,posnorm
+bull,n_bull,individuals,6282.35,7391,8499.65,posnorm
+heifer,n_heifer,individuals,34712.3,40838,46963.7,posnorm
+calf,n_calf,individuals,20742.55,24403,28063.45,posnorm
+"N excretion per ""Stellpletz"" and year",N_excretion_dairy,kg N / animal / year,97.155,114.3,131.445,posnorm
+,N_excretion_bull,kg N / animal / year,39.95,47,54.05,posnorm
+,N_excretion_heifer,kg N / animal / year,43.35,51,58.65,posnorm
+,N_exctretion_calf,kg N / animal / year,12.75,15,17.25,posnorm
+,N_excretion_hen,kg N / animal / year,0.6375,0.75,0.8625,posnorm
+,N_excretion_other_poultry,kg N / animal / year,0.136,0.16,0.184,posnorm
+,N_excretion_sheep,kg N / animal / year,14.45,17,19.55,posnorm
+,N_excretion_pig,kg N / animal / year,9.35,11,12.65,posnorm
+,n_sheep,individuals,5202.85,6121,7039.15,posnorm
+,n_pig,individuals,310630.8,365448,420265.2,posnorm
+share of cattle kept on liquid manure catchment systems,cattle_on_slurry,share,0.8835,0.93,0.9765,tnorm_0_1
+share of pig kept on liquid manure catchment systems,pig_on_slurry,share,0.7125,0.75,0.7875,tnorm_0_1
+"calculated as 1-rate in the Nährstoffreport, share of manure lost in storage process",cattle_housingloss_rate_liquid,share,0.1425,0.15,0.1575,tnorm_0_1
+,cattle_housingloss_rate_solid,share,0.285,0.3,0.315,tnorm_0_1
+,pig_housinglosss_rate_liquid,share,0.19,0.2,0.21,tnorm_0_1
+,pig_housinglosss_rate_solid,share,0.285,0.3,0.315,tnorm_0_1
+,others_housingloss_rate,share,0.38,0.4,0.42,tnorm_0_1
+,N_biogas_input,kg N,2155393.011,2535756.48,2916119.956,posnorm
+,share_N_biogas_input_animal,share,0.33,0.38,0.44,tnorm_0_1

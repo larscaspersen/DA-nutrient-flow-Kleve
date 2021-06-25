@@ -90,7 +90,23 @@ crop_function <- function(){
                                        N_leftover_potato,N_leftover_rye,
                                        N_leftover_sugar_beet,N_leftover_summer_barley,
                                        N_leftover_summer_wheat,N_leftover_triticale,
-                                       N_leftover_winter_barley,N_leftover_winter_wheat))
+                                       N_leftover_winter_barley,N_leftover_winter_wheat),
+                        share_leftover_straw = c(rep(0,4),straw_share,0,0,straw_share, 0, rep(straw_share,5)),
+                        share_to_animal = c(beans_to_animal,corn_to_animal,fodder_peas_to_animal,
+                                            mais_silage_to_animal,oat_to_animal, oilseed_rape_to_animal,
+                                            potato_to_animal, rye_to_animal, sugar_beet_to_animal,
+                                            summer_barley_to_animal, summer_wheat_to_animal,
+                                            triticale_to_animal, winter_barley_to_animal,
+                                            winter_wheat_to_animal),
+                        share_to_consumption = c(beans_to_consumption, corn_to_consumption,fodder_peas_to_consumption,
+                                                 mais_silage_to_consumption, oat_to_consumption,
+                                                 oilseed_rape_to_consumption, potato_to_ponsumption,
+                                                 rye_to_consumption, sugar_beet_to_sunsumption,
+                                                 summer_barley_to_consumption, summer_wheat_to_consumption,
+                                                 triticale_to_consumption, winter_barley_to_consumption,
+                                                 winter_wheat_to_consumption),
+                        share_to_biogas = c( rep(0,3), mais_silage_to_biogas, rep(0,10) ),
+                        through_processing = c( rep(1, 3), 0, rep(1, 2), 0.5, rep(1, 7) ) )
   
   #calculate absolute amount of ha per crop
   crop_df$land_absolute <- crop_df$land_share*arable_land
@@ -101,12 +117,67 @@ crop_function <- function(){
   #get N of consumable part
   crop_df$N_main <- crop_df$yield_total * crop_df$yield_share * crop_df$N_yield
   
+  #distributute main N by animal and human consumption and by with or without processing ----
+  
+  #human consumption with processing
+  crop_df$N_crop_human_consumption_processed <- crop_df$N_main * crop_df$share_to_consumption * crop_df$through_processing
+  
+  #human consumption without processing
+  crop_df$N_crop_human_consumption_unprocessed <- crop_df$N_main * crop_df$share_to_consumption * (1 - crop_df$through_processing)
+  
+  #to animal consumption without processing
+  crop_df$N_crop_animal_feeding_processed <- crop_df$N_main * crop_df$share_to_animal * crop_df$through_processing
+  
+  #to animal consumption without processing
+  crop_df$N_crop_animal_feeding_unprocessed <- crop_df$N_main * crop_df$share_to_animal * ( 1 - crop_df$through_processing )
+  
+  #to biogas
+  crop_df$N_crop_biogas <- crop_df$N_main * crop_df$share_to_biogas 
+  
   #get N of not consumable part
   crop_df$N_rest <- crop_df$yield_total * (1-crop_df$yield_share) * crop_df$N_leftover
   
+  #calculate N in straw which is used for animal bedding
+  crop_df$N_straw <- crop_df$N_rest * crop_df$share_leftover_straw
+  
+  #calculate N of crop which goes to animal feeding
+  
+  #sum up the columns of interest ----
   N_crop_main <- sum(crop_df$N_main)
+  
   N_crop_rest <- sum(crop_df$N_rest)
+  
+  N_straw <- sum(crop_df$N_straw)
+  
+  N_crop_human_consumption_processed <- sum(crop_df$N_crop_human_consumption_processed)
+  
+  N_crop_human_consumption_unprocessed <- sum(crop_df$N_crop_human_consumption_unprocessed)
+  
+  N_crop_animal_feeding_processed <- sum(crop_df$N_crop_animal_feeding_processed)
+  
+  N_crop_animal_feeding_unprocessed <- sum(crop_df$N_crop_animal_feeding_unprocessed)
+  
+  N_crop_biogas <- sum(crop_df$N_crop_biogas)
+  
+  
+  # grassland ----
+  N_grazing <- area_grassland * share_grazing * N_yield_grazing
+  
+  N_mowing <- area_grassland * (1 - share_grazing) * N_yield_mowing
+  
+  N_grassland <- N_grazing + N_mowing
+  
+  
+  
+  
+  
   return(list(N_crop_main = N_crop_main, N_crop_rest = N_crop_rest,
+              N_straw = N_straw, N_crop_human_consumption_processed = N_crop_human_consumption_processed,
+              N_crop_human_consumption_unprocessed = N_crop_human_consumption_unprocessed,
+              N_crop_animal_feeding_processed = N_crop_animal_feeding_processed,
+              N_crop_animal_feeding_unprocessed = N_crop_animal_feeding_unprocessed,
+              N_crop_biogas = N_crop_biogas,
+              N_grassland = N_grassland,
               share_beans = share_beans, share_corn = share_corn,
               share_fodder_peas = share_fodder_peas, share_mais_silage = share_mais_silage,
               share_oat = share_oat, share_oilseed_rape = share_oilseed_rape,
@@ -146,6 +217,43 @@ plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
                    method = "smooth_simple_overlay",
                    old_names = c("N_crop_main",'N_crop_rest'),
                    x_axis_name = 't N  / year')
+
+plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
+                   vars = c('N_straw'),
+                   method = "smooth_simple_overlay",
+                   old_names = c('N_straw'),
+                   x_axis_name = 't N  / year')
+
+plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
+                   vars = c('N_crop_human_consumption_unprocessed'),
+                   method = "smooth_simple_overlay",
+                   old_names = c('N_crop_human_consumption_unprocessed'),
+                   x_axis_name = 't N  / year')
+
+plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
+                   vars = c('N_crop_human_consumption_processed'),
+                   method = "smooth_simple_overlay",
+                   old_names = c('N_crop_human_consumption_processed'),
+                   x_axis_name = 't N  / year')
+
+plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
+                   vars = c('N_crop_animal_feeding_processed','N_crop_animal_feeding_unprocessed'),
+                   method = "smooth_simple_overlay",
+                   old_names = c('N_crop_animal_feeding_processed','N_crop_animal_feeding_unprocessed'),
+                   x_axis_name = 't N  / year')
+
+plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
+                   vars = c('N_crop_biogas'),
+                   method = "smooth_simple_overlay",
+                   old_names = c('N_crop_biogas'),
+                   x_axis_name = 't N  / year')
+
+plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
+                   vars = c('N_grassland'),
+                   method = "smooth_simple_overlay",
+                   old_names = c('N_grassland'),
+                   x_axis_name = 't N  / year')
+
 
 pls_result <- plsr.mcSimulation(object = nitrogen_mc_simulation,
                                 resultName = names(nitrogen_mc_simulation$y['N_crop_main']), ncomp = 1)
