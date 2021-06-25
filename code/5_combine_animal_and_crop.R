@@ -57,8 +57,8 @@ for(i in colnames(x)) assign(i,
 
 
 #read function etc from the scripts
-source('animal_model.R')
-source('crop_model.R')
+source('code/2_animal_model.R')
+source('code/3_crop_model.R')
 
 #combine the input files
 combined_input <- merge.data.frame(x = animal_input, y = crop_input, 
