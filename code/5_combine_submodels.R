@@ -2,9 +2,6 @@
 
 library(decisionSupport)
 
-#first test for nested function in decisionsupport
-
-animal_input <- read.csv('data/input-animal.csv')
 
 #function to draw random variables from input and create global variables
 make_variables<-function(est,n=1)
@@ -13,59 +10,23 @@ for(i in colnames(x)) assign(i,
                              as.numeric(x[1,i]),envir=.GlobalEnv)
 }
 
-#some tests regarding nested functions in decision support
-
-# make_variables(as.estimate(animal_input),n=1)
-# 
-# nested_function_1 <- function(n_eggs){
-#   #get N content of all eggs
-#   N_eggs <- n_eggs * `egg-weight` / 100 *  N_content_egg / 1000
-#   return(list(N_eggs = N_eggs))
-# }
-# 
-# nested_function_2 <- function(){
-#   #calculate amount of milk
-#   N_milk <- n_dairy_cow * milk_per_cow * N_content_milk
-#   return(list(N_milk = N_milk))
-# }
-# 
-# test_function <- function(){
-#   n_eggs <- egg_per_chicken * n_chicken
-#   egg_output <- nested_function_1(n_eggs)
-#   milk_output <- nested_function_2()
-#   #combine both outputs
-#   combined_output <- c(egg_output, milk_output)
-#   return(combined_output)
-# }
-# 
-# nitrogen_mc_simulation <- mcSimulation(estimate = as.estimate(animal_input),
-#                                        model_function = test_function,
-#                                        numberOfModelRuns = 10000,
-#                                        functionSyntax = "plainNames")
-# 
-# plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
-#                    vars = c("N_eggs"),
-#                    method = "smooth_simple_overlay",
-#                    old_names = c('N_eggs'),
-#                    x_axis_name = 'kg N  / year')
-
-#so it turns out that in nested functions, you only need to define newly inside 
-#the function created objects, but objects which are listed inside the input table
-#don't need to be specified in the function argument
-
-
-
-
 #read function etc from the scripts
 source('code/2_animal_model.R')
 source('code/3_crop_model.R')
+source('code/4_model_consumption.R')
 
 #combine the input files
-combined_input <- merge.data.frame(x = animal_input, y = crop_input, 
-                                   by.x = c('variable','lower','median','upper',
-                                            'distribution'),all.x = TRUE,all.y = TRUE)
+combined_input <- rbind.data.frame(crop_input, animal_input, consumption_input)
+
+#find and removed duplicates from input table (same inputs listed in two different input tables)
+#combined_input[duplicated(combined_input$variable),]
+combined_input <- combined_input[!duplicated(combined_input$variable),]
+
+make_variables(as.estimate(combined_input))
+
+
 #create function for mc-simulation
-crop_animal_combined <- function(){
+combined_function <- function(){
   
   #let the animla function run
   animal_output <- calc_animal(n_slaughter_dairy_cattle, n_slaughter_female_cattle,
@@ -157,6 +118,42 @@ crop_animal_combined <- function(){
                                area_grassland, share_grazing, N_yield_grazing,
                                N_yield_mowing)
   
+  #let consumption_submodel run
+  consumption_output <- calc_consume(population, 
+               consume_beef, N_content_beef,
+               consume_butter, N_content_butter,
+               consume_citrus_fruits, N_content_citrus_fruits,
+               consume_cocoa, N_content_cocoa,
+               consume_condensed_milk, N_content_condensed_milk,
+               consume_cream, N_content_cream,
+               consume_dried_fruit, N_content_dried_fruit,
+               consume_egg, N_content_egg,
+               consume_fish, N_content_fish,
+               consume_honey, N_content_honey,
+               consume_legumes, N_content_legumes,
+               consume_margarine, N_content_margarine,
+               consume_milk, N_content_milk,
+               consume_nuts, N_content_nuts,
+               consume_offal, N_contente_offal,
+               consume_other_meat, N_content_other_meat,
+               consume_pork, N_content_pork,
+               consume_potato, N_content_potato,
+               consume_potato_starch, N_content_potato_starch,
+               consume_poultry, N_content_poultry_meat,
+               consume_rice, N_content_rice,
+               consume_rye, N_content_rye,
+               consume_sheep, N_content_sheep_meat,
+               consume_sugar, N_content_sugar,
+               consume_tree_fruits, N_content_tree_fruits,
+               consume_vegetables, N_content_vegetables,
+               consume_wheat, N_content_wheat,
+               consume_coffee, N_content_coffee, convert_coffee,
+               consume_black_tea, N_content_black_tea, convert_black_tea,
+               consume_herb_tea, N_content_herb_tea, convert_herb_tea,
+               consume_sparkling_wine, N_content_sparkling_wine)
+  
+  
+  
   #calculate the amount of feed needed to be imported ----
   #= sum of products produced (egg, milk, meat (lifeweight) minus local feed (gras, fodder crops))
   
@@ -169,6 +166,34 @@ crop_animal_combined <- function(){
                           crop_output$N_crop_human_consumption_unprocessed
   
   feed_import <- animal_output_produced - animal_local_input
+  
+  
+  
+  #calculate degree of self-sufficiency for meat, egg and milk production
+  # animal_output$N_egg_available / consumption_output$consumed_N_egg
+  # animal_output$N_milk_available / consumption_output$consumed_N_dairy
+  # animal_output$N_meat_local_to_consumption / consumption_output$consumed_N_meat
+  #production of crops still not done, cant calculate the sufficiency ratio yet
+  
+  #imoport is consumption - local production, prevent that lower as zero
+  egg_import <- max(consumption_output$consumed_N_egg - animal_output$N_egg_available,0)
+  meat_import <- max(consumption_output$consumed_N_meat - animal_output$N_meat_local_to_consumption, 0)
+  dairy_import <- max(consumption_output$consumed_N_dairy - animal_output$N_milk_available, 0)
+  
+  other_food_import <- egg_import + dairy_import + meat_import + consumption_output$consumed_N_fish +
+                  consumption_output$consumed_N_foreign_vegetable
+  
+  #food exports (prevent negative exports if consumption exceeds the production)
+  egg_export <- max(animal_output$N_egg_available - consumption_output$consumed_N_egg, 0)
+  meat_export <- max(animal_output$N_meat_local_to_consumption - consumption_output$consumed_N_meat, 0) 
+  dairy_export <- max(animal_output$N_milk_available - consumption_output$consumed_N_dairy, 0)
+  #export of vegetal products is still missing
+  
+  #combine import and export to list
+  import_export <- list(egg_import = egg_import, meat_import = meat_import,
+                        dairy_import = dairy_import, other_food_import = other_food_import,
+                        egg_export = egg_export, meat_export = meat_export,
+                        dairy_export = dairy_export)
   
   
   #get a balance of N for animal subsystem----
@@ -184,14 +209,15 @@ crop_animal_combined <- function(){
                        export_org_fertilizer = export_org_fertilizer,
                        N_animal_in = N_animal_in,
                        N_animal_out = N_animal_out,
-                       N_animal_balance = N_animal_balance)
+                       N_animal_balance = N_animal_balance,
+                       consumption_output, import_export)
   
   return(combined_output)
 }
 
 #let mc simulation run, just to test if everything works out
 nitrogen_mc_simulation <- mcSimulation(estimate = as.estimate(combined_input),
-                                       model_function = crop_animal_combined,
+                                       model_function = combined_function,
                                        numberOfModelRuns = 10000,
                                        functionSyntax = "plainNames")
 
@@ -212,7 +238,79 @@ for(crop_i in crop){
   nitrogen_mc_simulation$x[crop_i] <- nitrogen_mc_simulation$y[crop_i]
 }
 
-#plots of flows in the model
+
+
+#other visualizations attempts ----
+#load needed libraries
+library(tidyverse)
+library(reshape2)
+library(ggridges)
+
+
+#assign output to new variable
+mc_simulation_output <- nitrogen_mc_simulation$y
+
+#melt df to make it ggplot-friendly
+mc_simulation_output_long <- melt(mc_simulation_output)
+
+#change output from kg to t
+mc_simulation_output_long$value <- mc_simulation_output_long$value / 1000
+
+
+
+mc_simulation_output_long %>%
+  filter(variable %in% c('N_straw','N_crop_animal_feeding_unprocessed','N_grassland',
+                         'N_crop_animal_feeding_processed','feed_import')) %>%
+  
+  ggplot(aes(x=value,y = variable,fill = variable)) +
+  geom_density_ridges_gradient(scale=2) + 
+  xlab('N [t per year]')+
+  ylab('flow leaving animal subsystem (without feed import)')+
+  theme_bw() +
+  theme(legend.position = "none")
+
+mc_simulation_output_long %>%
+  filter(variable %in% c('N_to_slaughter','N_meat_local_to_consumption','N_slaughter_waste',
+                         'N_egg_available','N_housing_loss', 'N_milk_available',
+                         'N_biogas_input_animal','export_org_fertilizer',
+                         'N_manure_to_crop')) %>%
+  
+  ggplot(aes(x=value,y = variable,fill = variable)) +
+  geom_density_ridges_gradient(scale=2) + 
+  xlab('N [t per year]')+
+  ylab('flow leaving animal subsystem (without feed import)')+
+  theme_bw() +
+  theme(legend.position = "none")
+
+mc_simulation_output_long %>%
+  filter(variable %in% c('egg_import','dairy_import',
+                         'meat_import', 'other_food_import')) %>%
+  ggplot(aes(x=value,y = variable,fill = variable)) +
+  geom_density_ridges_gradient(scale=2) + 
+  xlab('food import (without crops) N [t per year]')+
+  ylab('')+
+  theme_bw() +
+  theme(legend.position = "none")
+
+mc_simulation_output_long %>%
+  filter(variable %in% c('egg_export','dairy_export',
+                         'meat_export')) %>%
+  
+  ggplot(aes(x=value,y = variable,fill = variable)) +
+  geom_density_ridges_gradient(scale=2) + 
+  xlab('food export (without vegetables) N [t per year]')+
+  ylab('')+
+  theme_bw() +
+  theme(legend.position = "none")
+
+#calculate the amount of cases more eggs produced that consumed
+sum(mc_simulation_output$egg_export > 0) / 10000
+sum(mc_simulation_output$dairy_export > 0) / 10000
+sum(mc_simulation_output$meat_export > 0) / 10000
+
+
+
+#plots of flows out the animal subsystem
 plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
                    vars = c("N_to_slaughter",'N_meat_local_to_consumption','N_slaughter_waste'),
                    method = "smooth_simple_overlay",
@@ -261,6 +359,8 @@ plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
                    vars = c('feed_import'),
                    method = "smooth_simple_overlay",
                    x_axis_name = 'kg N  / year')
+
+
 
 #PLS----
 

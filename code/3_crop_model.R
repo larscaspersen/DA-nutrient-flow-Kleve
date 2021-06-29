@@ -14,7 +14,7 @@ for(i in colnames(x)) assign(i,
 crop_input$lower <- as.numeric(crop_input$lower)
 crop_input$upper <- as.numeric(crop_input$upper)
 
-make_variables(as.estimate(crop_input),n=1)
+#make_variables(as.estimate(crop_input),n=1)
 
 crop_function <- function(share_beans, share_corn, share_fodder_peas, 
                             share_mais_silage, share_oat, 

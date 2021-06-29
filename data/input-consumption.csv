@@ -1,0 +1,71 @@
+﻿description,variable,unit,lower,median,upper,distribution
+,population,persons,310329,310329,310329,const
+,consume_wheat,kg / person / year,58.5,65,71.5,posnorm
+,consume_rye,kg / person / year,6.84,7.6,8.36,posnorm
+,consume_rice,kg / person / year,4.59,5.1,5.61,posnorm
+,consume_legumes,kg / person / year,0.99,1.1,1.21,posnorm
+,consume_potato,kg / person / year,52.11,57.9,63.69,posnorm
+,consume_potato_starch,kg / person / year,9.63,10.7,11.77,posnorm
+,consume_sugar,kg / person / year,30.6,34,37.4,posnorm
+,consume_honey,kg / person / year,0.99,1.1,1.21,posnorm
+,consume_cocoa,kg / person / year,3.24,3.6,3.96,posnorm
+,consume_tree_fruits,kg / person / year,59.13,65.7,72.27,posnorm
+,consume_citrus_fruits,kg / person / year,32.85,36.5,40.15,posnorm
+,consume_nuts,kg / person / year,4.23,4.7,5.17,posnorm
+,consume_dried_fruit,kg / person / year,1.26,1.4,1.54,posnorm
+,consume_vegetables,kg / person / year,88.65,98.5,108.35,posnorm
+beef and veal,consume_beef,kg / person / year,12.6,14,15.4,posnorm
+pork meat,consume_pork,kg / person / year,45.09,50.1,55.11,posnorm
+sheep and goat meat,consume_sheep,kg / person / year,0.81,0.9,0.99,posnorm
+offal,consume_offal,kg / person / year,0.45,0.5,0.55,posnorm
+poultry,consume_poultry,kg / person / year,18.81,20.9,22.99,posnorm
+"other meat (game, rabbit)",consume_other_meat,kg / person / year,1.17,1.3,1.43,posnorm
+fish and fish products (catch weight),consume_fish,kg / person / year,12.69,14.1,15.51,posnorm
+fresh milk products,consume_milk,kg / person / year,75.51,83.9,92.29,posnorm
+cream,consume_cream,kg / person / year,5.4,6,6.6,posnorm
+condensed milk (product weight),consume_condensed_milk,kg / person / year,1.53,1.7,1.87,posnorm
+cheese incl. Cheese spread (product weight),consume_cheese,kg / person / year,22.23,24.7,27.17,posnorm
+butter (product weight),consume_butter,kg / person / year,5.4,6,6.6,posnorm
+margarine,consume_margarine,kg / person / year,2.43,2.7,2.97,posnorm
+,consume_beer,l / person,84.6,94.0,103.4,posnorm
+egg,consume_egg,kg / person / year,11.88,13.2,14.52,posnorm
+,consume_coffee,l / person,145.8,162,178.2,posnorm
+,consume_black_tea,l / person,23.76,26.4,29.04,posnorm
+,consume_herb_tea,l / person,48.06,53.4,58.74,posnorm
+,consume_sparkling_wine,l / person,3.123,3.47,3.817,posnorm
+,convert_coffee,g per liter,49.5,55,60.5,posnorm
+,convert_black_tea,g per liter,18,20,22,posnorm
+,convert_herb_tea,g per liter,18,20,22,posnorm
+,N_content_wheat,g N / 100 gram product,1.53,1.7,1.87,posnorm
+,N_content_rye,g N / 100 gram product,0.999,1.11,1.221,posnorm
+,N_content_rice,g N / 100 gram product,1.062,1.18,1.298,posnorm
+,N_content_legumes,g N / 100 gram product,0.945,1.05,1.155,posnorm
+,N_content_potato,g N / 100 gram product,0.297,0.33,0.363,posnorm
+,N_content_potato_starch,g N / 100 gram product,0.09,0.1,0.11,posnorm
+,N_content_sugar,g N / 100 gram product,0,0,0,const
+,N_content_honey,g N / 100 gram product,0.054,0.06,0.066,posnorm
+,N_content_cocoa,g N / 100 gram product,1.323,1.47,1.617,posnorm
+,N_content_tree_fruits,g N / 100 gram product,0.045,0.05,0.055,posnorm
+,N_content_citrus_fruits,g N / 100 gram product,0.099,0.11,0.121,posnorm
+,N_content_nuts,g N / 100 gram product,4.284,4.76,5.236,posnorm
+,N_content_dried_fruit,g N / 100 gram product,0.198,0.22,0.242,posnorm
+,N_content_vegetables,g N / 100 gram product,0.144,0.16,0.176,posnorm
+,N_content_beef,g N / 100 gram product,3.051,3.39,3.729,posnorm
+,N_content_pork,g N / 100 gram product,3.168,3.52,3.872,posnorm
+,N_content_sheep_meat,g N / 100 gram product,2.934,3.26,3.586,posnorm
+,N_content_offal,g N / 100 gram product,2.142,2.38,2.618,posnorm
+,N_content_poultry_meat,g N / 100 gram product,3.195,3.55,3.905,posnorm
+,N_content_other_meat,g N / 100 gram product,2.97,3.3,3.63,posnorm
+,N_content_fish,g N / 100 gram product,2.403,2.67,2.937,posnorm
+,N_content_milk,g N / 100 gram product,0.468,0.52,0.572,posnorm
+,N_content_cream,g N / 100 gram product,0.333,0.37,0.407,posnorm
+,N_content_condensed_milk,g N / 100 gram product,0.918,1.02,1.122,posnorm
+,N_content_cheese,g N / 100 gram product,3.6,4,4.4,posnorm
+,N_content_butter,g N / 100 gram product,0.099,0.11,0.121,posnorm
+,N_content_margarine,g N / 100 gram product,0.027,0.03,0.033,posnorm
+,N_content_egg,g N / 100 gram product,1.8,2,2.2,posnorm
+,N_content_beer,g N / 100 gram product,0.072,0.08,0.088,posnorm
+,N_content_coffee,g N / 100 gram product,2.016,2.24,2.464,posnorm
+,N_content_black_tea,g N / 100 gram product,3.528,3.92,4.312,posnorm
+,N_content_herb_tea,g N / 100 gram product,3.528,3.92,4.312,posnorm
+,N_content_sparkling_wine,g N / 100 gram product,0.027,0.03,0.033,posnorm

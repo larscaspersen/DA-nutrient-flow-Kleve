@@ -17,7 +17,7 @@ for(i in colnames(x)) assign(i,
                              as.numeric(x[1,i]),envir=.GlobalEnv)
 }
 
-make_variables(as.estimate(animal_input),n=1)
+#make_variables(as.estimate(animal_input),n=1)
 
 
 #detailed_input <- read.csv('data/input-table-detailed.csv')
@@ -150,7 +150,7 @@ calc_animal <- function(n_slaughter_dairy_cattle, n_slaughter_female_cattle,
   #milk production ----
   
   #total amount of N in milk
-  N_milk_produced <- n_dairy_cow * milk_per_cow * N_content_milk
+  N_milk_produced <- n_dairy_cow * milk_per_cow * N_content_milk / 100
   
   N_milk_available <- N_milk_produced * (share_milk_direct_sale +
                                            share_milk_other_use + share_milk_to_factory)
