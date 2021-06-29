@@ -2,7 +2,7 @@
 title: "Decision Analysis on nutrient flows in Kleve, Germany"
 author: "L. Caspersen"
 date: "6/29/2021"
-output: html_document
+output: github_document
 bibliography: references.bib
 ---
 
