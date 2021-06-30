@@ -1,5 +1,5 @@
-﻿label,variable,lower,median,upper,percent,distribution
-local animal products consumed,local_animal_products_consumed,1238.211,1482,1725.789,10%,posnorm
+label,variable,lower,median,upper,percent,distribution
+local animal products consumed (kg/yr),local_animal_products_consumed,1238.211,1482,1725.789,10%,posnorm
 sewage,sewage,1744.64275,1901,2057.35725,5%,posnorm
 waste water direct charge / remains in canalisation,waste_water_direct_charge,890.2175,970,1049.7825,5%,posnorm
 sewage sludge export,sewage_sludge_export,385.455,420,454.545,5%,posnorm
