@@ -21,7 +21,7 @@ for(i in colnames(x)) assign(i,
                              as.numeric(x[1,i]),envir=.GlobalEnv)
 }
 
-#draw random variables from nput table, so it is easier to define the model and try it out on the fly
+#draw random variables from input table, so it is easier to define the model and try it out on the fly
 #make_variables(as.estimate(input),n=1)
 
 #define the model
@@ -80,12 +80,24 @@ model_function <- function(){
   total_balance <- total_import - total_export
   
   #decide what to return from the monte-carlo simulation
-  return(list(consumption_in = consumption_in, consumption_out = consumption_out, consumption_balance = consumption_balance,
-              waste_in = waste_in, waste_out = waste_out, waste_balance = waste_balance,
-              crop_in = crop_in, crop_out = crop_out, crop_balance = crop_balance,
-              animal_in = animal_in, animal_out = animal_out, animal_balance = animal_balance,
-              processing_in = processing_in, processing_out = processing_out, processing_balance = processing_balance,
-              total_import = total_import, total_export = total_export, total_balance = total_balance))
+  return(list(consumption_in = consumption_in, 
+              consumption_out = consumption_out, 
+              consumption_balance = consumption_balance,
+              waste_in = waste_in, 
+              waste_out = waste_out, 
+              waste_balance = waste_balance,
+              crop_in = crop_in, 
+              crop_out = crop_out, 
+              crop_balance = crop_balance,
+              animal_in = animal_in, 
+              animal_out = animal_out, 
+              animal_balance = animal_balance,
+              processing_in = processing_in, 
+              processing_out = processing_out, 
+              processing_balance = processing_balance,
+              total_import = total_import, 
+              total_export = total_export, 
+              total_balance = total_balance))
 
 }
 
