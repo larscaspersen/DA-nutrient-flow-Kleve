@@ -5,7 +5,7 @@
 library(decisionSupport)
 
 #read input table
-#input <- read.csv('data/input-table.csv')
+input <- read.csv('data/input-table.csv')
 
 #x <- input$median
 #as.numeric(x[1])
@@ -20,6 +20,12 @@ make_variables<-function(est,n=1)
 for(i in colnames(x)) assign(i,
                              as.numeric(x[1,i]),envir=.GlobalEnv)
 }
+
+make_median<-function(est,n=1)
+{for(i in 1:length(est$variable)) assign(est$variable[i], est$median[i],envir=.GlobalEnv)
+}
+
+make_median(input)
 
 #draw random variables from nput table, so it is easier to define the model and try it out on the fly
 #make_variables(as.estimate(input),n=1)

@@ -11,12 +11,13 @@ for(i in colnames(x)) assign(i,
 }
 
 #read function etc from the scripts
-source('code/2_animal_model.R')
-source('code/3_crop_model.R')
-source('code/4_model_consumption.R')
+source('code/02_animal_model.R')
+source('code/03_crop_model.R')
+source('code/04_consumption_model.R')
+source('code/06_waste_submodel.R')
 
 #combine the input files
-combined_input <- rbind.data.frame(crop_input, animal_input, consumption_input)
+combined_input <- rbind.data.frame(crop_input, animal_input, consumption_input, waste_input)
 
 #find and removed duplicates from input table (same inputs listed in two different input tables)
 #combined_input[duplicated(combined_input$variable),]
@@ -152,6 +153,28 @@ combined_function <- function(){
                consume_herb_tea, N_content_herb_tea, convert_herb_tea,
                consume_sparkling_wine, N_content_sparkling_wine)
   
+  waste_output <- waste_function(waste_water,
+                                 N_content_wastewater,
+                                 lossrate_wastewater,
+                                 share_N_sewage_for_agriculture,
+                                 compost_to_horticulture,
+                                 compost_to_export,
+                                 compost_to_consumption,
+                                 dm_compost_consumption,
+                                 dm_compost_horticulture,
+                                 N_content_compost_consumption,
+                                 N_content_compost_horticulture,
+                                 ofmsw_import,
+                                 ofmsw_local,
+                                 green_waste_import,
+                                 green_waste_local,
+                                 grey_bin_food_waste,
+                                 grey_bin_garden_waste,
+                                 dm_green_waste,
+                                 dm_ofmsw,
+                                 N_content_ofmsw_waste,
+                                 N_content_green_waste)
+  
   
   
   #calculate the amount of feed needed to be imported ----
@@ -168,7 +191,15 @@ combined_function <- function(){
   feed_import <- animal_output_produced - animal_local_input
   
   
+  #biomass digestate (take imput of animal and crop, process it for waste subsystem)
+  lf_area <- arable_land + area_grassland
+  #get total kwel by biogas (based on the current amount of agricultural land), convestion factor is percentage, thus devide by 100
+  total_kwel <- lf_area * lf_to_kwel / 100
+  volume_digestate <- total_kwel  * Kwel_to_digestate
+  mass_digestate <- volume_digestate * digestate_density / 1000 #in tons. thus devide by 1000
+  N_digestate <- mass_digestate * digestate_N_content #result is kg
   
+
   #calculate degree of self-sufficiency for meat, egg and milk production
   # animal_output$N_egg_available / consumption_output$consumed_N_egg
   # animal_output$N_milk_available / consumption_output$consumed_N_dairy
@@ -205,12 +236,13 @@ combined_function <- function(){
   
   
   #combine output lists
-  combined_output <- c(animal_output, crop_output, feed_import = feed_import,
+  combined_output <- c(animal_output, crop_output, waste_output, consumption_output,
+                       feed_import = feed_import,
                        export_org_fertilizer = export_org_fertilizer,
+                       N_digestate = N_digestate,
                        N_animal_in = N_animal_in,
                        N_animal_out = N_animal_out,
-                       N_animal_balance = N_animal_balance,
-                       consumption_output, import_export)
+                       N_animal_balance = N_animal_balance,import_export)
   
   return(combined_output)
 }
@@ -316,6 +348,7 @@ plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
                    method = "smooth_simple_overlay",
                    old_names = c('N_to_slaughter','N_meat_local_to_consumption', 'N_slaughter_waste'),
                    x_axis_name = 'kg N  / year')
+?plot_distributions
 
 plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
                    vars = c('N_egg_available'),

@@ -129,6 +129,10 @@ calc_animal <- function(n_slaughter_dairy_cattle, n_slaughter_female_cattle,
   #total amount of Nitrogen that goes to the slaughterhouse
   slaughter_df$N_to_slaughter <- slaughter_df$total_weight / 100 * slaughter_df$N_content 
   
+  
+  
+  #the following calculations should be acutally in the processing subsystem
+  
   #total amount of N that can be consumed by customers
   slaughter_df$N_meat_consumption <- slaughter_df$total_weight * slaughter_df$edible_fraction / 100 * slaughter_df$N_content
   
@@ -141,9 +145,7 @@ calc_animal <- function(n_slaughter_dairy_cattle, n_slaughter_female_cattle,
   #total amount of N in the slaughter waster
   slaughter_df$N_slaughter_waste <- slaughter_df$total_slaughter_waste / 100 * slaughter_df$N_content
   
-  #
-  #c(sum(slaughter_df$N_to_slaughter),sum(slaughter_df$N_meat_consumption), sum(slaughter_df$N_slaughter_waste))
-  
+
   
   
   

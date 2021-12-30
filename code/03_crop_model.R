@@ -59,15 +59,23 @@ crop_function <- function(share_beans, share_corn, share_fodder_peas,
                           mais_silage_to_biogas,
                           area_grassland, share_grazing, N_yield_grazing,
                           N_yield_mowing){
-
+  
+  #correct land shares ----
+  #the land shares of the crops are randomly drawn, but they need to add up to 100%
+  #so add up everything and determine by how much each share needs to be corrected to reach 100%
+  #--> correction factor
+  
+  #sum of all shares
   estimated_crop_land <- share_beans + share_corn + share_fodder_peas + 
     share_mais_silage + share_oat + 
     share_oilseed_rape + share_potato +share_rye + share_sugar_beet + 
     share_summer_barley + share_summer_wheat + 
     share_triticale + share_winter_barley + share_winter_wheat
   
+  #calc correction factor
   correction_factor <- share_crop_land / estimated_crop_land
   
+  #apply correction factor to randomly drawn shares
   new_share_beans <- share_beans * correction_factor
   new_share_corn <- correction_factor * share_corn
   new_share_fodder_peas <- correction_factor * share_fodder_peas
@@ -87,12 +95,7 @@ crop_function <- function(share_beans, share_corn, share_fodder_peas,
   #I wonder if this correctio pushes values outside their upper and lower limits? 
   #####
   
-  round(sum(new_share_beans, new_share_corn, new_share_fodder_peas, new_share_mais_silage, 
-            new_share_oat, new_share_oilseed_rape, new_share_potato, new_share_rye, 
-            new_share_sugar_beet, new_share_summer_barley, new_share_summer_wheat, 
-            new_share_triticale, new_share_winter_barley, new_share_winter_wheat),3) == share_crop_land
-  
-  #bind to data frame
+  #bind all variables to data frame
   crop_df <- data.frame(crop = c('bean','corn', 'fodder_peas', 'mais_silage', 'oat',
                                   'oilseed_rape', 'potato', 'rye', 'sugar_beet', 
                                   'summer_barley', 'summer_wheat', 'triticale', 
@@ -159,6 +162,7 @@ crop_function <- function(share_beans, share_corn, share_fodder_peas,
   #get N of consumable part
   crop_df$N_main <- crop_df$yield_total * crop_df$yield_share * crop_df$N_yield
   
+  
   #distributute main N by animal and human consumption and by with or without processing ----
   
   #human consumption with processing
@@ -167,13 +171,17 @@ crop_function <- function(share_beans, share_corn, share_fodder_peas,
   #human consumption without processing
   crop_df$N_crop_human_consumption_unprocessed <- crop_df$N_main * crop_df$share_to_consumption * (1 - crop_df$through_processing)
   
-  #to animal consumption without processing
+  #to animal consumption with processing
   crop_df$N_crop_animal_feeding_processed <- crop_df$N_main * crop_df$share_to_animal * crop_df$through_processing
   
   #to animal consumption without processing
   crop_df$N_crop_animal_feeding_unprocessed <- crop_df$N_main * crop_df$share_to_animal * ( 1 - crop_df$through_processing )
   
+  
+  ######
   #to biogas
+  #(actually stream from crop to waste)
+  ######
   crop_df$N_crop_biogas <- crop_df$N_main * crop_df$share_to_biogas 
   
   #get N of not consumable part
@@ -182,7 +190,7 @@ crop_function <- function(share_beans, share_corn, share_fodder_peas,
   #calculate N in straw which is used for animal bedding
   crop_df$N_straw <- crop_df$N_rest * crop_df$share_leftover_straw
   
-  #calculate N of crop which goes to animal feeding
+
   
   #sum up the columns of interest ----
   N_crop_main <- sum(crop_df$N_main)
@@ -202,6 +210,81 @@ crop_function <- function(share_beans, share_corn, share_fodder_peas,
   N_crop_biogas <- sum(crop_df$N_crop_biogas)
   
   
+  
+  #vegetables +  frutis ----
+  
+  #NOTE: used N content of peas for green bean because no value in the excel file
+  #NOTE II: ha of vegetables add to only 60% of non-crop land
+  
+  #correct the vegetable land, so that it doesn't exceed the total
+  
+  horti_df <- data.frame(crop = c('apple','arugula','asparagus','berries','cabbage',
+                        'carrot','celery','green_bean','lambs_lettuce',
+                        'lettuce','onion', 'parley', 'pumpkin', 'radishes',
+                        'rhubarb', 'spinash', 'stone_fruit', 'strawberry',
+                        'sweet_corn', 'veggie_peas'),
+                         area_ha = c(land_apple_ha, land_arugula_ha,
+                         land_asparagus_ha, land_berries_ha,
+                         land_cabbage_ha, land_carrot_ha,
+                         land_celery_ha,
+                         land_green_bean_ha, land_lambs_lettuce_ha,
+                         land_lettuce_ha, land_onion_ha,
+                         land_parsley_ha,land_pumpkin_ha,
+                         land_radishes_ha, land_rhubarb_ha,
+                         land_spinash_ha, land_stone_fruit_ha,
+                         land_strawberry_ha, land_sweet_corn_ha,
+                         land_veggie_peas_ha),
+                         yield_dt_ha = c(yield_apple_dt_ha, yield_arugula_dt_ha,
+                                         yield_asparagus_dt_ha, yield_berries_dt_ha,
+                                         yield_cabbage_dt_ha, yield_carrot_dt_ha,
+                                         yield_celery_dt_ha, yield_green_bean_dt_ha,
+                                         yield_lambs_lettuce_dt_ha, yield_lettuce_dt_ha,
+                                         yield_onion_dt_ha, yield_parsley_dt_ha,
+                                         yield_pumpkin_dt_ha, yield_radishes_dt_ha,
+                                         yield_rhubarb_dt_ha, yield_spinash_dt_ha,
+                                         yield_stone_fruit_dt_ha, yield_strawberry_dt_ha,
+                                         yield_sweet_corn_dt_ha, yield_veggie_peas_dt_ha),
+                        N_content_gr_100gr = c(N_content_apple_gr_100gr,
+                                               N_content_arugula_gr_100gr,
+                                               N_content_asparagus_gr_100gr,
+                                               N_content_berries_gr_100gr,
+                                               N_content_cabbage_gr_100gr,
+                                               N_content_carrot_gr_100gr,
+                                               N_content_celery_gr_100gr,
+                                               N_content_green_bean_gr_100gr,
+                                               N_content_lambs_lettuce_gr_100gr,
+                                               N_content_lettuce_gr_100gr,
+                                               N_content_onion_gr_100gr,
+                                               N_content_parsley_gr_100gr,
+                                               N_content_pumpkin_gr_100gr,
+                                               N_content_radishes_gr_100gr,
+                                               N_content_rhubarb_gr_100gr,
+                                               N_content_spinash_gr_100gr,
+                                               N_content_stone_fruit_gr_100gr,
+                                               N_content_strawberry_gr_100gr,
+                                               N_content_sweet_corn_gr_100gr,
+                                               N_content_veggie_peas_gr_100gr))
+  
+  #calculate modelled horticultural land to actual land and calculate correction_factor
+  estimated_vegetable_land <- sum(horti_df$area_ha)
+  correction_factor <- land_horticulture_ha / estimated_vegetable_land
+  
+  
+  #correct the ha of the vegetables so that they add to total horticultural land
+  horti_df$corrected_area_ha <- horti_df$area_ha * correction_factor
+  
+  #calculate total yield of crop
+  horti_df$total_yield_kg <- horti_df$corrected_area_ha * horti_df$yield_dt_ha * 100
+  
+  #calculate total N (kg)
+  horti_df$total_N_kg <- horti_df$total_yield_kg * horti_df$N_content_gr_100gr * 10 / 1000
+  
+  #get total N from horticultural production
+  horti_N_kg <- sum(horti_df$total_N_kg)
+  
+  
+  
+  
   # grassland ----
   N_grazing <- area_grassland * share_grazing * N_yield_grazing
   
@@ -209,6 +292,14 @@ crop_function <- function(share_beans, share_corn, share_fodder_peas,
   
   N_grassland <- N_grazing + N_mowing
   
+  
+  # import of inorganic fertilizers ----
+  
+  #in bernous file there is only a total amount of inflow, so we still need to link it
+  #with the actual crops produced?
+  
+  
+
   
   
   
@@ -226,7 +317,29 @@ crop_function <- function(share_beans, share_corn, share_fodder_peas,
               share_potato = new_share_potato, share_rye = new_share_rye, 
               share_sugar_beet = new_share_sugar_beet, share_summer_barley = new_share_summer_barley,
               share_summer_wheat = new_share_summer_wheat, share_triticale = new_share_triticale,
-              share_winter_barley = new_share_winter_barley, share_winter_wheat = new_share_winter_wheat))
+              share_winter_barley = new_share_winter_barley, share_winter_wheat = new_share_winter_wheat,
+              land_apple_ha = horti_df$corrected_area_ha[1],  
+              land_arugula_ha = horti_df$corrected_area_ha[2],
+              land_asparagus_ha = horti_df$corrected_area_ha[3], 
+              land_berries_ha = horti_df$corrected_area_ha[4],
+              land_cabbage_ha = horti_df$corrected_area_ha[5],
+              land_carrot_ha = horti_df$corrected_area_ha[6],
+              land_celery_ha = horti_df$corrected_area_ha[7],
+              land_green_bean_ha = horti_df$corrected_area_ha[8],
+              land_lambs_lettuce_ha = horti_df$corrected_area_ha[9],
+              land_lettuce_ha = horti_df$corrected_area_ha[10],
+              land_onion_ha = horti_df$corrected_area_ha[11],
+              land_parsley_ha = horti_df$corrected_area_ha[12],
+              land_pumpkin_ha = horti_df$corrected_area_ha[13],
+              land_radishes_ha = horti_df$corrected_area_ha[14],
+              land_rhubarb_ha = horti_df$corrected_area_ha[15],
+              land_spinash_ha = horti_df$corrected_area_ha[16],
+              land_stone_fruit_ha = horti_df$corrected_area_ha[17],
+              land_strawberry_ha = horti_df$corrected_area_ha[18],
+              land_sweet_corn_ha = horti_df$corrected_area_ha[19],
+              land_veggie_peas_ha = horti_df$corrected_area_ha[20],
+              total_N_horticulture = horti_N_kg
+              ))
 }
 
 # nitrogen_mc_simulation <- mcSimulation(estimate = as.estimate(crop_input),

@@ -1,121 +1,189 @@
 ﻿description,variable,unit,lower,median,upper,distribution
-Winter wheat,share_winter_wheat,,0.169,,0.253,tnorm_0_1
-Summer wheat (weizen),share_summer_wheat,,0.0008,,0.0012,tnorm_0_1
-Rye (rogge),share_rye,,0.0008,,0.0012,tnorm_0_1
-Winter barley (gerste),share_winter_barley,,0.057,,0.085,tnorm_0_1
-Summer barley,share_summer_barley,,0.002,,0.004,tnorm_0_1
-Common oat (hafer),share_oat,,0.0008,,0.0012,tnorm_0_1
-Triticale,share_triticale,,0.011,,0.017,tnorm_0_1
-Corn mais 2,share_corn,,0.033,,0.049,tnorm_0_1
-Fodder peas (erbsen),share_fodder_peas,,0.005,,0.007,tnorm_0_1
-Beans (ackerbohnen),share_beans,,0.012,,0.018,tnorm_0_1
-winter koolzaad (raps),share_oilseed_rape,,0.018,,0.026,tnorm_0_1
-Potato 3,share_potato,,0.095,,0.143,tnorm_0_1
-Sugar beet 4,share_sugar_beet,,0.057,,0.085,tnorm_0_1
-Mais silage 5,share_mais_silage,,0.264,,0.396,tnorm_0_1
-total share of arable land,share_crop_land,,0.906,,0.906,const
-arable land in ha,arable_land,,49585,,49585,const
-Winter wheat,yield_winter_wheat,,70.13,,94.88,posnorm
-Summer wheat (weizen),yield_summer_wheat,,57.04,,77.17,posnorm
-Rye (rogge),yield_rye,,42.67,,57.73,posnorm
-Winter barley (gerste),yield_winter_barley,,58.74,,79.47,posnorm
-Summer barley,yield_summer_barley,,52.87,,71.53,posnorm
-Common oat (hafer),yield_oat,,49.98,,67.62,posnorm
-Triticale,yield_triticale,,59.5,,80.5,posnorm
-Corn mais 2,yield_corn,,62.05,,83.95,posnorm
-Fodder peas (erbsen),yield_fodder_peas,,42.84,,57.96,posnorm
-Beans (ackerbohnen),yield_beans,,35.7,,48.3,posnorm
-winter koolzaad (raps),yield_oilseed_rape,,33.83,,45.77,posnorm
-Potato 3,yield_potato,,514.25,,695.75,posnorm
-Sugar beet 4,yield_sugar_beet,,576.3,,779.7,posnorm
-Mais silage 5,yield_mais_silage,,351.05,,474.95,posnorm
-Winter wheat,dm_winter_wheat,,0.82,,0.9,tnorm_0_1
-Summer wheat,dm_summer_wheat,,0.82,,0.9,tnorm_0_1
-Rye,dm_rye,,0.82,,0.9,tnorm_0_1
-Winter barley,dm_winter_barley,,0.82,,0.9,tnorm_0_1
-Summer barley,dm_summer_barley,,0.82,,0.9,tnorm_0_1
-Oat,dm_oat,,0.82,,0.9,tnorm_0_1
-Triticale,dm_triticale,,0.82,,0.9,tnorm_0_1
-Corn,dm_corn,,0.82,,0.9,tnorm_0_1
-Fodder peas,dm_fodder_peas,,0.82,,0.9,tnorm_0_1
-Beans,dm_beans,,0.82,,0.9,tnorm_0_1
-Oilseed rape,dm_oilseed_rape,,0.86,,0.96,tnorm_0_1
-Potato,dm_potato,,0.21,,0.23,tnorm_0_1
-Sugar beet,dm_sugar_beet,,0.22,,0.24,tnorm_0_1
-Mais silage,dm_mais_silage,,0.31,,0.35,tnorm_0_1
-Winter wheat,N_yield_winter_weat,,1.58,,1.93,posnorm
-Summer wheat,N_yield_summer_weat,,1.58,,1.93,posnorm
-Rye,N_yield_rye,,1.42,,1.74,posnorm
-Winter barley,N_yield_winter_barley,,1.55,,1.89,posnorm
-Summer barley,N_yield_summer_barley,,1.55,,1.89,posnorm
-Oat,N_yield_oat,,1.42,,1.74,posnorm
-Triticale,N_yield_triticale,,1.55,,1.89,posnorm
-Corn,N_yield_corn,,1.31,,1.6,posnorm
-Fodder peas,N_yield_fodder_peas,,3.24,,3.96,posnorm
-Beans,N_yield_beans,,3.69,,4.51,posnorm
-Oilseed rape,N_yield_oilseed_rape,,3.02,,3.69,posnorm
-Potato,N_yield_potato,,0.32,,0.39,posnorm
-Sugar beet,N_yield_sugar_beet,,0.16,,0.2,posnorm
-Mais silage,N_yield_mais_silage,,0.72,,0.88,posnorm
-Winter wheat,N_leftover_winter_wheat,,0.48,,0.53,posnorm
-Summer wheat,N_leftover_summer_wheat,,0.48,,0.53,posnorm
-Rye,N_leftover_rye,,0.48,,0.53,posnorm
-Winter barley,N_leftover_winter_barley,,0.48,,0.53,posnorm
-Summer barley,N_leftover_summer_barley,,0.48,,0.53,posnorm
-Oat,N_leftover_oat,,0.48,,0.53,posnorm
-Triticale,N_leftover_triticale,,0.48,,0.53,posnorm
-Corn,N_leftover_corn,,0.86,,0.95,posnorm
-Fodder peas,N_leftover_foder_peas,,1.43,,1.58,posnorm
-Beans,N_leftover_beans,,1.43,,1.58,posnorm
-Oilseed rape,N_leftover_oilseed_rape,,0.67,,0.74,posnorm
-Potato,N_leftover_potato,,0.19,,0.21,posnorm
-Sugar beet,N_leftover_sugar_beet,,0.38,,0.42,posnorm
-Mais silage,N_leftover_mais_silage,,0,,0,const
-Winter wheat,yield_share_winter_wheat,,0.42,,0.47,tnorm_0_1
-Summer wheat,yield_share_summer_wheat,,0.42,,0.47,tnorm_0_1
-Rye,yield_share_rye,,0.45,,0.5,tnorm_0_1
-Winter barley,yield_share_winter_barley,,0.39,,0.43,tnorm_0_1
-Summer barley,yield_share_summer_barley,,0.42,,0.47,tnorm_0_1
-Oat,yield_share_oat,,0.5,,0.55,tnorm_0_1
-Triticale,yield_share_triticale,,0.45,,0.5,tnorm_0_1
-Corn,yield_share_corn,,0.48,,0.53,tnorm_0_1
-Fodder peas,yield_share_fodder_peas,,0.48,,0.53,tnorm_0_1
-Beans,yield_share_beans,,0.48,,0.53,tnorm_0_1
-Oilseed rape,yield_share_oilseed_rape,,0.6,,0.66,tnorm_0_1
-Potato,yield_share_potato,,0.16,,0.18,tnorm_0_1
-Sugar beet,yield_share_sugar_beet,,0.39,,0.43,tnorm_0_1
-Mais silage,yield_share_mais_silage,,1,,1,const
-share of straw harvested and used for animal bedding of cereals,straw_share,,0.33,,0.33,const
-Winter wheat,winter_wheat_to_animal,,0,,0,const
-Summer wheat,summer_wheat_to_animal,,0,,0,const
-Rye,rye_to_animal,,1,,1,const
-Winter barley,winter_barley_to_animal,,1,,1,const
-Summer barley,summer_barley_to_animal,,0.5,,0.5,const
-Common oat,oat_to_animal,,0.5,,0.5,const
-Triticale,triticale_to_animal,,1,,1,const
-Corn,corn_to_animal,,0,,0,const
-Fodder peas,fodder_peas_to_animal,,1,,1,const
-Beans,beans_to_animal,,1,,1,const
-Oilseed rape,oilseed_rape_to_animal,,0.5,,0.5,const
-Potato,potato_to_animal,,0.25,,0.25,const
-Sugar beet,sugar_beet_to_animal,,0.5,,0.5,const
-Mais silage,mais_silage_to_animal,,0.75,,0.75,const
-Winter wheat,winter_wheat_to_consumption,,1,,1,const
-Summer wheat,summer_wheat_to_consumption,,1,,1,const
-Rye,rye_to_consumption,,0,,0,const
-Winter barley,winter_barley_to_consumption,,0,,0,const
-Summer barley,summer_barley_to_consumption,,0.5,,0.5,const
-Common oat,oat_to_consumption,,0.5,,0.5,const
-Triticale,triticale_to_consumption,,0,,0,const
-Corn,corn_to_consumption,,1,,1,const
-Fodder peas,fodder_peas_to_consumption,,0,,0,const
-Beans,beans_to_consumption,,0,,0,const
-Oilseed rape,oilseed_rape_to_consumption,,0.5,,0.5,const
-Potato,potato_to_ponsumption,,0.75,,0.75,const
-Sugar beet,sugar_beet_to_sunsumption,,0.5,,0.5,const
-Mais silage,mais_silage_to_consumption,,0,,0,const
-,mais_silage_to_biogas,,0.25,,0.25,const
-,area_grassland,,21254,,21254,const
-share of grazzland grazed; mowing is 1- the value,share_grazing,,0.4,,0.6,tnorm_0_1
-"grazing, N harvested kg/ha",N_yield_grazing,,117,,143,posnorm
-"silage mowing (max 20% hay), N harvested kg/ha",N_yield_mowing,,220.5,,269.5,posnorm
+Winter wheat,share_winter_wheat,,0.169,0.211,0.253,tnorm_0_1
+Summer wheat (weizen),share_summer_wheat,,0.0008,0.001,0.0012,tnorm_0_1
+Rye (rogge),share_rye,,0.0008,0.001,0.0012,tnorm_0_1
+Winter barley (gerste),share_winter_barley,,0.057,0.071,0.085,tnorm_0_1
+Summer barley,share_summer_barley,,0.002,0.003,0.004,tnorm_0_1
+Common oat (hafer),share_oat,,0.0008,0.001,0.0012,tnorm_0_1
+Triticale,share_triticale,,0.011,0.014,0.017,tnorm_0_1
+Corn mais 2,share_corn,,0.033,0.041,0.049,tnorm_0_1
+Fodder peas (erbsen),share_fodder_peas,,0.005,0.006,0.007,tnorm_0_1
+Beans (ackerbohnen),share_beans,,0.012,0.015,0.018,tnorm_0_1
+winter koolzaad (raps),share_oilseed_rape,,0.018,0.022,0.026,tnorm_0_1
+Potato 3,share_potato,,0.095,0.119,0.143,tnorm_0_1
+Sugar beet 4,share_sugar_beet,,0.057,0.071,0.085,tnorm_0_1
+Mais silage 5,share_mais_silage,,0.264,0.33,0.396,tnorm_0_1
+total share of arable land,share_crop_land,,0.906,0.906,0.906,const
+arable land in ha,arable_land,,49585,49585,49585,const
+Winter wheat,yield_winter_wheat,,70.13,82.5,94.88,posnorm
+Summer wheat (weizen),yield_summer_wheat,,57.04,67.1,77.17,posnorm
+Rye (rogge),yield_rye,,42.67,50.2,57.73,posnorm
+Winter barley (gerste),yield_winter_barley,,58.74,69.1,79.47,posnorm
+Summer barley,yield_summer_barley,,52.87,62.2,71.53,posnorm
+Common oat (hafer),yield_oat,,49.98,58.8,67.62,posnorm
+Triticale,yield_triticale,,59.5,70,80.5,posnorm
+Corn mais 2,yield_corn,,62.05,73,83.95,posnorm
+Fodder peas (erbsen),yield_fodder_peas,,42.84,50.4,57.96,posnorm
+Beans (ackerbohnen),yield_beans,,35.7,42,48.3,posnorm
+winter koolzaad (raps),yield_oilseed_rape,,33.83,39.8,45.77,posnorm
+Potato 3,yield_potato,,514.25,605,695.75,posnorm
+Sugar beet 4,yield_sugar_beet,,576.3,678,779.7,posnorm
+Mais silage 5,yield_mais_silage,,351.05,413,474.95,posnorm
+Winter wheat,dm_winter_wheat,,0.82,0.86,0.9,tnorm_0_1
+Summer wheat,dm_summer_wheat,,0.82,0.86,0.9,tnorm_0_1
+Rye,dm_rye,,0.82,0.86,0.9,tnorm_0_1
+Winter barley,dm_winter_barley,,0.82,0.86,0.9,tnorm_0_1
+Summer barley,dm_summer_barley,,0.82,0.86,0.9,tnorm_0_1
+Oat,dm_oat,,0.82,0.86,0.9,tnorm_0_1
+Triticale,dm_triticale,,0.82,0.86,0.9,tnorm_0_1
+Corn,dm_corn,,0.82,0.86,0.9,tnorm_0_1
+Fodder peas,dm_fodder_peas,,0.82,0.86,0.9,tnorm_0_1
+Beans,dm_beans,,0.82,0.86,0.9,tnorm_0_1
+Oilseed rape,dm_oilseed_rape,,0.86,0.91,0.96,tnorm_0_1
+Potato,dm_potato,,0.21,0.22,0.23,tnorm_0_1
+Sugar beet,dm_sugar_beet,,0.22,0.23,0.24,tnorm_0_1
+Mais silage,dm_mais_silage,,0.31,0.33,0.35,tnorm_0_1
+Winter wheat,N_yield_winter_weat,,1.58,1.75,1.93,posnorm
+Summer wheat,N_yield_summer_weat,,1.58,1.75,1.93,posnorm
+Rye,N_yield_rye,,1.42,1.58,1.74,posnorm
+Winter barley,N_yield_winter_barley,,1.55,1.72,1.89,posnorm
+Summer barley,N_yield_summer_barley,,1.55,1.72,1.89,posnorm
+Oat,N_yield_oat,,1.42,1.58,1.74,posnorm
+Triticale,N_yield_triticale,,1.55,1.72,1.89,posnorm
+Corn,N_yield_corn,,1.31,1.45,1.6,posnorm
+Fodder peas,N_yield_fodder_peas,,3.24,3.6,3.96,posnorm
+Beans,N_yield_beans,,3.69,4.1,4.51,posnorm
+Oilseed rape,N_yield_oilseed_rape,,3.02,3.35,3.69,posnorm
+Potato,N_yield_potato,,0.32,0.35,0.39,posnorm
+Sugar beet,N_yield_sugar_beet,,0.16,0.18,0.2,posnorm
+Mais silage,N_yield_mais_silage,,0.72,0.8,0.88,posnorm
+Winter wheat,N_leftover_winter_wheat,,0.48,0.5,0.53,posnorm
+Summer wheat,N_leftover_summer_wheat,,0.48,0.5,0.53,posnorm
+Rye,N_leftover_rye,,0.48,0.5,0.53,posnorm
+Winter barley,N_leftover_winter_barley,,0.48,0.5,0.53,posnorm
+Summer barley,N_leftover_summer_barley,,0.48,0.5,0.53,posnorm
+Oat,N_leftover_oat,,0.48,0.5,0.53,posnorm
+Triticale,N_leftover_triticale,,0.48,0.5,0.53,posnorm
+Corn,N_leftover_corn,,0.86,0.9,0.95,posnorm
+Fodder peas,N_leftover_foder_peas,,1.43,1.5,1.58,posnorm
+Beans,N_leftover_beans,,1.43,1.5,1.58,posnorm
+Oilseed rape,N_leftover_oilseed_rape,,0.67,0.7,0.74,posnorm
+Potato,N_leftover_potato,,0.19,0.2,0.21,posnorm
+Sugar beet,N_leftover_sugar_beet,,0.38,0.4,0.42,posnorm
+Mais silage,N_leftover_mais_silage,,0,0,0,const
+Winter wheat,yield_share_winter_wheat,,0.42,0.444444444,0.47,tnorm_0_1
+Summer wheat,yield_share_summer_wheat,,0.42,0.444444444,0.47,tnorm_0_1
+Rye,yield_share_rye,,0.45,0.473684211,0.5,tnorm_0_1
+Winter barley,yield_share_winter_barley,,0.39,0.411764706,0.43,tnorm_0_1
+Summer barley,yield_share_summer_barley,,0.42,0.444444444,0.47,tnorm_0_1
+Oat,yield_share_oat,,0.5,0.523809524,0.55,tnorm_0_1
+Triticale,yield_share_triticale,,0.45,0.473684211,0.5,tnorm_0_1
+Corn,yield_share_corn,,0.48,0.5,0.53,tnorm_0_1
+Fodder peas,yield_share_fodder_peas,,0.48,0.5,0.53,tnorm_0_1
+Beans,yield_share_beans,,0.48,0.5,0.53,tnorm_0_1
+Oilseed rape,yield_share_oilseed_rape,,0.6,0.62962963,0.66,tnorm_0_1
+Potato,yield_share_potato,,0.16,0.166666667,0.18,tnorm_0_1
+Sugar beet,yield_share_sugar_beet,,0.39,0.411764706,0.43,tnorm_0_1
+Mais silage,yield_share_mais_silage,,1,1,1,const
+share of straw harvested and used for animal bedding of cereals,straw_share,,0.33,0.33,0.33,const
+Winter wheat,winter_wheat_to_animal,,0,0,0,const
+Summer wheat,summer_wheat_to_animal,,0,0,0,const
+Rye,rye_to_animal,,1,1,1,const
+Winter barley,winter_barley_to_animal,,1,1,1,const
+Summer barley,summer_barley_to_animal,,0.5,0.5,0.5,const
+Common oat,oat_to_animal,,0.5,0.5,0.5,const
+Triticale,triticale_to_animal,,1,1,1,const
+Corn,corn_to_animal,,0,0,0,const
+Fodder peas,fodder_peas_to_animal,,1,1,1,const
+Beans,beans_to_animal,,1,1,1,const
+Oilseed rape,oilseed_rape_to_animal,,0.5,0.5,0.5,const
+Potato,potato_to_animal,,0.25,0.25,0.25,const
+Sugar beet,sugar_beet_to_animal,,0.5,0.5,0.5,const
+Mais silage,mais_silage_to_animal,,0.75,0.75,0.75,const
+Winter wheat,winter_wheat_to_consumption,,1,1,1,const
+Summer wheat,summer_wheat_to_consumption,,1,1,1,const
+Rye,rye_to_consumption,,0,0,0,const
+Winter barley,winter_barley_to_consumption,,0,0,0,const
+Summer barley,summer_barley_to_consumption,,0.5,0.5,0.5,const
+Common oat,oat_to_consumption,,0.5,0.5,0.5,const
+Triticale,triticale_to_consumption,,0,0,0,const
+Corn,corn_to_consumption,,1,1,1,const
+Fodder peas,fodder_peas_to_consumption,,0,0,0,const
+Beans,beans_to_consumption,,0,0,0,const
+Oilseed rape,oilseed_rape_to_consumption,,0.5,0.5,0.5,const
+Potato,potato_to_ponsumption,,0.75,0.75,0.75,const
+Sugar beet,sugar_beet_to_sunsumption,,0.5,0.5,0.5,const
+Mais silage,mais_silage_to_consumption,,0,0,0,const
+,mais_silage_to_biogas,,0.25,0.25,0.25,const
+,area_grassland,,21254,"21,254",21254,const
+share of grazzland grazed; mowing is 1- the value,share_grazing,,0.4,0.5,0.6,tnorm_0_1
+"grazing, N harvested kg/ha",N_yield_grazing,,117,130,143,posnorm
+"silage mowing (max 20% hay), N harvested kg/ha",N_yield_mowing,,220.5,245,269.5,posnorm
+,N_biogas_input,kg N,2155393.011,2535756.48,2916119.956,posnorm
+,share_N_biogas_input_animal,share,0.33,0.38,0.44,tnorm_0_1
+sweet_corn,land_sweet_corn_ha,,13.5,15,16.5,posnorm
+veggie_peas,land_veggie_peas_ha,,531,590,649,posnorm
+cabbage,land_cabbage_ha,,180,200,220,posnorm
+arugula,land_arugula_ha,,45,50,55,posnorm
+pumpkin,land_pumpkin_ha,,81,90,99,posnorm
+onion,land_onion_ha,,144,160,176,posnorm
+carrot,land_carrot_ha,,306,340,374,posnorm
+green_bean,land_green_bean_ha,,139.5,155,170.5,posnorm
+lambs_lettuce,land_lambs_lettuce_ha,,90,100,110,posnorm
+lettuce,land_lettuce_ha,,288,320,352,posnorm
+spinash,land_spinash_ha,,36,40,44,posnorm
+radishes,land_radishes_ha,,36,40,44,posnorm
+celery,land_celery_ha,,94.5,105,115.5,posnorm
+parsley,land_parsley_ha,,22.5,25,27.5,posnorm
+strawberry,land_strawberry_ha,,49.5,55,60.5,posnorm
+apple,land_apple_ha,,45,50,55,posnorm
+stone_fruit,land_stone_fruit_ha,,18,20,22,posnorm
+berries,land_berries_ha,,121.5,135,148.5,posnorm
+rhubarb,land_rhubarb_ha,,9,10,11,posnorm
+asparagus,land_asparagus_ha,,261,290,319,posnorm
+horticultural area,land_horticulture_ha,,2790,2790,2790,const
+sweet_corn,yield_sweet_corn_dt_ha,,84.51,93.9,103.29,posnorm
+veggie_peas,yield_veggie_peas_dt_ha,,56.88,63.2,69.52,posnorm
+cabbage,yield_cabbage_dt_ha,,634.77,705.3,775.83,posnorm
+arugula,yield_arugula_dt_ha,,125.01,138.9,152.79,posnorm
+pumpkin,yield_pumpkin_dt_ha,,324.36,360.4,396.44,posnorm
+onion,yield_onion_dt_ha,,463.77,515.3,566.83,posnorm
+carrot,yield_carrot_dt_ha,,539.01,598.9,658.79,posnorm
+green_bean,yield_green_bean_dt_ha,,106.02,117.8,129.58,posnorm
+lambs_lettuce,yield_lambs_lettuce_dt_ha,,100.89,112.1,123.31,posnorm
+lettuce,yield_lettuce_dt_ha,,318.96,354.4,389.84,posnorm
+spinash,yield_spinash_dt_ha,,204.12,226.8,249.48,posnorm
+radishes,yield_radishes_dt_ha,,467.82,519.8,571.78,posnorm
+celery,yield_celery_dt_ha,,394.92,438.8,482.68,posnorm
+parsley,yield_parsley_dt_ha,,19.3185,21,23.6115,posnorm
+strawberry,yield_strawberry_dt_ha,,87.3,97,106.7,posnorm
+apple,yield_apple_dt_ha,,229.5,255,280.5,posnorm
+stone_fruit,yield_stone_fruit_dt_ha,,87.3,97,106.7,posnorm
+berries,yield_berries_dt_ha,,112.5,125,137.5,posnorm
+rhubarb,yield_rhubarb_dt_ha,,248.76,276.4,304.04,posnorm
+asparagus,yield_asparagus_dt_ha,,25.92,28.8,31.68,posnorm
+sweet_corn,N_content_sweet_corn_gr_100gr,,0.468,0.52,0.572,posnorm
+veggie_peas,N_content_veggie_peas_gr_100gr,,0.945,1.05,1.155,posnorm
+cabbage,N_content_cabbage_gr_100gr,,0.198,0.22,0.242,posnorm
+arugula,N_content_arugula_gr_100gr,,0.378,0.42,0.462,posnorm
+pumpkin,N_content_pumpkin_gr_100gr,,0.162,0.18,0.198,posnorm
+onion,N_content_onion_gr_100gr,,0.171,0.19,0.209,posnorm
+carrot,N_content_carrot_gr_100gr,,0.144,0.16,0.176,posnorm
+green_bean,N_content_green_bean_gr_100gr,,0.945,1.05,1.155,posnorm
+lambs_lettuce,N_content_lambs_lettuce_gr_100gr,,0.261,0.29,0.319,posnorm
+lettuce,N_content_lettuce_gr_100gr,,0.171,0.19,0.209,posnorm
+spinash,N_content_spinash_gr_100gr,,0.405,0.45,0.495,posnorm
+radishes,N_content_radishes_gr_100gr,,0.216,0.24,0.264,posnorm
+celery,N_content_celery_gr_100gr,,0.171,0.19,0.209,posnorm
+parsley,N_content_parsley_gr_100gr,,0.639,0.71,0.781,posnorm
+strawberry,N_content_strawberry_gr_100gr,,0.117,0.13,0.143,posnorm
+apple,N_content_apple_gr_100gr,,0.045,0.05,0.055,posnorm
+stone_fruit,N_content_stone_fruit_gr_100gr,,0.09,0.1,0.11,posnorm
+berries,N_content_berries_gr_100gr,,0.162,0.18,0.198,posnorm
+rhubarb,N_content_rhubarb_gr_100gr,,0.09,0.1,0.11,posnorm
+asparagus,N_content_asparagus_gr_100gr,,0.279,0.31,0.341,posnorm
+amount of digestate staying in Kleve,N_digestate_kg_ha,,12.69,14.1,15.51,posnorm
+import of inorganic fertilizer based on the ha,import_inorganic_N_kg_ha,,100,112.5,125,posnorm
+taken from Nährstoffreport,import_organic_N_kg,,1125822.6,1250914,1376005.4,posnorm
+taken from Nährstoffreport,export_manure_N_kg,,1692378,1880420,2068462,posnorm
+calculated from total export - animal derived export,export_other_organic_N_kg,,391309.2,434788,478266.8,posnorm
