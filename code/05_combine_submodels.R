@@ -29,7 +29,7 @@ make_variables(as.estimate(combined_input))
 #create function for mc-simulation
 combined_function <- function(){
   
-  #let the animla function run
+  #ANIMAL SUBSYSTEM
   animal_output <- calc_animal(n_slaughter_dairy_cattle, n_slaughter_female_cattle,
                                n_slaughter_bulls, n_slaughter_oxes, n_slaughter_younstock_youngage,
                                n_slaughter_younstock_midage, n_slaughter_pig,
@@ -74,7 +74,7 @@ combined_function <- function(){
                                N_biogas_input, share_N_biogas_input_animal,
                                export_org_fertilizer)
   
-  #let crop function run
+  #CROP SUBSYSTEM
   crop_output <- crop_function(share_beans, share_corn, share_fodder_peas, 
                                share_mais_silage, share_oat, 
                                share_oilseed_rape, share_potato, share_rye,
@@ -119,7 +119,7 @@ combined_function <- function(){
                                area_grassland, share_grazing, N_yield_grazing,
                                N_yield_mowing)
   
-  #let consumption_submodel run
+  #CONSUMPTION SUBSYSTEM
   consumption_output <- calc_consume(population, 
                consume_beef, N_content_beef,
                consume_butter, N_content_butter,
@@ -153,6 +153,7 @@ combined_function <- function(){
                consume_herb_tea, N_content_herb_tea, convert_herb_tea,
                consume_sparkling_wine, N_content_sparkling_wine)
   
+  #WASTE SUBSYSTEM
   waste_output <- waste_function(waste_water,
                                  N_content_wastewater,
                                  lossrate_wastewater,
@@ -174,6 +175,44 @@ combined_function <- function(){
                                  dm_ofmsw,
                                  N_content_ofmsw_waste,
                                  N_content_green_waste)
+  
+  
+  #BIOGAS
+  #(interaction of crop and animal subsystem, that is why it needs to be calculated here)
+  
+  #manure going to biogas ----
+  N_biogas_input_animal <- N_biogas_input * share_N_biogas_input_animal
+  
+  
+  #N_crop_biogas contains sofar only maize, but there are also other crops like sugar beet used
+  #so the gap of animal based input and crop(actually maize based) input is then taken again from N_crop
+  
+  N_biogas_crop_missing <- N_biogas_input - (crop_output$N_crop_biogas + N_biogas_input_animal)
+  
+  #55% of additional biomass comes from cover crops, green rye and other crop sources
+  #--> take it from the "rest" stream of the crop production, so reduced the stream by that
+  crop_output$N_crop_rest <- crop_output$N_crop_rest - (0.55 * N_biogas_crop_missing)
+  
+  #20.4% comes from processed human crop food (sugar beet, cereals)
+  crop_output$N_crop_human_consumption_processed <- crop_output$N_crop_human_consumption_processed - (0.204 * N_biogas_crop_missing)
+  
+  #14.2% comes from grass based sources 
+  crop_output$N_grassland <- crop_output$N_grassland - (0.142 * N_biogas_crop_missing)
+  
+  #10.6% comes from processed animal food (cereal silage)
+  crop_output$N_crop_animal_feeding_processed <- crop_output$N_crop_animal_feeding_processed - (0.106 * N_biogas_crop_missing)
+  
+  #update the crop biogas iput (because in the crop out it was sofar only maize)
+  crop_output$N_crop_biogas <- N_biogas_input - N_biogas_input_animal
+  
+  
+   
+
+  #manure going to crops ----
+  N_manure_to_crop <- animal_output$N_remaining_manure - N_biogas_input_animal - export_org_fertilizer
+  
+
+  
   
   
   
@@ -198,6 +237,10 @@ combined_function <- function(){
   volume_digestate <- total_kwel  * Kwel_to_digestate
   mass_digestate <- volume_digestate * digestate_density / 1000 #in tons. thus devide by 1000
   N_digestate <- mass_digestate * digestate_N_content #result is kg
+  
+  #wastewater from consumption that doesnt reach the waste subsystem (remains in canal or direct discharge)
+  #needs to be calculated here, because not part of the waste subsystem, but variable defined already in waste input file
+  N_wastewater_direct_discharge <- (wastewater_direct_discharge + wastewater_remain_canal) * 1000 * N_content_wastewater / 1000000
   
 
   #calculate degree of self-sufficiency for meat, egg and milk production
@@ -235,11 +278,20 @@ combined_function <- function(){
   N_animal_balance <- N_animal_in - N_animal_out
   
   
+  
+  
+  #check if in output is everything which was calculated additionally in the combined version of 
+  #all submodels
+  
+  
   #combine output lists
   combined_output <- c(animal_output, crop_output, waste_output, consumption_output,
                        feed_import = feed_import,
                        export_org_fertilizer = export_org_fertilizer,
                        N_digestate = N_digestate,
+                       N_manure_to_crop = N_manure_to_crop,
+                       N_biogas_input_animal = N_biogas_input_animal,
+                       N_wastewater_direct_discharge = N_wastewater_direct_discharge,
                        N_animal_in = N_animal_in,
                        N_animal_out = N_animal_out,
                        N_animal_balance = N_animal_balance,import_export)
