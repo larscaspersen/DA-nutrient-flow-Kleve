@@ -67,7 +67,7 @@ calc_animal <- function(n_slaughter_dairy_cattle, n_slaughter_female_cattle,
                         cattle_housingloss_rate_liquid, cattle_housingloss_rate_solid,
                         pig_housinglosss_rate_liquid, pig_housinglosss_rate_solid,
                         others_housingloss_rate,
-                        N_biogas_input, share_N_biogas_input_animal,
+                        N_biogas_input, 
                         export_org_fertilizer ){
   
   #slaughtering -----
@@ -196,11 +196,7 @@ calc_animal <- function(n_slaughter_dairy_cattle, n_slaughter_female_cattle,
   manure_df$N_manure_remaining <- manure_df$N_total_manure - manure_df$N_housing_loss
   
   
-  #manure going to biogas ----
-  N_biogas_input_animal <- N_biogas_input * share_N_biogas_input_animal
-  
-  #manure going to crops ----
-  N_manure_to_crop <- sum(manure_df$N_manure_remaining) - N_biogas_input_animal - export_org_fertilizer
+
   
   
   return(list(N_to_slaughter = sum(slaughter_df$N_to_slaughter),
@@ -210,9 +206,7 @@ calc_animal <- function(n_slaughter_dairy_cattle, n_slaughter_female_cattle,
               N_egg_available = N_egg_available,
               N_total_manure = sum(manure_df$N_total_manure),
               N_housing_loss = sum(manure_df$N_housing_loss),
-              N_remaining_manure = sum(manure_df$N_manure_remaining),
-              N_biogas_input_animal = N_biogas_input_animal,
-              N_manure_to_crop = N_manure_to_crop))
+              N_remaining_manure = sum(manure_df$N_manure_remaining)))
   
 }
 
