@@ -119,7 +119,6 @@ Mais silage,mais_silage_to_consumption,,0,0,0,const
 share of grazzland grazed; mowing is 1- the value,share_grazing,,0.4,0.5,0.6,tnorm_0_1
 "grazing, N harvested kg/ha",N_yield_grazing,,117,130,143,posnorm
 "silage mowing (max 20% hay), N harvested kg/ha",N_yield_mowing,,220.5,245,269.5,posnorm
-,N_biogas_input,kg N,2155393.011,2535756.48,2916119.956,posnorm
 ,share_N_biogas_input_animal,share,0.33,0.38,0.44,tnorm_0_1
 sweet_corn,land_sweet_corn_ha,,13.5,15,16.5,posnorm
 veggie_peas,land_veggie_peas_ha,,531,590,649,posnorm
@@ -183,7 +182,14 @@ berries,N_content_berries_gr_100gr,,0.162,0.18,0.198,posnorm
 rhubarb,N_content_rhubarb_gr_100gr,,0.09,0.1,0.11,posnorm
 asparagus,N_content_asparagus_gr_100gr,,0.279,0.31,0.341,posnorm
 amount of digestate staying in Kleve,N_digestate_kg_ha,,12.69,14.1,15.51,posnorm
-import of inorganic fertilizer based on the ha,import_inorganic_N_kg_ha,,100,112.5,125,posnorm
+import of inorganic fertilizer based on the ha,import_inorganic_N_kg_LF,kg per LF,100,112.5,125,posnorm
 taken from Nährstoffreport,import_organic_N_kg,,1125822.6,1250914,1376005.4,posnorm
 taken from Nährstoffreport,export_manure_N_kg,,1692378,1880420,2068462,posnorm
 calculated from total export - animal derived export,export_other_organic_N_kg,,391309.2,434788,478266.8,posnorm
+yearly precipitation sum taken from climate-data.org,precipitation_sum,mm,848,848,848,const
+average ackerzahl,ackerzahl,,54,60,66,posnorm
+livestock density,livestock_density,LU per ha,1.6,1.85,2.1,posnorm
+Nährstoffbericht said only larger than 160,fertilization_rate,kg per ha per year,160,170,180,posnorm
+from unvermeidbare nährstoffverluste,ammonia_loss_rate_fertilizer,,0.018,0.02,0.022,tnorm_0_1
+share of groundwater influenced grasslands,share_gorundwater_influenced_grassland,,0.09,0.1,0.11,tnorm_0_1
+pauschale ammoniak verluste ackerland,flatrate_ammonia_losses,,3.6,4,4.4,posnorm

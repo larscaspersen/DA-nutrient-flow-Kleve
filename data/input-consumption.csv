@@ -27,7 +27,7 @@ condensed milk (product weight),consume_condensed_milk,kg / person / year,1.53,1
 cheese incl. Cheese spread (product weight),consume_cheese,kg / person / year,22.23,24.7,27.17,posnorm
 butter (product weight),consume_butter,kg / person / year,5.4,6,6.6,posnorm
 margarine,consume_margarine,kg / person / year,2.43,2.7,2.97,posnorm
-,consume_beer,l / person,84.6,94.0,103.4,posnorm
+,consume_beer,l / person,84.6,94,103.4,posnorm
 egg,consume_egg,kg / person / year,11.88,13.2,14.52,posnorm
 ,consume_coffee,l / person,145.8,162,178.2,posnorm
 ,consume_black_tea,l / person,23.76,26.4,29.04,posnorm
@@ -69,3 +69,5 @@ egg,consume_egg,kg / person / year,11.88,13.2,14.52,posnorm
 ,N_content_black_tea,g N / 100 gram product,3.528,3.92,4.312,posnorm
 ,N_content_herb_tea,g N / 100 gram product,3.528,3.92,4.312,posnorm
 ,N_content_sparkling_wine,g N / 100 gram product,0.027,0.03,0.033,posnorm
+amount of waste water remaining in channel,wastewater_remain_canal,m3,990900,1101000,1211100,posnorm
+direct discharge of wastewater to ground and surface water,wastewater_direct_discharge,m3,11570400,12856000,14141600,posnorm
