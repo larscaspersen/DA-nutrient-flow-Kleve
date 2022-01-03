@@ -14,7 +14,7 @@ for(i in colnames(x)) assign(i,
 crop_input$lower <- as.numeric(crop_input$lower)
 crop_input$upper <- as.numeric(crop_input$upper)
 
-#make_variables(as.estimate(crop_input),n=1)
+make_variables(as.estimate(crop_input),n=1)
 
 crop_function <- function(share_beans, share_corn, share_fodder_peas, 
                             share_mais_silage, share_oat, 
@@ -195,9 +195,11 @@ crop_function <- function(share_beans, share_corn, share_fodder_peas,
   #sum up the columns of interest ----
   N_crop_main <- sum(crop_df$N_main)
   
-  N_crop_rest <- sum(crop_df$N_rest)
-  
   N_straw <- sum(crop_df$N_straw)
+  
+  #part which neither straw nor consumable yield
+  N_crop_rest <- sum(crop_df$N_rest) - N_straw
+  
   
   N_crop_human_consumption_processed <- sum(crop_df$N_crop_human_consumption_processed)
   
@@ -285,6 +287,150 @@ crop_function <- function(share_beans, share_corn, share_fodder_peas,
   
   
   
+  # import of inorganic fertilizers ----
+  #this is only coupled to the LF, but it should be affected by the amount of available animal N otherwise
+  imported_inorganic_N <- import_inorganic_N_kg_LF * (area_grassland + arable_land)
+  
+  
+  
+  #N losses
+  if(precipitation_sum < 600){
+    
+    if(ackerzahl <45){
+      
+      arable_N_leached <- 30 * arable_land
+      
+    } else if(ackerzahl >= 45 & ackerzahl <= 65){
+      
+      arable_N_leached <- 25 * arable_land
+      
+    } else if(ackerzahl >65 & ackerzahl <= 85){
+      
+      arable_N_leached <- 15 * arable_land
+      
+    } else if(ackerzahl > 85){
+      
+      arable_N_leached <- 5 * arable_land
+      
+    }
+    
+  } else if(precipitation_sum >= 600 & precipitation_sum <= 750 ){
+    
+    if(ackerzahl <45){
+      
+      arable_N_leached <- 35 * arable_land
+      
+    } else if(ackerzahl >= 45 & ackerzahl <= 65){
+      
+      arable_N_leached <- 30 * arable_land
+      
+    } else if(ackerzahl >65 & ackerzahl <= 85){
+      
+      arable_N_leached <- 20 * arable_land
+      
+    } else if(ackerzahl > 85){
+      
+      arable_N_leached <- 10 * arable_land
+      
+    }
+    
+  } else if(precipitation_sum > 750){
+    
+    if(ackerzahl <45){
+      
+      arable_N_leached <- 40 * arable_land
+      
+    } else if(ackerzahl >= 45 & ackerzahl <= 65){
+      
+      arable_N_leached <- 35 * arable_land
+      
+    } else if(ackerzahl >65 & ackerzahl <= 85){
+      
+      arable_N_leached <- 25 * arable_land
+      
+    } else if(ackerzahl > 85){
+      
+      arable_N_leached <- 15 * arable_land
+      
+    }
+  }
+  
+  
+  #modifiy arable N losses by certain criteria:
+  #fertilization intensity of organic fertilizer
+  #fertilization intensity of inorganic fertilizer
+  #share of vulnerable crops
+  
+  if(livestock_density < 0.5){
+    arable_N_leached <- arable_N_leached
+  } else if(livestock_density >= 0.5 & livestock_density <= 1){
+    arable_N_leached <- arable_N_leached * 1.1
+  }  else if(livestock_density > 1 & livestock_density <= 1.5){
+    arable_N_leached <- arable_N_leached * 1.2
+  }  else if(livestock_density > 1.5 & livestock_density <= 2.0){
+    arable_N_leached <- arable_N_leached * 1.3
+  }  else if(livestock_density > 2 & livestock_density <= 2.5){
+    arable_N_leached <- arable_N_leached * 1.45
+  }  else if(livestock_density  > 2.5){
+    arable_N_leached <- arable_N_leached * 1.6
+  } 
+  
+  #additional losses depending inorganic fertilization regime
+  if(fertilization_rate < 50){
+    arable_N_leached <- arable_N_leached
+  }  else if(fertilization_rate >= 50 & fertilization_rate <= 100){
+    arable_N_leached <- arable_N_leached * 1.2
+  } else if(fertilization_rate > 100 & fertilization_rate <= 150){
+    arable_N_leached <- arable_N_leached * 1.3
+  } else if(fertilization_rate > 150 & fertilization_rate <= 200){
+    arable_N_leached <- arable_N_leached * 1.4
+  } else if(fertilization_rate > 200){
+    arable_N_leached <- arable_N_leached * 1.6
+  }
+  
+  #additional losses if high share of loss vulnerable crops
+  share_vulnerable_area <- share_beans + share_fodder_peas + share_oilseed_rape + (land_horticulture_ha / (land_horticulture_ha+arable_land))
+  
+  if(share_vulnerable_area < 0.20){
+    arable_N_leached <- arable_N_leached
+  } else if(share_vulnerable_area >= 0.20 & share_vulnerable_area <= 0.45){
+    arable_N_leached <- arable_N_leached * 1.3
+  } else if(share_vulnerable_area > 0.45 & share_vulnerable_area <= 0.70){
+    arable_N_leached <- arable_N_leached * 1.5
+  } else if(share_vulnerable_area > 0.7){
+    arable_N_leached <- arable_N_leached * 1.8
+  }
+  
+  #arable land amminioa losses
+  
+  #roughly 2% of applied inorganic fertilizer
+  arable_ammonia_losses <-  import_organic_N_kg * ammonia_loss_rate_fertilizer
+  
+  
+  #in the manual for unvermeidbare düngungsverluste it sais there is a constant loss of 4 kg N which is added ontop after modifying
+  #mostly for losses from plant material, especially if mulch is used intensively
+  
+  arable_ammonia_losses <- arable_ammonia_losses + (arable_land * flatrate_ammonia_losses) 
+  
+  #further losses if ammonia rich fertilizer is applied, ignored for now
+  
+  
+  #further N losses from grassland (leached)
+  grassland_N_losses <- (area_grassland * share_gorundwater_influenced_grassland * 30) + 
+                        (area_grassland * (1-share_gorundwater_influenced_grassland) * 20)
+  
+  
+  inevitable_N_losses <- grassland_N_losses + arable_ammonia_losses + arable_N_leached
+  
+  
+  
+  #add rapeseed, peas, beans and horticultural area together
+  #if larger than 20 then add extra share of losses to loss calculation
+  #(quite unlikely, because by current numbers ~15%)
+  
+  
+  
+  
   # grassland ----
   N_grazing <- area_grassland * share_grazing * N_yield_grazing
   
@@ -293,11 +439,7 @@ crop_function <- function(share_beans, share_corn, share_fodder_peas,
   N_grassland <- N_grazing + N_mowing
   
   
-  # import of inorganic fertilizers ----
-  
-  #in bernous file there is only a total amount of inflow, so we still need to link it
-  #with the actual crops produced?
-  
+
   
 
   
@@ -338,7 +480,8 @@ crop_function <- function(share_beans, share_corn, share_fodder_peas,
               land_strawberry_ha = horti_df$corrected_area_ha[18],
               land_sweet_corn_ha = horti_df$corrected_area_ha[19],
               land_veggie_peas_ha = horti_df$corrected_area_ha[20],
-              total_N_horticulture = horti_N_kg
+              total_N_horticulture = horti_N_kg,
+              imported_inorganic_N = imported_inorganic_N
               ))
 }
 
@@ -421,3 +564,5 @@ crop_function <- function(share_beans, share_corn, share_fodder_peas,
 # 
 # #evpi <- multi_EVPI(mc = mcSimulation_table, first_out_var = "N_crop_main")
 # #plot_evpi(evpi, decision_vars = "N_crop_main")
+
+
