@@ -287,6 +287,7 @@ combined_function <- function(){
   
   #extract the flows shown in Bernous model and return those
   #give them same name as in the chart
+  #also I need to return the correct area of crops and horticultural products, because the original input got adjusted in the submodel
   combined_output <- list(sewage = waste_output$N_sewage_in,
                           ofmsw_residual_waste = waste_output$N_grey_bin_food_waste + waste_output$N_grey_bin_garden_waste,
                           ofmsw = waste_output$N_ofmsw_local + waste_output$N_green_waste_local,
@@ -326,7 +327,44 @@ combined_function <- function(){
                           import_inorganic_fertilizer = crop_output$imported_inorganic_N,
                           import_organic_fertilizer = import_organic_N_kg,
                           net_food_import = total_food_import,
-                          net_feed_import = feed_import)
+                          net_feed_import = feed_import,
+        
+                          share_beans = crop_output$share_winter_wheat, 
+                          share_corn = crop_output$share_corn,
+                          share_fodder_peas = crop_output$share_fodder_peas, 
+                          share_mais_silage = crop_output$share_mais_silage,
+                          share_oat = crop_output$share_oat, 
+                          share_oilseed_rape = crop_output$share_oilseed_rape,
+                          share_potato = crop_output$share_potato, 
+                          share_rye = crop_output$share_rye, 
+                          share_sugar_beet = crop_output$share_sugar_beet, 
+                          share_summer_barley = crop_output$share_summer_barley,
+                          share_summer_wheat = crop_output$share_summer_wheat, 
+                          share_triticale = crop_output$share_triticale,
+                          share_winter_barley = crop_output$share_winter_barley, 
+                          share_winter_wheat = crop_output$share_winter_wheat,
+                          
+                          land_apple_ha = crop_output$land_apple_ha,  
+                          land_arugula_ha = crop_output$land_arugula_ha,
+                          land_asparagus_ha = crop_output$land_asparagus_ha, 
+                          land_berries_ha = crop_output$land_berries_ha,
+                          land_cabbage_ha = crop_output$land_cabbage_ha,
+                          land_carrot_ha = crop_output$land_carrot_ha,
+                          land_celery_ha = crop_output$land_celery_ha,
+                          land_green_bean_ha = crop_output$land_green_bean_ha,
+                          land_lambs_lettuce_ha = crop_output$land_lambs_lettuce_ha,
+                          land_lettuce_ha = crop_output$land_lettuce_ha,
+                          land_onion_ha = crop_output$land_onion_ha,
+                          land_parsley_ha = crop_output$land_parsley_ha,
+                          land_pumpkin_ha = crop_output$land_pumpkin_ha,
+                          land_radishes_ha = crop_output$land_radishes_ha,
+                          land_rhubarb_ha = crop_output$land_rhubarb_ha,
+                          land_spinash_ha = crop_output$land_spinash_ha,
+                          land_stone_fruit_ha = crop_output$land_stone_fruit_ha,
+                          land_strawberry_ha = crop_output$land_strawberry_ha,
+                          land_sweet_corn_ha = crop_output$land_sweet_corn_ha,
+                          land_veggie_peas_ha = crop_output$land_veggie_peas_ha
+                          )
   
   return(combined_output)
 }
@@ -334,7 +372,7 @@ combined_function <- function(){
 #let mc simulation run, just to test if everything works out
 nitrogen_mc_simulation <- mcSimulation(estimate = as.estimate(combined_input),
                                        model_function = combined_function,
-                                       numberOfModelRuns = 10000,
+                                       numberOfModelRuns = 100,
                                        functionSyntax = "plainNames")
 
 #correct the crop shares in the input table of the mcsimulation object ----
@@ -349,6 +387,21 @@ crop = c('beans','corn', 'fodder_peas', 'mais_silage', 'oat',
 crop <- paste('share_', crop, sep = '')
 
 #replace initial shares (in x) with corrected shares (from y)
+for(crop_i in crop){
+  print(crop_i)
+  nitrogen_mc_simulation$x[crop_i] <- nitrogen_mc_simulation$y[crop_i]
+}
+
+
+#do also correction for horticulture products
+crop <- c('apple','arugula','asparagus','berries','cabbage',
+          'carrot','celery','green_bean','lambs_lettuce',
+          'lettuce','onion', 'parsley', 'pumpkin', 'radishes',
+          'rhubarb', 'spinash', 'stone_fruit', 'strawberry',
+          'sweet_corn', 'veggie_peas')
+
+crop <- paste0('land_', crop, '_ha')
+
 for(crop_i in crop){
   print(crop_i)
   nitrogen_mc_simulation$x[crop_i] <- nitrogen_mc_simulation$y[crop_i]
@@ -373,11 +426,64 @@ mc_simulation_output_long <- melt(mc_simulation_output)
 mc_simulation_output_long$value <- mc_simulation_output_long$value / 1000
 
 
+#classify which stream belongs to which subsystem
+#we always use streams leaving a system to decide to which subsystem it belongs to
+#e.g. manure going to crop belongs to the animal subsystem
+
+streams_df <- rbind.data.frame(c('sewage', 'consumption', 'waste'),
+                               c('ofmsw_residual_waste', 'consumption', 'waste'),
+                               c('ofmsw','consumption','waste'),
+                               c('wastewater','consumption','export'),
+                               c('compost_to_consumption','waste','consumption'),
+                               c('digestate','waste','crop'),
+                               c('sewage_sludge_export','waste','export'),
+                               c('wastewater_effluent_gaseous_losses','waste','export'),
+                               c('fresh_compost_export','waste','export'),
+                               c('fresh_compost_crop','waste','crop'),
+                               c('sewage_to_crop','waste','crop'),
+                               c('vegetal_biogas_substrate','crop','waste'),
+                               c('crop_cultivation_losses','crop','export'),
+                               c('other_organic_fertilizer_export','crop','export'),
+                               c('straw','crop','animal'),
+                               c('feed_crops','crop','animal'),
+                               c('grassbased_feed','crop','animal'),
+                               c('fruit_and_vegetable','crop','processing'),
+                               c('food_and_feed_crops','crop','processing'),
+                               c('manure_as_biogas_substrate','animal','waste'),
+                               c('manure_to_crop','animal','crop'),
+                               c('manure_export','animal','export'),
+                               c('animal_housing_and_storage_losses','animal','export'),
+                               c('slaughter_animal','animal','processing'),
+                               c('egg_and_dairy','animal','processing'),
+                               c('local_vegetal_products_consumed','processing','consumption'),
+                               c('imported_animal_products','processing','consumption'),
+                               c('imported_vegetal_products','processing','consumption'),
+                               c('feed_from_processed_crops','processing','animal'),
+                               c('import_processed_feed','processing','animal'),
+                               c('local_animal_products_consumed','processing','consumption'),
+                               c('export_meat','processing','export'),
+                               c('import_meat','import','processing'),
+                               c('export_egg','processing','export'),
+                               c('slaughter_waste','processing','export'),
+                               c('import_OFMSW','import','waste'),
+                               c('import_inorganic_fertilizer','import','crop'),
+                               c('import_organic_fertilizer','import','crop'),
+                               c('net_food_import','import','processing'),
+                               c('net_feed_import','import','processing'))
+
+#adjust column names
+names(streams_df) <- c('flow', 'origin', 'destination')
+
+#make origin and destination factor
+streams_df$origin <- as.factor(streams_df$origin)
+streams_df$destination <- as.factor(streams_df$destination)
+
+
+
+
 
 mc_simulation_output_long %>%
-  filter(variable %in% c('N_straw','N_crop_animal_feeding_unprocessed','N_grassland',
-                         'N_crop_animal_feeding_processed','feed_import')) %>%
-  
+  filter(variable %in% streams_df$flow[streams_df$origin == 'animal']) %>%
   ggplot(aes(x=value,y = variable,fill = variable)) +
   geom_density_ridges_gradient(scale=2) + 
   xlab('N [t per year]')+
@@ -385,12 +491,9 @@ mc_simulation_output_long %>%
   theme_bw() +
   theme(legend.position = "none")
 
+
 mc_simulation_output_long %>%
-  filter(variable %in% c('N_to_slaughter','N_meat_local_to_consumption','N_slaughter_waste',
-                         'N_egg_available','N_housing_loss', 'N_milk_available',
-                         'N_biogas_input_animal','export_org_fertilizer',
-                         'N_manure_to_crop')) %>%
-  
+  filter(variable %in% streams_df$flow[streams_df$destination == 'animal']) %>%
   ggplot(aes(x=value,y = variable,fill = variable)) +
   geom_density_ridges_gradient(scale=2) + 
   xlab('N [t per year]')+
@@ -398,91 +501,109 @@ mc_simulation_output_long %>%
   theme_bw() +
   theme(legend.position = "none")
 
-mc_simulation_output_long %>%
-  filter(variable %in% c('egg_import','dairy_import',
-                         'meat_import', 'other_food_import')) %>%
-  ggplot(aes(x=value,y = variable,fill = variable)) +
-  geom_density_ridges_gradient(scale=2) + 
-  xlab('food import (without crops) N [t per year]')+
-  ylab('')+
-  theme_bw() +
-  theme(legend.position = "none")
-
-mc_simulation_output_long %>%
-  filter(variable %in% c('egg_export','dairy_export',
-                         'meat_export')) %>%
-  
-  ggplot(aes(x=value,y = variable,fill = variable)) +
-  geom_density_ridges_gradient(scale=2) + 
-  xlab('food export (without vegetables) N [t per year]')+
-  ylab('')+
-  theme_bw() +
-  theme(legend.position = "none")
-
-#calculate the amount of cases more eggs produced that consumed
-sum(mc_simulation_output$egg_export > 0) / 10000
-sum(mc_simulation_output$dairy_export > 0) / 10000
-sum(mc_simulation_output$meat_export > 0) / 10000
 
 
 
-#plots of flows out the animal subsystem
-plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
-                   vars = c("N_to_slaughter",'N_meat_local_to_consumption','N_slaughter_waste'),
-                   method = "smooth_simple_overlay",
-                   old_names = c('N_to_slaughter','N_meat_local_to_consumption', 'N_slaughter_waste'),
-                   x_axis_name = 'kg N  / year')
-?plot_distributions
-
-plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
-                   vars = c('N_egg_available'),
-                   method = "smooth_simple_overlay",
-                   old_names = c('N_egg_available'),
-                   x_axis_name = 'kg N  / year')
-
-plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
-                   vars = c('N_milk_available'),
-                   method = "smooth_simple_overlay",
-                   old_names = c('N_milk_available'),
-                   x_axis_name = 'kg N  / year')
-
-plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
-                   vars = c('N_housing_loss','N_biogas_input_animal','export_org_fertilizer'),
-                   method = "smooth_simple_overlay",
-                   x_axis_name = 'kg N  / year')
-
-plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
-                   vars = c('N_manure_to_crop'),
-                   method = "smooth_simple_overlay",
-                   x_axis_name = 'kg N  / year')
-
-#plots flow entering the system
-plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
-                   vars = c("N_straw"),
-                   method = "smooth_simple_overlay",
-                   x_axis_name = 'kg N  / year')
-
-plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
-                   vars = c('N_crop_animal_feeding_unprocessed','N_grassland'),
-                   method = "smooth_simple_overlay",
-                   x_axis_name = 'kg N  / year')
-
-plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
-                   vars = c('N_crop_animal_feeding_processed'),
-                   method = "smooth_simple_overlay",
-                   x_axis_name = 'kg N  / year')
-
-plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
-                   vars = c('feed_import'),
-                   method = "smooth_simple_overlay",
-                   x_axis_name = 'kg N  / year')
-
-
-
-#PLS----
-
-pls_result <- plsr.mcSimulation(object = nitrogen_mc_simulation,
-                                resultName = names(nitrogen_mc_simulation$y['N_manure_to_crop']), ncomp = 1)
-
-plot_pls(pls_result, input = combined_input, threshold = 0.8)
-
+# 
+# 
+# mc_simulation_output_long %>%
+#   filter(variable %in% c('N_to_slaughter','N_meat_local_to_consumption','N_slaughter_waste',
+#                          'N_egg_available','N_housing_loss', 'N_milk_available',
+#                          'N_biogas_input_animal','export_org_fertilizer',
+#                          'N_manure_to_crop')) %>%
+#   
+#   ggplot(aes(x=value,y = variable,fill = variable)) +
+#   geom_density_ridges_gradient(scale=2) + 
+#   xlab('N [t per year]')+
+#   ylab('flow leaving animal subsystem (without feed import)')+
+#   theme_bw() +
+#   theme(legend.position = "none")
+# 
+# mc_simulation_output_long %>%
+#   filter(variable %in% c('egg_import','dairy_import',
+#                          'meat_import', 'other_food_import')) %>%
+#   ggplot(aes(x=value,y = variable,fill = variable)) +
+#   geom_density_ridges_gradient(scale=2) + 
+#   xlab('food import (without crops) N [t per year]')+
+#   ylab('')+
+#   theme_bw() +
+#   theme(legend.position = "none")
+# 
+# mc_simulation_output_long %>%
+#   filter(variable %in% c('egg_export','dairy_export',
+#                          'meat_export')) %>%
+#   
+#   ggplot(aes(x=value,y = variable,fill = variable)) +
+#   geom_density_ridges_gradient(scale=2) + 
+#   xlab('food export (without vegetables) N [t per year]')+
+#   ylab('')+
+#   theme_bw() +
+#   theme(legend.position = "none")
+# 
+# #calculate the amount of cases more eggs produced that consumed
+# sum(mc_simulation_output$egg_export > 0) / 10000
+# sum(mc_simulation_output$dairy_export > 0) / 10000
+# sum(mc_simulation_output$meat_export > 0) / 10000
+# 
+# 
+# 
+# #plots of flows out the animal subsystem
+# plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
+#                    vars = c("N_to_slaughter",'N_meat_local_to_consumption','N_slaughter_waste'),
+#                    method = "smooth_simple_overlay",
+#                    old_names = c('N_to_slaughter','N_meat_local_to_consumption', 'N_slaughter_waste'),
+#                    x_axis_name = 'kg N  / year')
+# ?plot_distributions
+# 
+# plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
+#                    vars = c('N_egg_available'),
+#                    method = "smooth_simple_overlay",
+#                    old_names = c('N_egg_available'),
+#                    x_axis_name = 'kg N  / year')
+# 
+# plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
+#                    vars = c('N_milk_available'),
+#                    method = "smooth_simple_overlay",
+#                    old_names = c('N_milk_available'),
+#                    x_axis_name = 'kg N  / year')
+# 
+# plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
+#                    vars = c('N_housing_loss','N_biogas_input_animal','export_org_fertilizer'),
+#                    method = "smooth_simple_overlay",
+#                    x_axis_name = 'kg N  / year')
+# 
+# plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
+#                    vars = c('N_manure_to_crop'),
+#                    method = "smooth_simple_overlay",
+#                    x_axis_name = 'kg N  / year')
+# 
+# #plots flow entering the system
+# plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
+#                    vars = c("N_straw"),
+#                    method = "smooth_simple_overlay",
+#                    x_axis_name = 'kg N  / year')
+# 
+# plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
+#                    vars = c('N_crop_animal_feeding_unprocessed','N_grassland'),
+#                    method = "smooth_simple_overlay",
+#                    x_axis_name = 'kg N  / year')
+# 
+# plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
+#                    vars = c('N_crop_animal_feeding_processed'),
+#                    method = "smooth_simple_overlay",
+#                    x_axis_name = 'kg N  / year')
+# 
+# plot_distributions(mcSimulation_object = nitrogen_mc_simulation,
+#                    vars = c('feed_import'),
+#                    method = "smooth_simple_overlay",
+#                    x_axis_name = 'kg N  / year')
+# 
+# 
+# 
+# #PLS----
+# 
+# pls_result <- plsr.mcSimulation(object = nitrogen_mc_simulation,
+#                                 resultName = names(nitrogen_mc_simulation$y['N_manure_to_crop']), ncomp = 1)
+# 
+# plot_pls(pls_result, input = combined_input, threshold = 0.8)
+# 
