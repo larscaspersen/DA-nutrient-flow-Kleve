@@ -481,7 +481,8 @@ crop_function <- function(share_beans, share_corn, share_fodder_peas,
               land_sweet_corn_ha = horti_df$corrected_area_ha[19],
               land_veggie_peas_ha = horti_df$corrected_area_ha[20],
               total_N_horticulture = horti_N_kg,
-              imported_inorganic_N = imported_inorganic_N
+              imported_inorganic_N = imported_inorganic_N,
+              inevitable_N_losses = inevitable_N_losses
               ))
 }
 

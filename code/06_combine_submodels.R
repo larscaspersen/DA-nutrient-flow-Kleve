@@ -14,7 +14,7 @@ for(i in colnames(x)) assign(i,
 source('code/02_animal_model.R')
 source('code/03_crop_model.R')
 source('code/04_consumption_model.R')
-source('code/06_waste_submodel.R')
+source('code/05_waste_submodel.R')
 
 #combine the input files
 combined_input <- rbind.data.frame(crop_input, animal_input, consumption_input, waste_input)
@@ -71,8 +71,7 @@ combined_function <- function(){
                                cattle_housingloss_rate_liquid, cattle_housingloss_rate_solid,
                                pig_housinglosss_rate_liquid, pig_housinglosss_rate_solid,
                                others_housingloss_rate,
-                               N_biogas_input, share_N_biogas_input_animal,
-                               export_org_fertilizer)
+                               N_biogas_input, share_N_biogas_input_animal)
   
   #CROP SUBSYSTEM
   crop_output <- crop_function(share_beans, share_corn, share_fodder_peas, 
@@ -253,14 +252,22 @@ combined_function <- function(){
   egg_import <- max(consumption_output$consumed_N_egg - animal_output$N_egg_available,0)
   meat_import <- max(consumption_output$consumed_N_meat - animal_output$N_meat_local_to_consumption, 0)
   dairy_import <- max(consumption_output$consumed_N_dairy - animal_output$N_milk_available, 0)
+  vegetable_import <- max(consumption_output$consumed_N_vegetable - crop_output$N_crop_human_consumption_processed, 0) + consumption_output$consumed_N_foreign_vegetable
   
-  other_food_import <- egg_import + dairy_import + meat_import + consumption_output$consumed_N_fish +
-                  consumption_output$consumed_N_foreign_vegetable
-  
+  total_food_import <-  egg_import + dairy_import + meat_import + vegetable_import
+
   #food exports (prevent negative exports if consumption exceeds the production)
   egg_export <- max(animal_output$N_egg_available - consumption_output$consumed_N_egg, 0)
   meat_export <- max(animal_output$N_meat_local_to_consumption - consumption_output$consumed_N_meat, 0) 
   dairy_export <- max(animal_output$N_milk_available - consumption_output$consumed_N_dairy, 0)
+  vegetable_export <- max(crop_output$N_crop_human_consumption_processed - consumption_output$consumed_N_vegetable,0)
+  
+  #get amount of local products which also get consumed locally
+  local_animal_products_consumed <- (animal_output$N_egg_available - egg_export) +
+                                    (animal_output$N_meat_local_to_consumption - meat_export) + 
+                                    (animal_output$N_milk_available - dairy_export)
+  local_vegetal_products_consumed <- crop_output$N_crop_human_consumption_processed - vegetable_export
+  
   #export of vegetal products is still missing
   
   #combine import and export to list
@@ -278,23 +285,48 @@ combined_function <- function(){
   N_animal_balance <- N_animal_in - N_animal_out
   
   
-  
-  
-  #check if in output is everything which was calculated additionally in the combined version of 
-  #all submodels
-  
-  
-  #combine output lists
-  combined_output <- c(animal_output, crop_output, waste_output, consumption_output,
-                       feed_import = feed_import,
-                       export_org_fertilizer = export_org_fertilizer,
-                       N_digestate = N_digestate,
-                       N_manure_to_crop = N_manure_to_crop,
-                       N_biogas_input_animal = N_biogas_input_animal,
-                       N_wastewater_direct_discharge = N_wastewater_direct_discharge,
-                       N_animal_in = N_animal_in,
-                       N_animal_out = N_animal_out,
-                       N_animal_balance = N_animal_balance,import_export)
+  #extract the flows shown in Bernous model and return those
+  #give them same name as in the chart
+  combined_output <- list(sewage = waste_output$N_sewage_in,
+                          ofmsw_residual_waste = waste_output$N_grey_bin_food_waste + waste_output$N_grey_bin_garden_waste,
+                          ofmsw = waste_output$N_ofmsw_local + waste_output$N_green_waste_local,
+                          wastewater_direct_discharge = wastewater_direct_discharge,
+                          compost_to_consumption = waste_output$N_compost_consumption,
+                          digestate = N_digestate,
+                          sewage_sludge_export = waste_output$N_sewage_exported,
+                          wastewater_effluent_gaseous_losses = waste_output$N_sewage_lost,
+                          fresh_compost_export = waste_output$N_compost_export,
+                          fresh_compost_crop = waste_output$N_compost_crop,
+                          sewage_to_crop = waste_output$N_sewage_to_crop,
+                          vegetal_biogas_substrate = crop_output$N_crop_biogas,
+                          crop_cultivation_losses = crop_output$inevitable_N_losses,
+                          other_organic_fertilizer_export = export_other_organic_N_kg,
+                          straw = crop_output$N_straw,
+                          feed_crops = crop_output$N_crop_animal_feeding_unprocessed,
+                          grassbased_feed = crop_output$N_grassland,
+                          fruit_and_vegetable = crop_output$total_N_horticulture,
+                          food_and_feed_crops = crop_output$N_crop_animal_feeding_processed + crop_output$N_crop_human_consumption_processed,
+                          manure_as_biogas_substrate = N_biogas_input_animal,
+                          manure_to_crop = N_manure_to_crop,
+                          manure_export = export_manure_N_kg,
+                          animal_housing_and_storage_losses = animal_output$N_housing_loss,
+                          slaughter_animal = animal_output$N_to_slaughter,
+                          egg_and_dairy = animal_output$N_milk_available + animal_output$N_egg_available,
+                          local_vegetal_products_consumed = local_vegetal_products_consumed,
+                          imported_animal_products = meat_import + egg_import + dairy_import,
+                          imported_vegetal_products = vegetable_import,
+                          feed_from_processed_crops = crop_output$N_crop_animal_feeding_processed,
+                          import_processed_feed = feed_import,
+                          local_animal_products_consumed = local_animal_products_consumed,
+                          export_meat = meat_export,
+                          import_meat = meat_import,
+                          export_egg = egg_export,
+                          slaughter_waste = animal_output$N_slaughter_waste,
+                          import_OFMSW = waste_output$N_green_waste_import + waste_output$N_ofmsw_import,
+                          import_inorganic_fertilizer = crop_output$imported_inorganic_N,
+                          import_organic_fertilizer = import_organic_N_kg,
+                          net_food_import = total_food_import,
+                          net_feed_import = feed_import)
   
   return(combined_output)
 }
