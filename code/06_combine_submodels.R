@@ -271,10 +271,14 @@ combined_function <- function(){
   #export of vegetal products is still missing
   
   #combine import and export to list
-  import_export <- list(egg_import = egg_import, meat_import = meat_import,
-                        dairy_import = dairy_import, other_food_import = other_food_import,
-                        egg_export = egg_export, meat_export = meat_export,
-                        dairy_export = dairy_export)
+  import_export <- list(egg_import = egg_import, 
+                        meat_import = meat_import,
+                        dairy_import = dairy_import, 
+                        vegetable_import = vegetable_import,
+                        egg_export = egg_export, 
+                        meat_export = meat_export,
+                        dairy_export = dairy_export,
+                        vegetable_export = vegetable_export)
   
   
   #get a balance of N for animal subsystem----
@@ -366,7 +370,47 @@ combined_function <- function(){
                           land_veggie_peas_ha = crop_output$land_veggie_peas_ha
                           )
   
-  return(combined_output)
+  #parameters to evaluate model output:
+  #
+  #- total N self supplied: 
+  #- total N input from external
+  #- total N lost (exported)
+  #- SSE: self supplied * 100 / (self supplied + import - export)
+  #- total N supplied outside of Kleve (in forms of products
+  
+  self_supplied <- N_manure_to_crop + crop_output$N_crop_animal_feeding_unprocessed +
+    crop_output$N_grassland + local_animal_products_consumed + N_digestate +
+    local_vegetal_products_consumed + crop_output$N_crop_animal_feeding_processed +
+    waste_output$N_compost_crop + waste_output$N_compost_consumption + 
+    waste_output$N_sewage_to_crop + crop_output$N_straw
+  
+  external_input <- feed_import + crop_output$imported_inorganic_N +
+    import_organic_N_kg + vegetable_import + waste_output$N_ofmsw_import + 
+    waste_output$N_green_waste_import + egg_import + meat_import + dairy_import
+  
+  system_output  <- export_manure_N_kg + dairy_export + egg_export + meat_export + 
+                    vegetable_export + export_other_organic_N_kg + 
+                    waste_output$N_sewage_exported + waste_output$N_compost_export
+  
+  system_losses <- crop_output$inevitable_N_losses + animal_output$N_housing_loss + 
+                   waste_output$N_sewage_lost + animal_output$N_slaughter_waste + 
+                   N_wastewater_direct_discharge 
+  
+  SSE <- (self_supplied * 100) / (self_supplied + external_input - system_output)
+  
+  #this is about stuff which would have been possible to supply locally 
+  supplied_by_outside <- feed_import +  crop_output$imported_inorganic_N  +
+                         import_organic_N_kg + egg_import + meat_import + 
+                         dairy_import + 
+                         (vegetable_import - consumption_output$consumed_N_foreign_vegetable)
+                         
+  
+  return(list(self_supplied = self_supplied,
+              external_input = external_input,
+              system_output = system_output,
+              system_losses = system_losses,
+              SSE = SSE,
+              supplied_by_outside = supplied_by_outside))
 }
 
 #let mc simulation run, just to test if everything works out
