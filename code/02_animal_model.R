@@ -119,31 +119,67 @@ calc_animal <- function(n_slaughter_dairy_cattle, n_slaughter_female_cattle,
                              slaughter_weight_fraction, edible_fraction,
                              N_content)
   
+  
+  #calculatate the rate of slaughtered animals relative to total stock
+  #this might be important when we reduce the animal number not homogenously but say that the composition reacts
+  #to the change in feed production
+  
+  slaughter_rate_dairy_cow <- n_slaughter_dairy_cattle / n_dairy_cow
+  slaughter_rate_heifer <- n_slaughter_female_cattle / n_heifer
+  slaughter_rate_calf <- (n_slaughter_younstock_midage + n_slaughter_younstock_youngage) / n_calf
+  slaughter_rate_bull <- n_slaughter_bulls / n_bull
+  #note: pigs are ~6months old when slaughtered, that is why share is almost 2
+  slaughter_rate_pig <- n_slaughter_pig / n_pig
+  #chicken usually 6 weeks old when slaughtered, so share should be ~ 8 times higher but I got only value of 4.5
+  slaughter_rate_poultry <- n_slaughter_poultry / n_chicken
+  slaughter_rate_sheep <- n_slaughter_sheep / n_sheep
+  
+  #for oxes, goats and horses we dont have information on their stock, so there we reduce the number of slaughtered animals
+  #proportionally to the reduction in available feed no matter how the composition changes
+
+  
   #calculate total weight of animal type that goes to food processing:
   #first get weight of individuum when slaughtered: slaughter_weight / slaughter_fraction
   #second multiply by number of individuals (in NRW and imported)
   
   #total weight which goes to the slaughter house
+  #differentiate local and imported meat and give one for everything
   slaughter_df$total_weight <- (slaughter_df$slaughter_weight / slaughter_df$slaughter_weight_fraction) * (slaughter_df$n_slaughter + slaughter_df$n_import)
+  slaughter_df$total_weight_local <- (slaughter_df$slaughter_weight / slaughter_df$slaughter_weight_fraction) * (slaughter_df$n_slaughter)
+  slaughter_df$total_weight_import <- (slaughter_df$slaughter_weight / slaughter_df$slaughter_weight_fraction) * (slaughter_df$n_import)
+  
   
   #total amount of Nitrogen that goes to the slaughterhouse
   slaughter_df$N_to_slaughter <- slaughter_df$total_weight / 100 * slaughter_df$N_content 
+  slaughter_df$N_to_slaughter_local <- slaughter_df$total_weight_local / 100 * slaughter_df$N_content 
+  slaughter_df$N_to_slaughter_import <- slaughter_df$total_weight_import / 100 * slaughter_df$N_content 
   
   
   
   #the following calculations should be acutally in the processing subsystem
   
   #total amount of N that can be consumed by customers
+  #important: import does not mean imported meat but locally butchered meat from imported slaughter animals
   slaughter_df$N_meat_consumption <- slaughter_df$total_weight * slaughter_df$edible_fraction / 100 * slaughter_df$N_content
+  slaughter_df$N_meat_consumption_local <- slaughter_df$total_weight_local * slaughter_df$edible_fraction / 100 * slaughter_df$N_content
+  slaughter_df$N_meat_consumption_import <- slaughter_df$total_weight_import * slaughter_df$edible_fraction / 100 * slaughter_df$N_content
+  
   
   #total amount of meat comming out of the slaughter house
   slaughter_df$total_slaughter <- slaughter_df$slaughter_weight * (slaughter_df$n_slaughter + slaughter_df$n_import)
+  slaughter_df$total_slaughter_local <- slaughter_df$slaughter_weight * (slaughter_df$n_slaughter)
+  slaughter_df$total_slaughter_import <- slaughter_df$slaughter_weight * (slaughter_df$n_import)
   
-  #total amount of slaughter waste comming out of the slaughter house
+  #total amount (kg) of slaughter waste comming out of the slaughter house
   slaughter_df$total_slaughter_waste <- slaughter_df$total_weight - (slaughter_df$total_weight * slaughter_df$edible_fraction)
+  slaughter_df$total_slaughter_waste_local <- slaughter_df$total_weight_local - (slaughter_df$total_weight_local * slaughter_df$edible_fraction)
+  slaughter_df$total_slaughter_waste_import <- slaughter_df$total_weight_import - (slaughter_df$total_weight_import * slaughter_df$edible_fraction)
+  
   
   #total amount of N in the slaughter waster
   slaughter_df$N_slaughter_waste <- slaughter_df$total_slaughter_waste / 100 * slaughter_df$N_content
+  slaughter_df$N_slaughter_waste_local <- slaughter_df$total_slaughter_waste_local / 100 * slaughter_df$N_content
+  slaughter_df$N_slaughter_waste_import <- slaughter_df$total_slaughter_waste_import / 100 * slaughter_df$N_content
   
 
   
@@ -200,8 +236,11 @@ calc_animal <- function(n_slaughter_dairy_cattle, n_slaughter_female_cattle,
   
   
   return(list(N_to_slaughter = sum(slaughter_df$N_to_slaughter),
+              N-to_slaughter_import <- sum(slaughter_df$N_to_slaughter_import),
               N_meat_local_to_consumption = sum(slaughter_df$N_meat_consumption),
+              N_meat_local_to_consumption_import = sum(slaughter_df$N_meat_consumption_import),
               N_slaughter_waste = sum(slaughter_df$N_slaughter_waste),
+              N_slaughter_waste_import = sum(slaughter_df$N_slaughter_waste_import),
               N_milk_available = N_milk_available,
               N_egg_available = N_egg_available,
               N_total_manure = sum(manure_df$N_total_manure),
