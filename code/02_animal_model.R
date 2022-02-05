@@ -5,23 +5,23 @@
 #in this file all the outgoing flows from the animal subsystem are modelled
 #ingoing flows still need to be processed
 
-library(decisionSupport)
-
-
-animal_input <- read.csv('data/input-animal.csv')
-
-#function to draw random variables from input and create global variables
-make_variables<-function(est,n=1)
-{ x<-random(rho=est, n=n)
-for(i in colnames(x)) assign(i,
-                             as.numeric(x[1,i]),envir=.GlobalEnv)
-}
-
-#make_variables(as.estimate(animal_input),n=1)
-
-
-#detailed_input <- read.csv('data/input-table-detailed.csv')
-#make_median(detailed_input)
+# library(decisionSupport)
+# 
+# 
+# animal_input <- read.csv('data/input-animal.csv')
+# 
+# #function to draw random variables from input and create global variables
+# make_variables<-function(est,n=1)
+# { x<-random(rho=est, n=n)
+# for(i in colnames(x)) assign(i,
+#                              as.numeric(x[1,i]),envir=.GlobalEnv)
+# }
+# 
+# #make_variables(as.estimate(animal_input),n=1)
+# 
+# 
+# #detailed_input <- read.csv('data/input-table-detailed.csv')
+# #make_median(detailed_input)
 
 
 
@@ -67,10 +67,27 @@ calc_animal <- function(n_slaughter_dairy_cattle, n_slaughter_female_cattle,
                         cattle_housingloss_rate_liquid, cattle_housingloss_rate_solid,
                         pig_housinglosss_rate_liquid, pig_housinglosss_rate_solid,
                         others_housingloss_rate,
-                        N_biogas_input, 
                         export_org_fertilizer ){
   
   #slaughtering -----
+  
+  #calculatate the rate of slaughtered animals relative to total stock
+  #this might be important when we reduce the animal number not homogenously but say that the composition reacts
+  #to the change in feed production
+  
+  slaughter_rate_dairy_cow <- n_slaughter_dairy_cattle / n_dairy_cow
+  slaughter_rate_heifer <- n_slaughter_female_cattle / n_heifer
+  slaughter_rate_younstock_midage <- n_slaughter_younstock_midage / n_calf
+  slaughter_rate_younstock_youngage <-  n_slaughter_younstock_youngage / n_calf
+  slaughter_rate_bull <- n_slaughter_bulls / n_bull
+  #note: pigs are ~6months old when slaughtered, that is why share is almost 2
+  slaughter_rate_pig <- n_slaughter_pig / n_pig
+  #chicken usually 6 weeks old when slaughtered, so share should be ~ 8 times higher but I got only value of 4.5
+  slaughter_rate_poultry <- n_slaughter_poultry / n_chicken
+  slaughter_rate_sheep <- n_slaughter_sheep / n_sheep
+  
+  #for oxes, goats and horses we dont have information on their stock, so there we reduce the number of slaughtered animals
+  #proportionally to the reduction in available feed no matter how the composition changes
   
   
   #prepare slaughter df with all the inputs
@@ -120,24 +137,7 @@ calc_animal <- function(n_slaughter_dairy_cattle, n_slaughter_female_cattle,
                              N_content)
   
   
-  #calculatate the rate of slaughtered animals relative to total stock
-  #this might be important when we reduce the animal number not homogenously but say that the composition reacts
-  #to the change in feed production
-  
-  slaughter_rate_dairy_cow <- n_slaughter_dairy_cattle / n_dairy_cow
-  slaughter_rate_heifer <- n_slaughter_female_cattle / n_heifer
-  slaughter_rate_calf <- (n_slaughter_younstock_midage + n_slaughter_younstock_youngage) / n_calf
-  slaughter_rate_bull <- n_slaughter_bulls / n_bull
-  #note: pigs are ~6months old when slaughtered, that is why share is almost 2
-  slaughter_rate_pig <- n_slaughter_pig / n_pig
-  #chicken usually 6 weeks old when slaughtered, so share should be ~ 8 times higher but I got only value of 4.5
-  slaughter_rate_poultry <- n_slaughter_poultry / n_chicken
-  slaughter_rate_sheep <- n_slaughter_sheep / n_sheep
-  
-  #for oxes, goats and horses we dont have information on their stock, so there we reduce the number of slaughtered animals
-  #proportionally to the reduction in available feed no matter how the composition changes
 
-  
   #calculate total weight of animal type that goes to food processing:
   #first get weight of individuum when slaughtered: slaughter_weight / slaughter_fraction
   #second multiply by number of individuals (in NRW and imported)
@@ -236,7 +236,7 @@ calc_animal <- function(n_slaughter_dairy_cattle, n_slaughter_female_cattle,
   
   
   return(list(N_to_slaughter = sum(slaughter_df$N_to_slaughter),
-              N-to_slaughter_import <- sum(slaughter_df$N_to_slaughter_import),
+              N_to_slaughter_import = sum(slaughter_df$N_to_slaughter_import),
               N_meat_local_to_consumption = sum(slaughter_df$N_meat_consumption),
               N_meat_local_to_consumption_import = sum(slaughter_df$N_meat_consumption_import),
               N_slaughter_waste = sum(slaughter_df$N_slaughter_waste),
@@ -245,7 +245,15 @@ calc_animal <- function(n_slaughter_dairy_cattle, n_slaughter_female_cattle,
               N_egg_available = N_egg_available,
               N_total_manure = sum(manure_df$N_total_manure),
               N_housing_loss = sum(manure_df$N_housing_loss),
-              N_remaining_manure = sum(manure_df$N_manure_remaining)))
+              N_remaining_manure = sum(manure_df$N_manure_remaining),
+              slaughter_rate_dairy_cow = slaughter_rate_dairy_cow,
+              slaughter_rate_heifer = slaughter_rate_heifer,
+              slaughter_rate_bull = slaughter_rate_bull,
+              slaughter_rate_younstock_midage = slaughter_rate_younstock_midage,
+              slaughter_rate_younstock_youngage = slaughter_rate_younstock_youngage,
+              slaughter_rate_pig = slaughter_rate_pig,
+              slaughter_rate_poultry = slaughter_rate_poultry,
+              slaughter_rate_sheep = slaughter_rate_sheep))
   
 }
 

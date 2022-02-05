@@ -1,20 +1,20 @@
-#waste subsystem
-
-library(decisionSupport)
-
-waste_input <- read.csv('data/input-waste.csv') 
-
-make_variables<-function(est,n=1)
-{ x<-random(rho=est, n=n)
-for(i in colnames(x)) assign(i,
-                             as.numeric(x[1,i]),envir=.GlobalEnv)
-}
-
-waste_input$lower <- as.numeric(waste_input$lower)
-waste_input$upper <- as.numeric(waste_input$upper)
-
-#create variable so I can test the function
-#make_variables(as.estimate(waste_input),n=1)
+# #waste subsystem
+# 
+# library(decisionSupport)
+# 
+# waste_input <- read.csv('data/input-waste.csv') 
+# 
+# make_variables<-function(est,n=1)
+# { x<-random(rho=est, n=n)
+# for(i in colnames(x)) assign(i,
+#                              as.numeric(x[1,i]),envir=.GlobalEnv)
+# }
+# 
+# waste_input$lower <- as.numeric(waste_input$lower)
+# waste_input$upper <- as.numeric(waste_input$upper)
+# 
+# #create variable so I can test the function
+# #make_variables(as.estimate(waste_input),n=1)
 
 ####wastewater
 

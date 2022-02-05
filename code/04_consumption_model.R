@@ -1,17 +1,17 @@
-library(decisionSupport)
-
-#read input table
-consumption_input <- read.csv('data/input-consumption.csv')
-
-#function to draw random variables from input and create global variables
-make_variables<-function(est,n=1)
-{ x<-random(rho=est, n=n)
-for(i in colnames(x)) assign(i,
-                             as.numeric(x[1,i]),envir=.GlobalEnv)
-}
-
-#create variable so I can test the function
-#make_variables(as.estimate(consumption_input),n=1)
+# library(decisionSupport)
+# 
+# #read input table
+# consumption_input <- read.csv('data/input-consumption.csv')
+# 
+# #function to draw random variables from input and create global variables
+# make_variables<-function(est,n=1)
+# { x<-random(rho=est, n=n)
+# for(i in colnames(x)) assign(i,
+#                              as.numeric(x[1,i]),envir=.GlobalEnv)
+# }
+# 
+# #create variable so I can test the function
+# #make_variables(as.estimate(consumption_input),n=1)
 
 #function to calcualte consumption rate of products
 calc_consume <- function(population, 

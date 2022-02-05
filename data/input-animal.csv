@@ -6,7 +6,7 @@ Female cattle (before calving),n_slaughter_female_cattle,individuals,1193.4,1404
 Younstock ≤ 8 months,n_slaughter_younstock_youngage,individuals,150.45,177,203.55,posnorm
 Younstock ≥ 8 and ≤ 12 months 15,n_slaughter_younstock_midage,individuals,23.8,28,32.2,posnorm
 ,n_slaughter_pig,individuals,614689.4,723164,831638.6,posnorm
-,n_slaughter_poultry,individuals,1785.85,2101,2416.15,posnorm
+,n_slaughter_poultry,individuals,914362.2,1015958,1117553.8,posnorm
 ,n_slaughter_lamb,individuals,0,0,0,const
 ,n_slaughter_sheep,individuals,1905.7,2242,2578.3,posnorm
 ,n_slaughter_goat,individuals,15.3,18,20.7,posnorm
@@ -62,10 +62,9 @@ taken IT.NRW for 2016,n_dairy_cow,individuals,48274.9,"56,794",65313.1,posnorm
 calculated based on cow number and milk output,milk_per_cow,kg per cow ,6520.69,7671.4,8822.11,posnorm
 calculated on LLU units in Nährstoffreport,n_other_poultry,individuals,370124,435440,500756,posnorm
 weeks until turkey is slaughtered,weeks_to_grow,weeks,17,20,23,posnorm
-export of organic fertilizer,export_org_fertilizer,kg N,1598357,1880420,2162483,posnorm
-bull,n_bull,individuals,6282.35,7391,8499.65,posnorm
-heifer,n_heifer,individuals,34712.3,40838,46963.7,posnorm
-calf,n_calf,individuals,20742.55,24403,28063.45,posnorm
+Regionalstatistik 2016,n_bull,individuals,6282.35,7391,8499.65,posnorm
+Regionalstatistik 2016,n_heifer,individuals,34712.3,40838,46963.7,posnorm
+Regionalstatistik 2016,n_calf,individuals,20742.55,24403,28063.45,posnorm
 "N excretion per ""Stellpletz"" and year",N_excretion_dairy,kg N / animal / year,97.155,114.3,131.445,posnorm
 ,N_excretion_bull,kg N / animal / year,39.95,47,54.05,posnorm
 ,N_excretion_heifer,kg N / animal / year,43.35,51,58.65,posnorm

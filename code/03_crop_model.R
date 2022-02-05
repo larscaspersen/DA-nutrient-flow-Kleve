@@ -1,20 +1,20 @@
 #try out how to solve the problem of several percantages in input table 
 #which need to add up to 1
-
-library(decisionSupport)
-
-crop_input <- read.csv('data/crop_input.csv')
-
-make_variables<-function(est,n=1)
-{ x<-random(rho=est, n=n)
-for(i in colnames(x)) assign(i,
-                             as.numeric(x[1,i]),envir=.GlobalEnv)
-}
-
-crop_input$lower <- as.numeric(crop_input$lower)
-crop_input$upper <- as.numeric(crop_input$upper)
-
-make_variables(as.estimate(crop_input),n=1)
+# 
+# library(decisionSupport)
+# 
+# crop_input <- read.csv('data/crop_input.csv')
+# 
+# make_variables<-function(est,n=1)
+# { x<-random(rho=est, n=n)
+# for(i in colnames(x)) assign(i,
+#                              as.numeric(x[1,i]),envir=.GlobalEnv)
+# }
+# 
+# crop_input$lower <- as.numeric(crop_input$lower)
+# crop_input$upper <- as.numeric(crop_input$upper)
+# 
+# #make_variables(as.estimate(crop_input),n=1)
 
 crop_function <- function(share_beans, share_corn, share_fodder_peas, 
                             share_mais_silage, share_oat, 
@@ -292,7 +292,8 @@ crop_function <- function(share_beans, share_corn, share_fodder_peas,
   imported_inorganic_N <- import_inorganic_N_kg_LF * (area_grassland + arable_land)
   
   
-  
+
+    
   #N losses
   if(precipitation_sum < 600){
     
@@ -417,12 +418,14 @@ crop_function <- function(share_beans, share_corn, share_fodder_peas,
   
   #further N losses from grassland (leached)
   grassland_N_losses <- (area_grassland * share_gorundwater_influenced_grassland * 30) + 
-                        (area_grassland * (1-share_gorundwater_influenced_grassland) * 20)
+    (area_grassland * (1-share_gorundwater_influenced_grassland) * 20)
   
   
+  #these are the losses calculated after the approach of bundesarbeitskreis düngung, 
+  #alternatively it is also possible to calculate losses as difference between input and output
+  #of nitrogen
   inevitable_N_losses <- grassland_N_losses + arable_ammonia_losses + arable_N_leached
-  
-  
+    
   
   #add rapeseed, peas, beans and horticultural area together
   #if larger than 20 then add extra share of losses to loss calculation
