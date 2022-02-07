@@ -243,11 +243,27 @@ Younstock ≥ 8 and ≤ 12 months 15,slaughter_weight_younstock_midage,kg,149.98
 ,N_content_poultry,gr N / 100 gram product,2.7625,3.25,3.7375,posnorm,animal
 ,N_content_sheep,gr N / 100 gram product,2.21,2.6,2.99,posnorm,animal
 ,N_content_horse,gr N / 100 gram product,2.55,3,3.45,posnorm,animal
+,P_content_female_cattle,g P2O5 / 100 g,1.233,1.37,1.507,posnorm,animal
+,P_content_male_cattle,g P2O5 / 100 g,1.341,1.49,1.639,posnorm,animal
+,P_content_pig,g P2O5 / 100 g,1.08,1.2,1.32,posnorm,animal
+,P_content_poultry,g P2O5 / 100 g,0.99,1.1,1.21,posnorm,animal
+,P_content_sheep,g P2O5 / 100 g,1.233,1.37,1.507,posnorm,animal
+,P_content_horse,g P2O5 / 100 g,1.566,1.74,1.914,posnorm,animal
+,K_content_female_cattle,g K2O / 100 g,0.261,0.29,0.319,posnorm,animal
+,K_content_male_cattle,g K2O / 100 g,0.261,0.29,0.319,posnorm,animal
+,K_content_pig,g K2O / 100 g,0.216,0.24,0.264,posnorm,animal
+,K_content_poultry,g K2O / 100 g,0.279,0.31,0.341,posnorm,animal
+,K_content_sheep,g K2O / 100 g,0.216,0.24,0.264,posnorm,animal
+,K_content_horse,g K2O / 100 g,0.261,0.29,0.319,posnorm,animal
 number of chicken in Kleve (assuming that the number of eggs in correct),n_chicken,individuals,165704.1,194946,224187.9,posnorm,animal
 egg laying rate (consumable eggs),egg_per_chicken,egg per chicken,238,280,322,posnorm,animal
 weight of average egg,egg-weight,g,53.465,62.9,72.335,posnorm,animal
 gr N / 100 gram product,N_content_egg,gr N / 100 gram product,1.7,2,2.3,posnorm,animal
+,P_content_egg,mg P / 100 g,189,210,231,posnorm,animal
+,K_content_egg,mg K / 100 g,132.3,147,161.7,posnorm,animal
 calculated based on total milk,N_content_milk,gr N / 100 gram product,0.442,0.52,0.598,posnorm,animal
+,P_content_milk,mg P / 100 g,82.8,92,101.2,posnorm,animal
+,K_content_milk,mg K / 100 g,141.3,157,172.7,posnorm,animal
 calculated based on total milk,share_milk_to_factory,share,0.65365,0.769,0.88435,tnorm_0_1,animal
 calculated based on total milk,share_milk_fed_farm,share,0.0102,0.012,0.0138,tnorm_0_1,animal
 calculated based on total milk,share_milk_direct_sale,share,0.0034,0.004,0.0046,tnorm_0_1,animal

@@ -664,6 +664,26 @@ nitrogen_mc_simulation <- mcSimulation(estimate = as.estimate(input),
                                        functionSyntax = "plainNames")
 
 
+#how to make this also for other nutrients without copying everything?
+#loop within function for different nutrients?
+#or maybe make everything a vector? each entry of the vector is one nutrient?
+
+
+#for each scenario different column, can't I make so that it is combined?
+scenario <- c(nitrogen_mc_simulation$y$scenario1, nitrogen_mc_simulation$y$scenario2)
+self_supplied <- c(nitrogen_mc_simulation$y$self_supplied1, nitrogen_mc_simulation$y$self_supplied2)
+external_input <- c(nitrogen_mc_simulation$y$external_input1, nitrogen_mc_simulation$y$external_input2)
+system_output <- c(nitrogen_mc_simulation$y$system_output1, nitrogen_mc_simulation$y$system_output2)
+system_losses <- c(nitrogen_mc_simulation$y$system_losses1, nitrogen_mc_simulation$y$system_losses2)
+SSE <- c(nitrogen_mc_simulation$y$SSE1, nitrogen_mc_simulation$y$SSE2)
+supplied_by_outside <- c(nitrogen_mc_simulation$y$supplied_by_outside1, nitrogen_mc_simulation$y$supplied_by_outside2)
+
+#combine to new dataframe and replace the old one in nitrogen_mc_simulation
+y <- data.frame(scenario, self_supplied, external_input, system_output, system_losses, SSE, supplied_by_outside)
+
+#in that case also the 
+
+
 
 #correct the crop shares in the input table of the mcsimulation object ----
 

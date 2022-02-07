@@ -5,19 +5,18 @@
 #in this file all the outgoing flows from the animal subsystem are modelled
 #ingoing flows still need to be processed
 
-# library(decisionSupport)
-# 
-# 
-# animal_input <- read.csv('data/input-animal.csv')
-# 
-# #function to draw random variables from input and create global variables
-# make_variables<-function(est,n=1)
-# { x<-random(rho=est, n=n)
-# for(i in colnames(x)) assign(i,
-#                              as.numeric(x[1,i]),envir=.GlobalEnv)
-# }
-# 
-# #make_variables(as.estimate(animal_input),n=1)
+library(decisionSupport)
+
+input <- read.csv('data/input-all.csv')
+
+#function to draw random variables from input and create global variables
+make_variables<-function(est,n=1)
+{ x<-random(rho=est, n=n)
+for(i in colnames(x)) assign(i,
+                             as.numeric(x[1,i]),envir=.GlobalEnv)
+}
+
+make_variables(as.estimate(input),n=1)
 # 
 # 
 # #detailed_input <- read.csv('data/input-table-detailed.csv')
@@ -132,15 +131,37 @@ calc_animal <- function(n_slaughter_dairy_cattle, n_slaughter_female_cattle,
                  rep(N_content_sheep, 3),
                  N_content_horse)
   
+  #actually P2O5 content
+  P_content_slaughter <- c(rep(P_content_female_cattle,2),
+                          rep(P_content_male_cattle,2),
+                          rep(P_content_female_cattle,2),
+                          P_content_pig, 
+                          P_content_poultry,
+                          rep(P_content_sheep,3),
+                          P_content_horse)
+  
+  #actually KO2 content
+  K_content_slaughter <- c(rep(K_content_female_cattle,2),
+                           rep(K_content_male_cattle,2),
+                           rep(K_content_female_cattle,2),
+                           K_content_pig, 
+                           K_content_poultry,
+                           rep(K_content_sheep,3),
+                           K_content_horse)
+  
   slaughter_df <- data.frame(animal, n_slaughter, n_import,slaughter_weight,
                              slaughter_weight_fraction, edible_fraction,
-                             N_content)
+                             N_content, P_content_slaughter, K_content_slaughter)
   
   
 
   #calculate total weight of animal type that goes to food processing:
   #first get weight of individuum when slaughtered: slaughter_weight / slaughter_fraction
   #second multiply by number of individuals (in NRW and imported)
+  
+  #######
+  # meat from ANIMAL to PROCESSING
+  ######
   
   #total weight which goes to the slaughter house
   #differentiate local and imported meat and give one for everything
@@ -154,6 +175,23 @@ calc_animal <- function(n_slaughter_dairy_cattle, n_slaughter_female_cattle,
   slaughter_df$N_to_slaughter_local <- slaughter_df$total_weight_local / 100 * slaughter_df$N_content 
   slaughter_df$N_to_slaughter_import <- slaughter_df$total_weight_import / 100 * slaughter_df$N_content 
   
+  #total amount of P in going to slaughter house
+  convert_phosphorous_pentoxide_to_p <- 0.4364
+  slaughter_df$P_to_slaughter <- (slaughter_df$total_weight / 100 * slaughter_df$P_content_slaughter) * convert_phosphorous_pentoxide_to_p
+  slaughter_df$P_to_slaughter_local <- (slaughter_df$total_weight_local / 100 * slaughter_df$P_content_slaughter) * convert_phosphorous_pentoxide_to_p
+  slaughter_df$P_to_slaughter_import <- (slaughter_df$total_weight_import / 100 * slaughter_df$P_content_slaughter) * convert_phosphorous_pentoxide_to_p
+  
+  
+  #total amount of K going to slaughter house
+  convert_potassium_oxide_to_k <- 0.8301
+  slaughter_df$K_to_slaughter <- (slaughter_df$total_weight / 100 * slaughter_df$K_content_slaughter) * convert_potassium_oxide_to_k
+  slaughter_df$K_to_slaughter_local <- (slaughter_df$total_weight_local / 100 * slaughter_df$K_content_slaughter) * convert_potassium_oxide_to_k
+  slaughter_df$K_to_slaughter_import <- (slaughter_df$total_weight_import / 100 * slaughter_df$K_content_slaughter) * convert_potassium_oxide_to_k
+  
+  
+  #######
+  # meat from PROCESSING to CONSUMPTION
+  #######
   
   
   #the following calculations should be acutally in the processing subsystem
@@ -163,6 +201,18 @@ calc_animal <- function(n_slaughter_dairy_cattle, n_slaughter_female_cattle,
   slaughter_df$N_meat_consumption <- slaughter_df$total_weight * slaughter_df$edible_fraction / 100 * slaughter_df$N_content
   slaughter_df$N_meat_consumption_local <- slaughter_df$total_weight_local * slaughter_df$edible_fraction / 100 * slaughter_df$N_content
   slaughter_df$N_meat_consumption_import <- slaughter_df$total_weight_import * slaughter_df$edible_fraction / 100 * slaughter_df$N_content
+  
+  slaughter_df$P_meat_consumption <- (slaughter_df$total_weight * slaughter_df$edible_fraction / 100 * slaughter_df$P_content_slaughter) * convert_phosphorous_pentoxide_to_p
+  slaughter_df$P_meat_consumption_local <- (slaughter_df$total_weight_local * slaughter_df$edible_fraction / 100 * slaughter_df$P_content_slaughter) * convert_phosphorous_pentoxide_to_p
+  slaughter_df$P_meat_consumption_import <- (slaughter_df$total_weight_import * slaughter_df$edible_fraction / 100 * slaughter_df$P_content_slaughter) * convert_phosphorous_pentoxide_to_p
+  
+  slaughter_df$K_meat_consumption <- (slaughter_df$total_weight * slaughter_df$edible_fraction / 100 * slaughter_df$K_content_slaughter) * convert_potassium_oxide_to_k
+  slaughter_df$K_meat_consumption_local <- (slaughter_df$total_weight_local * slaughter_df$edible_fraction / 100 * slaughter_df$K_content_slaughter) * convert_potassium_oxide_to_k
+  slaughter_df$K_meat_consumption_import <- (slaughter_df$total_weight_import * slaughter_df$edible_fraction / 100 * slaughter_df$K_content_slaughter) * convert_potassium_oxide_to_k
+  
+  
+  
+  
   
   
   #total amount of meat comming out of the slaughter house
@@ -176,12 +226,27 @@ calc_animal <- function(n_slaughter_dairy_cattle, n_slaughter_female_cattle,
   slaughter_df$total_slaughter_waste_import <- slaughter_df$total_weight_import - (slaughter_df$total_weight_import * slaughter_df$edible_fraction)
   
   
+  
+  ########
+  # meat from PROCESSING to WASTE
+  ########
+  
   #total amount of N in the slaughter waster
   slaughter_df$N_slaughter_waste <- slaughter_df$total_slaughter_waste / 100 * slaughter_df$N_content
   slaughter_df$N_slaughter_waste_local <- slaughter_df$total_slaughter_waste_local / 100 * slaughter_df$N_content
   slaughter_df$N_slaughter_waste_import <- slaughter_df$total_slaughter_waste_import / 100 * slaughter_df$N_content
   
+  slaughter_df$P_slaughter_waste <- (slaughter_df$total_slaughter_waste / 100 * slaughter_df$P_content_slaughter) * convert_phosphorous_pentoxide_to_p
+  slaughter_df$P_slaughter_waste_local <- (slaughter_df$total_slaughter_waste_local / 100 * slaughter_df$P_content_slaughter) * convert_phosphorous_pentoxide_to_p
+  slaughter_df$P_slaughter_waste_import <- (slaughter_df$total_slaughter_waste_import / 100 * slaughter_df$P_content_slaughter) * convert_phosphorous_pentoxide_to_p
 
+  slaughter_df$K_slaughter_waste <- (slaughter_df$total_slaughter_waste / 100 * slaughter_df$K_content_slaughter) * convert_potassium_oxide_to_k
+  slaughter_df$K_slaughter_waste_local <- (slaughter_df$total_slaughter_waste_local / 100 * slaughter_df$K_content_slaughter) * convert_potassium_oxide_to_k
+  slaughter_df$K_slaughter_waste_import <- (slaughter_df$total_slaughter_waste_import / 100 * slaughter_df$K_content_slaughter) * convert_potassium_oxide_to_k
+  
+  
+  
+  
   
   
   
