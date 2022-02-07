@@ -1,392 +1,405 @@
-﻿description,variable,unit,lower,median,upper,distribution,subsystem
-Winter wheat,share_winter_wheat,,0.169,0.211,0.253,tnorm_0_1,crop
-Summer wheat (weizen),share_summer_wheat,,0.0008,0.001,0.0012,tnorm_0_1,crop
-Rye (rogge),share_rye,,0.0008,0.001,0.0012,tnorm_0_1,crop
-Winter barley (gerste),share_winter_barley,,0.057,0.071,0.085,tnorm_0_1,crop
-Summer barley,share_summer_barley,,0.002,0.003,0.004,tnorm_0_1,crop
-Common oat (hafer),share_oat,,0.0008,0.001,0.0012,tnorm_0_1,crop
-Triticale,share_triticale,,0.011,0.014,0.017,tnorm_0_1,crop
-Corn mais 2,share_corn,,0.033,0.041,0.049,tnorm_0_1,crop
-Fodder peas (erbsen),share_fodder_peas,,0.005,0.006,0.007,tnorm_0_1,crop
-Beans (ackerbohnen),share_beans,,0.012,0.015,0.018,tnorm_0_1,crop
-winter koolzaad (raps),share_oilseed_rape,,0.018,0.022,0.026,tnorm_0_1,crop
-Potato 3,share_potato,,0.095,0.119,0.143,tnorm_0_1,crop
-Sugar beet 4,share_sugar_beet,,0.057,0.071,0.085,tnorm_0_1,crop
-Mais silage 5,share_mais_silage,,0.264,0.33,0.396,tnorm_0_1,crop
-total share of arable land,share_crop_land,,0.906,0.906,0.906,const,crop
-arable land in ha,arable_land,,49585,49585,49585,const,crop
-Winter wheat,yield_winter_wheat,,70.13,82.5,94.88,posnorm,crop
-Summer wheat (weizen),yield_summer_wheat,,57.04,67.1,77.17,posnorm,crop
-Rye (rogge),yield_rye,,42.67,50.2,57.73,posnorm,crop
-Winter barley (gerste),yield_winter_barley,,58.74,69.1,79.47,posnorm,crop
-Summer barley,yield_summer_barley,,52.87,62.2,71.53,posnorm,crop
-Common oat (hafer),yield_oat,,49.98,58.8,67.62,posnorm,crop
-Triticale,yield_triticale,,59.5,70,80.5,posnorm,crop
-Corn mais 2,yield_corn,,62.05,73,83.95,posnorm,crop
-Fodder peas (erbsen),yield_fodder_peas,,42.84,50.4,57.96,posnorm,crop
-Beans (ackerbohnen),yield_beans,,35.7,42,48.3,posnorm,crop
-winter koolzaad (raps),yield_oilseed_rape,,33.83,39.8,45.77,posnorm,crop
-Potato 3,yield_potato,,514.25,605,695.75,posnorm,crop
-Sugar beet 4,yield_sugar_beet,,576.3,678,779.7,posnorm,crop
-Mais silage 5,yield_mais_silage,,351.05,413,474.95,posnorm,crop
-Winter wheat,dm_winter_wheat,,0.82,0.86,0.9,tnorm_0_1,crop
-Summer wheat,dm_summer_wheat,,0.82,0.86,0.9,tnorm_0_1,crop
-Rye,dm_rye,,0.82,0.86,0.9,tnorm_0_1,crop
-Winter barley,dm_winter_barley,,0.82,0.86,0.9,tnorm_0_1,crop
-Summer barley,dm_summer_barley,,0.82,0.86,0.9,tnorm_0_1,crop
-Oat,dm_oat,,0.82,0.86,0.9,tnorm_0_1,crop
-Triticale,dm_triticale,,0.82,0.86,0.9,tnorm_0_1,crop
-Corn,dm_corn,,0.82,0.86,0.9,tnorm_0_1,crop
-Fodder peas,dm_fodder_peas,,0.82,0.86,0.9,tnorm_0_1,crop
-Beans,dm_beans,,0.82,0.86,0.9,tnorm_0_1,crop
-Oilseed rape,dm_oilseed_rape,,0.86,0.91,0.96,tnorm_0_1,crop
-Potato,dm_potato,,0.21,0.22,0.23,tnorm_0_1,crop
-Sugar beet,dm_sugar_beet,,0.22,0.23,0.24,tnorm_0_1,crop
-Mais silage,dm_mais_silage,,0.31,0.33,0.35,tnorm_0_1,crop
-Winter wheat,N_yield_winter_weat,,1.58,1.75,1.93,posnorm,crop
-Summer wheat,N_yield_summer_weat,,1.58,1.75,1.93,posnorm,crop
-Rye,N_yield_rye,,1.42,1.58,1.74,posnorm,crop
-Winter barley,N_yield_winter_barley,,1.55,1.72,1.89,posnorm,crop
-Summer barley,N_yield_summer_barley,,1.55,1.72,1.89,posnorm,crop
-Oat,N_yield_oat,,1.42,1.58,1.74,posnorm,crop
-Triticale,N_yield_triticale,,1.55,1.72,1.89,posnorm,crop
-Corn,N_yield_corn,,1.31,1.45,1.6,posnorm,crop
-Fodder peas,N_yield_fodder_peas,,3.24,3.6,3.96,posnorm,crop
-Beans,N_yield_beans,,3.69,4.1,4.51,posnorm,crop
-Oilseed rape,N_yield_oilseed_rape,,3.02,3.35,3.69,posnorm,crop
-Potato,N_yield_potato,,0.32,0.35,0.39,posnorm,crop
-Sugar beet,N_yield_sugar_beet,,0.16,0.18,0.2,posnorm,crop
-Mais silage,N_yield_mais_silage,,0.72,0.8,0.88,posnorm,crop
-Winter wheat,N_leftover_winter_wheat,,0.48,0.5,0.53,posnorm,crop
-Summer wheat,N_leftover_summer_wheat,,0.48,0.5,0.53,posnorm,crop
-Rye,N_leftover_rye,,0.48,0.5,0.53,posnorm,crop
-Winter barley,N_leftover_winter_barley,,0.48,0.5,0.53,posnorm,crop
-Summer barley,N_leftover_summer_barley,,0.48,0.5,0.53,posnorm,crop
-Oat,N_leftover_oat,,0.48,0.5,0.53,posnorm,crop
-Triticale,N_leftover_triticale,,0.48,0.5,0.53,posnorm,crop
-Corn,N_leftover_corn,,0.86,0.9,0.95,posnorm,crop
-Fodder peas,N_leftover_foder_peas,,1.43,1.5,1.58,posnorm,crop
-Beans,N_leftover_beans,,1.43,1.5,1.58,posnorm,crop
-Oilseed rape,N_leftover_oilseed_rape,,0.67,0.7,0.74,posnorm,crop
-Potato,N_leftover_potato,,0.19,0.2,0.21,posnorm,crop
-Sugar beet,N_leftover_sugar_beet,,0.38,0.4,0.42,posnorm,crop
-Mais silage,N_leftover_mais_silage,,0,0,0,const,crop
-Winter wheat,yield_share_winter_wheat,,0.42,0.444444444,0.47,tnorm_0_1,crop
-Summer wheat,yield_share_summer_wheat,,0.42,0.444444444,0.47,tnorm_0_1,crop
-Rye,yield_share_rye,,0.45,0.473684211,0.5,tnorm_0_1,crop
-Winter barley,yield_share_winter_barley,,0.39,0.411764706,0.43,tnorm_0_1,crop
-Summer barley,yield_share_summer_barley,,0.42,0.444444444,0.47,tnorm_0_1,crop
-Oat,yield_share_oat,,0.5,0.523809524,0.55,tnorm_0_1,crop
-Triticale,yield_share_triticale,,0.45,0.473684211,0.5,tnorm_0_1,crop
-Corn,yield_share_corn,,0.48,0.5,0.53,tnorm_0_1,crop
-Fodder peas,yield_share_fodder_peas,,0.48,0.5,0.53,tnorm_0_1,crop
-Beans,yield_share_beans,,0.48,0.5,0.53,tnorm_0_1,crop
-Oilseed rape,yield_share_oilseed_rape,,0.6,0.62962963,0.66,tnorm_0_1,crop
-Potato,yield_share_potato,,0.16,0.166666667,0.18,tnorm_0_1,crop
-Sugar beet,yield_share_sugar_beet,,0.39,0.411764706,0.43,tnorm_0_1,crop
-Mais silage,yield_share_mais_silage,,1,1,1,const,crop
-share of straw harvested and used for animal bedding of cereals,straw_share,,0.33,0.33,0.33,const,crop
-Winter wheat,winter_wheat_to_animal,,0,0,0,const,crop
-Summer wheat,summer_wheat_to_animal,,0,0,0,const,crop
-Rye,rye_to_animal,,1,1,1,const,crop
-Winter barley,winter_barley_to_animal,,1,1,1,const,crop
-Summer barley,summer_barley_to_animal,,0.5,0.5,0.5,const,crop
-Common oat,oat_to_animal,,0.5,0.5,0.5,const,crop
-Triticale,triticale_to_animal,,1,1,1,const,crop
-Corn,corn_to_animal,,0,0,0,const,crop
-Fodder peas,fodder_peas_to_animal,,1,1,1,const,crop
-Beans,beans_to_animal,,1,1,1,const,crop
-Oilseed rape,oilseed_rape_to_animal,,0.5,0.5,0.5,const,crop
-Potato,potato_to_animal,,0.25,0.25,0.25,const,crop
-Sugar beet,sugar_beet_to_animal,,0.5,0.5,0.5,const,crop
-Mais silage,mais_silage_to_animal,,0.75,0.75,0.75,const,crop
-Winter wheat,winter_wheat_to_consumption,,1,1,1,const,crop
-Summer wheat,summer_wheat_to_consumption,,1,1,1,const,crop
-Rye,rye_to_consumption,,0,0,0,const,crop
-Winter barley,winter_barley_to_consumption,,0,0,0,const,crop
-Summer barley,summer_barley_to_consumption,,0.5,0.5,0.5,const,crop
-Common oat,oat_to_consumption,,0.5,0.5,0.5,const,crop
-Triticale,triticale_to_consumption,,0,0,0,const,crop
-Corn,corn_to_consumption,,1,1,1,const,crop
-Fodder peas,fodder_peas_to_consumption,,0,0,0,const,crop
-Beans,beans_to_consumption,,0,0,0,const,crop
-Oilseed rape,oilseed_rape_to_consumption,,0.5,0.5,0.5,const,crop
-Potato,potato_to_ponsumption,,0.75,0.75,0.75,const,crop
-Sugar beet,sugar_beet_to_sunsumption,,0.5,0.5,0.5,const,crop
-Mais silage,mais_silage_to_consumption,,0,0,0,const,crop
-,mais_silage_to_biogas,,0.25,0.25,0.25,const,crop
-,area_grassland,,21254,"21,254",21254,const,crop
-share of grazzland grazed; mowing is 1- the value,share_grazing,,0.4,0.5,0.6,tnorm_0_1,crop
-"grazing, N harvested kg/ha",N_yield_grazing,,117,130,143,posnorm,crop
-"silage mowing (max 20% hay), N harvested kg/ha",N_yield_mowing,,220.5,245,269.5,posnorm,crop
-,share_N_biogas_input_animal,share,0.33,0.38,0.44,tnorm_0_1,crop
-sweet_corn,land_sweet_corn_ha,,13.5,15,16.5,posnorm,crop
-veggie_peas,land_veggie_peas_ha,,531,590,649,posnorm,crop
-cabbage,land_cabbage_ha,,180,200,220,posnorm,crop
-arugula,land_arugula_ha,,45,50,55,posnorm,crop
-pumpkin,land_pumpkin_ha,,81,90,99,posnorm,crop
-onion,land_onion_ha,,144,160,176,posnorm,crop
-carrot,land_carrot_ha,,306,340,374,posnorm,crop
-green_bean,land_green_bean_ha,,139.5,155,170.5,posnorm,crop
-lambs_lettuce,land_lambs_lettuce_ha,,90,100,110,posnorm,crop
-lettuce,land_lettuce_ha,,288,320,352,posnorm,crop
-spinash,land_spinash_ha,,36,40,44,posnorm,crop
-radishes,land_radishes_ha,,36,40,44,posnorm,crop
-celery,land_celery_ha,,94.5,105,115.5,posnorm,crop
-parsley,land_parsley_ha,,22.5,25,27.5,posnorm,crop
-strawberry,land_strawberry_ha,,49.5,55,60.5,posnorm,crop
-apple,land_apple_ha,,45,50,55,posnorm,crop
-stone_fruit,land_stone_fruit_ha,,18,20,22,posnorm,crop
-berries,land_berries_ha,,121.5,135,148.5,posnorm,crop
-rhubarb,land_rhubarb_ha,,9,10,11,posnorm,crop
-asparagus,land_asparagus_ha,,261,290,319,posnorm,crop
-horticultural area,land_horticulture_ha,,2790,2790,2790,const,crop
-sweet_corn,yield_sweet_corn_dt_ha,,84.51,93.9,103.29,posnorm,crop
-veggie_peas,yield_veggie_peas_dt_ha,,56.88,63.2,69.52,posnorm,crop
-cabbage,yield_cabbage_dt_ha,,634.77,705.3,775.83,posnorm,crop
-arugula,yield_arugula_dt_ha,,125.01,138.9,152.79,posnorm,crop
-pumpkin,yield_pumpkin_dt_ha,,324.36,360.4,396.44,posnorm,crop
-onion,yield_onion_dt_ha,,463.77,515.3,566.83,posnorm,crop
-carrot,yield_carrot_dt_ha,,539.01,598.9,658.79,posnorm,crop
-green_bean,yield_green_bean_dt_ha,,106.02,117.8,129.58,posnorm,crop
-lambs_lettuce,yield_lambs_lettuce_dt_ha,,100.89,112.1,123.31,posnorm,crop
-lettuce,yield_lettuce_dt_ha,,318.96,354.4,389.84,posnorm,crop
-spinash,yield_spinash_dt_ha,,204.12,226.8,249.48,posnorm,crop
-radishes,yield_radishes_dt_ha,,467.82,519.8,571.78,posnorm,crop
-celery,yield_celery_dt_ha,,394.92,438.8,482.68,posnorm,crop
-parsley,yield_parsley_dt_ha,,19.3185,21,23.6115,posnorm,crop
-strawberry,yield_strawberry_dt_ha,,87.3,97,106.7,posnorm,crop
-apple,yield_apple_dt_ha,,229.5,255,280.5,posnorm,crop
-stone_fruit,yield_stone_fruit_dt_ha,,87.3,97,106.7,posnorm,crop
-berries,yield_berries_dt_ha,,112.5,125,137.5,posnorm,crop
-rhubarb,yield_rhubarb_dt_ha,,248.76,276.4,304.04,posnorm,crop
-asparagus,yield_asparagus_dt_ha,,25.92,28.8,31.68,posnorm,crop
-sweet_corn,N_content_sweet_corn_gr_100gr,,0.468,0.52,0.572,posnorm,crop
-veggie_peas,N_content_veggie_peas_gr_100gr,,0.945,1.05,1.155,posnorm,crop
-cabbage,N_content_cabbage_gr_100gr,,0.198,0.22,0.242,posnorm,crop
-arugula,N_content_arugula_gr_100gr,,0.378,0.42,0.462,posnorm,crop
-pumpkin,N_content_pumpkin_gr_100gr,,0.162,0.18,0.198,posnorm,crop
-onion,N_content_onion_gr_100gr,,0.171,0.19,0.209,posnorm,crop
-carrot,N_content_carrot_gr_100gr,,0.144,0.16,0.176,posnorm,crop
-green_bean,N_content_green_bean_gr_100gr,,0.945,1.05,1.155,posnorm,crop
-lambs_lettuce,N_content_lambs_lettuce_gr_100gr,,0.261,0.29,0.319,posnorm,crop
-lettuce,N_content_lettuce_gr_100gr,,0.171,0.19,0.209,posnorm,crop
-spinash,N_content_spinash_gr_100gr,,0.405,0.45,0.495,posnorm,crop
-radishes,N_content_radishes_gr_100gr,,0.216,0.24,0.264,posnorm,crop
-celery,N_content_celery_gr_100gr,,0.171,0.19,0.209,posnorm,crop
-parsley,N_content_parsley_gr_100gr,,0.639,0.71,0.781,posnorm,crop
-strawberry,N_content_strawberry_gr_100gr,,0.117,0.13,0.143,posnorm,crop
-apple,N_content_apple_gr_100gr,,0.045,0.05,0.055,posnorm,crop
-stone_fruit,N_content_stone_fruit_gr_100gr,,0.09,0.1,0.11,posnorm,crop
-berries,N_content_berries_gr_100gr,,0.162,0.18,0.198,posnorm,crop
-rhubarb,N_content_rhubarb_gr_100gr,,0.09,0.1,0.11,posnorm,crop
-asparagus,N_content_asparagus_gr_100gr,,0.279,0.31,0.341,posnorm,crop
-amount of digestate staying in Kleve,N_digestate_kg_ha,,12.69,14.1,15.51,posnorm,crop
-import of inorganic fertilizer based on the ha,import_inorganic_N_kg_LF,kg per LF,100,112.5,125,posnorm,crop
-taken from Nährstoffreport,import_organic_N_kg,,1125822.6,1250914,1376005.4,posnorm,crop
-taken from Nährstoffreport,export_manure_N_kg,,1692378,1880420,2068462,posnorm,crop
-calculated from total export - animal derived export,export_other_organic_N_kg,,391309.2,434788,478266.8,posnorm,crop
-yearly precipitation sum taken from climate-data.org,precipitation_sum,mm,848,848,848,const,crop
-average ackerzahl,ackerzahl,,54,60,66,posnorm,crop
-livestock density,livestock_density,LU per ha,1.6,1.85,2.1,posnorm,crop
-Nährstoffbericht said only larger than 160,fertilization_rate,kg per ha per year,160,170,180,posnorm,crop
-from unvermeidbare nährstoffverluste,ammonia_loss_rate_fertilizer,,0.018,0.02,0.022,tnorm_0_1,crop
-share of groundwater influenced grasslands,share_gorundwater_influenced_grassland,,0.09,0.1,0.11,tnorm_0_1,crop
-pauschale ammoniak verluste ackerland,flatrate_ammonia_losses,,3.6,4,4.4,posnorm,crop
-Dairy cattle 4,n_slaughter_dairy_cattle,individuals,215.9,254,292.1,posnorm,animal
-Oxes,n_slaughter_oxes,individuals,79.9,94,108.1,posnorm,animal
-Bulls,n_slaughter_bulls,individuals,487.05,573,658.95,posnorm,animal
-Female cattle (before calving),n_slaughter_female_cattle,individuals,1193.4,1404,1614.6,posnorm,animal
-Younstock ≤ 8 months,n_slaughter_younstock_youngage,individuals,150.45,177,203.55,posnorm,animal
-Younstock ≥ 8 and ≤ 12 months 15,n_slaughter_younstock_midage,individuals,23.8,28,32.2,posnorm,animal
-,n_slaughter_pig,individuals,614689.4,723164,831638.6,posnorm,animal
-,n_slaughter_poultry,individuals,914362.2,1015958,1117553.8,posnorm,animal
-,n_slaughter_lamb,individuals,0,0,0,const,animal
-,n_slaughter_sheep,individuals,1905.7,2242,2578.3,posnorm,animal
-,n_slaughter_goat,individuals,15.3,18,20.7,posnorm,animal
-,n_slaughter_horse,individuals,13.6,16,18.4,posnorm,animal
-,n_slaughter_import_dairy_cattle,individuals,2.55,3,3.45,posnorm,animal
-,n_slaughter_import_oxes,individuals,0,0,0,const,animal
-,n_slaughter_import_bulls,individuals,0,0,0,const,animal
-,n_slaughter_import_female_cattle,individuals,0,0,0,const,animal
-,n_slaughter_import_younstock_youngage,individuals,0,0,0,const,animal
-,n_slaughter_import_younstock_midage,individuals,0,0,0,const,animal
-,n_slaughter_import_pig,individuals,121435.25,142865,164294.75,posnorm,animal
-,n_slaughter_import_poultry,individuals,0,0,0,const,animal
-,n_slaughter_import_lamb,individuals,0,0,0,const,animal
-,n_slaughter_import_sheep,individuals,0,0,0,const,animal
-,n_slaughter_import_goat,individuals,0,0,0,const,animal
-,n_slaughter_import_horse,individuals,0,0,0,const,animal
-Dairy cattle 4,slaughter_weight_dairy_cattle,kg,247.259909,290.8940106,334.5281122,posnorm,animal
-Oxes,slaughter_weight_oxes,kg,289.1367959,340.1609364,391.1850769,posnorm,animal
-Bulls,slaughter_weight_bulls,kg,340.9754121,401.1475436,461.3196751,posnorm,animal
-Female cattle (before calving),slaughter_weight_female_cattle,kg,230.4829006,271.1563536,311.8298066,posnorm,animal
-Younstock ≤ 8 months,slaughter_weight_younstock_youngage,kg,128.4100927,151.0706973,173.7313019,posnorm,animal
-Younstock ≥ 8 and ≤ 12 months 15,slaughter_weight_younstock_midage,kg,149.9812189,176.4484928,202.9157667,posnorm,animal
-,slaughter_weight_pig,kg,81.85769807,96.3031742,110.7486503,posnorm,animal
-,slaughter_weight_poultry,kg,1.7,2,2.3,posnorm,animal
-,slaughter_weight_lamb,kg,15.30175983,18.00207039,20.70238095,posnorm,animal
-,slaughter_weight_sheep,kg,25.49339549,29.99222999,34.49106449,posnorm,animal
-,slaughter_weight_goat,kg,15.09769094,17.76198934,20.42628774,posnorm,animal
-,slaughter_weight_horse,kg,224.4408074,264.0480087,303.65521,posnorm,animal
-,slaughter_weight_fraction_cattle,share,0.493,0.58,0.667,tnorm_0_1,animal
-,slaughter_weight_fraction_pig,share,0.6375,0.75,0.8625,tnorm_0_1,animal
-,slaughter_weight_fraction_poultry,share,0.6035,0.71,0.8165,tnorm_0_1,animal
-,slaughter_weight_fraction_others,share,0.527,0.62,0.713,tnorm_0_1,animal
-,edible_fraction_cattle,share,0.442,0.52,0.598,tnorm_0_1,animal
-,edible_fraction_pig,share,0.578,0.68,0.782,tnorm_0_1,animal
-,edible_fraction_poultry,share,0.544,0.64,0.736,tnorm_0_1,animal
-,edible_fraction_other,share,0.476,0.56,0.644,tnorm_0_1,animal
-,N_content_female_cattle,gr N / 100 gram product,2.125,2.5,2.875,posnorm,animal
-,N_content_male_cattle,gr N / 100 gram product,2.295,2.7,3.105,posnorm,animal
-,N_content_pig,gr N / 100 gram product,2.176,2.56,2.944,posnorm,animal
-,N_content_poultry,gr N / 100 gram product,2.7625,3.25,3.7375,posnorm,animal
-,N_content_sheep,gr N / 100 gram product,2.21,2.6,2.99,posnorm,animal
-,N_content_horse,gr N / 100 gram product,2.55,3,3.45,posnorm,animal
-,P_content_female_cattle,g P2O5 / 100 g,1.233,1.37,1.507,posnorm,animal
-,P_content_male_cattle,g P2O5 / 100 g,1.341,1.49,1.639,posnorm,animal
-,P_content_pig,g P2O5 / 100 g,1.08,1.2,1.32,posnorm,animal
-,P_content_poultry,g P2O5 / 100 g,0.99,1.1,1.21,posnorm,animal
-,P_content_sheep,g P2O5 / 100 g,1.233,1.37,1.507,posnorm,animal
-,P_content_horse,g P2O5 / 100 g,1.566,1.74,1.914,posnorm,animal
-,K_content_female_cattle,g K2O / 100 g,0.261,0.29,0.319,posnorm,animal
-,K_content_male_cattle,g K2O / 100 g,0.261,0.29,0.319,posnorm,animal
-,K_content_pig,g K2O / 100 g,0.216,0.24,0.264,posnorm,animal
-,K_content_poultry,g K2O / 100 g,0.279,0.31,0.341,posnorm,animal
-,K_content_sheep,g K2O / 100 g,0.216,0.24,0.264,posnorm,animal
-,K_content_horse,g K2O / 100 g,0.261,0.29,0.319,posnorm,animal
-number of chicken in Kleve (assuming that the number of eggs in correct),n_chicken,individuals,165704.1,194946,224187.9,posnorm,animal
-egg laying rate (consumable eggs),egg_per_chicken,egg per chicken,238,280,322,posnorm,animal
-weight of average egg,egg-weight,g,53.465,62.9,72.335,posnorm,animal
-gr N / 100 gram product,N_content_egg,gr N / 100 gram product,1.7,2,2.3,posnorm,animal
-,P_content_egg,mg P / 100 g,189,210,231,posnorm,animal
-,K_content_egg,mg K / 100 g,132.3,147,161.7,posnorm,animal
-calculated based on total milk,N_content_milk,gr N / 100 gram product,0.442,0.52,0.598,posnorm,animal
-,P_content_milk,mg P / 100 g,82.8,92,101.2,posnorm,animal
-,K_content_milk,mg K / 100 g,141.3,157,172.7,posnorm,animal
-calculated based on total milk,share_milk_to_factory,share,0.65365,0.769,0.88435,tnorm_0_1,animal
-calculated based on total milk,share_milk_fed_farm,share,0.0102,0.012,0.0138,tnorm_0_1,animal
-calculated based on total milk,share_milk_direct_sale,share,0.0034,0.004,0.0046,tnorm_0_1,animal
-calculated based on total milk,share_milk_other_use,share,0.18275,0.215,0.24725,tnorm_0_1,animal
-taken IT.NRW for 2016,n_dairy_cow,individuals,48274.9,"56,794",65313.1,posnorm,animal
-calculated based on cow number and milk output,milk_per_cow,kg per cow ,6520.69,7671.4,8822.11,posnorm,animal
-calculated on LLU units in Nährstoffreport,n_other_poultry,individuals,370124,435440,500756,posnorm,animal
-weeks until turkey is slaughtered,weeks_to_grow,weeks,17,20,23,posnorm,animal
-Regionalstatistik 2016,n_bull,individuals,6282.35,7391,8499.65,posnorm,animal
-Regionalstatistik 2016,n_heifer,individuals,34712.3,40838,46963.7,posnorm,animal
-Regionalstatistik 2016,n_calf,individuals,20742.55,24403,28063.45,posnorm,animal
-"N excretion per ""Stellpletz"" and year",N_excretion_dairy,kg N / animal / year,97.155,114.3,131.445,posnorm,animal
-,N_excretion_bull,kg N / animal / year,39.95,47,54.05,posnorm,animal
-,N_excretion_heifer,kg N / animal / year,43.35,51,58.65,posnorm,animal
-,N_exctretion_calf,kg N / animal / year,12.75,15,17.25,posnorm,animal
-,N_excretion_hen,kg N / animal / year,0.6375,0.75,0.8625,posnorm,animal
-,N_excretion_other_poultry,kg N / animal / year,0.136,0.16,0.184,posnorm,animal
-,N_excretion_sheep,kg N / animal / year,14.45,17,19.55,posnorm,animal
-,N_excretion_pig,kg N / animal / year,9.35,11,12.65,posnorm,animal
-,n_sheep,individuals,5202.85,6121,7039.15,posnorm,animal
-,n_pig,individuals,310630.8,365448,420265.2,posnorm,animal
-share of cattle kept on liquid manure catchment systems,cattle_on_slurry,share,0.8835,0.93,0.9765,tnorm_0_1,animal
-share of pig kept on liquid manure catchment systems,pig_on_slurry,share,0.7125,0.75,0.7875,tnorm_0_1,animal
-"calculated as 1-rate in the Nährstoffreport, share of manure lost in storage process",cattle_housingloss_rate_liquid,share,0.1425,0.15,0.1575,tnorm_0_1,animal
-,cattle_housingloss_rate_solid,share,0.285,0.3,0.315,tnorm_0_1,animal
-,pig_housinglosss_rate_liquid,share,0.19,0.2,0.21,tnorm_0_1,animal
-,pig_housinglosss_rate_solid,share,0.285,0.3,0.315,tnorm_0_1,animal
-,others_housingloss_rate,share,0.38,0.4,0.42,tnorm_0_1,animal
-,N_biogas_input,kg N,2155393.011,2535756.48,2916119.956,posnorm,animal
-,population,persons,310329,310329,310329,const,consumption
-,consume_wheat,kg / person / year,58.5,65,71.5,posnorm,consumption
-,consume_rye,kg / person / year,6.84,7.6,8.36,posnorm,consumption
-,consume_rice,kg / person / year,4.59,5.1,5.61,posnorm,consumption
-,consume_legumes,kg / person / year,0.99,1.1,1.21,posnorm,consumption
-,consume_potato,kg / person / year,52.11,57.9,63.69,posnorm,consumption
-,consume_potato_starch,kg / person / year,9.63,10.7,11.77,posnorm,consumption
-,consume_sugar,kg / person / year,30.6,34,37.4,posnorm,consumption
-,consume_honey,kg / person / year,0.99,1.1,1.21,posnorm,consumption
-,consume_cocoa,kg / person / year,3.24,3.6,3.96,posnorm,consumption
-,consume_tree_fruits,kg / person / year,59.13,65.7,72.27,posnorm,consumption
-,consume_citrus_fruits,kg / person / year,32.85,36.5,40.15,posnorm,consumption
-,consume_nuts,kg / person / year,4.23,4.7,5.17,posnorm,consumption
-,consume_dried_fruit,kg / person / year,1.26,1.4,1.54,posnorm,consumption
-,consume_vegetables,kg / person / year,88.65,98.5,108.35,posnorm,consumption
-beef and veal,consume_beef,kg / person / year,12.6,14,15.4,posnorm,consumption
-pork meat,consume_pork,kg / person / year,45.09,50.1,55.11,posnorm,consumption
-sheep and goat meat,consume_sheep,kg / person / year,0.81,0.9,0.99,posnorm,consumption
-offal,consume_offal,kg / person / year,0.45,0.5,0.55,posnorm,consumption
-poultry,consume_poultry,kg / person / year,18.81,20.9,22.99,posnorm,consumption
-"other meat (game, rabbit)",consume_other_meat,kg / person / year,1.17,1.3,1.43,posnorm,consumption
-fish and fish products (catch weight),consume_fish,kg / person / year,12.69,14.1,15.51,posnorm,consumption
-fresh milk products,consume_milk,kg / person / year,75.51,83.9,92.29,posnorm,consumption
-cream,consume_cream,kg / person / year,5.4,6,6.6,posnorm,consumption
-condensed milk (product weight),consume_condensed_milk,kg / person / year,1.53,1.7,1.87,posnorm,consumption
-cheese incl. Cheese spread (product weight),consume_cheese,kg / person / year,22.23,24.7,27.17,posnorm,consumption
-butter (product weight),consume_butter,kg / person / year,5.4,6,6.6,posnorm,consumption
-margarine,consume_margarine,kg / person / year,2.43,2.7,2.97,posnorm,consumption
-,consume_beer,l / person,84.6,94,103.4,posnorm,consumption
-egg,consume_egg,kg / person / year,11.88,13.2,14.52,posnorm,consumption
-,consume_coffee,l / person,145.8,162,178.2,posnorm,consumption
-,consume_black_tea,l / person,23.76,26.4,29.04,posnorm,consumption
-,consume_herb_tea,l / person,48.06,53.4,58.74,posnorm,consumption
-,consume_sparkling_wine,l / person,3.123,3.47,3.817,posnorm,consumption
-,convert_coffee,g per liter,49.5,55,60.5,posnorm,consumption
-,convert_black_tea,g per liter,18,20,22,posnorm,consumption
-,convert_herb_tea,g per liter,18,20,22,posnorm,consumption
-,N_content_wheat,g N / 100 gram product,1.53,1.7,1.87,posnorm,consumption
-,N_content_rye,g N / 100 gram product,0.999,1.11,1.221,posnorm,consumption
-,N_content_rice,g N / 100 gram product,1.062,1.18,1.298,posnorm,consumption
-,N_content_legumes,g N / 100 gram product,0.945,1.05,1.155,posnorm,consumption
-,N_content_potato,g N / 100 gram product,0.297,0.33,0.363,posnorm,consumption
-,N_content_potato_starch,g N / 100 gram product,0.09,0.1,0.11,posnorm,consumption
-,N_content_sugar,g N / 100 gram product,0,0,0,const,consumption
-,N_content_honey,g N / 100 gram product,0.054,0.06,0.066,posnorm,consumption
-,N_content_cocoa,g N / 100 gram product,1.323,1.47,1.617,posnorm,consumption
-,N_content_tree_fruits,g N / 100 gram product,0.045,0.05,0.055,posnorm,consumption
-,N_content_citrus_fruits,g N / 100 gram product,0.099,0.11,0.121,posnorm,consumption
-,N_content_nuts,g N / 100 gram product,4.284,4.76,5.236,posnorm,consumption
-,N_content_dried_fruit,g N / 100 gram product,0.198,0.22,0.242,posnorm,consumption
-,N_content_vegetables,g N / 100 gram product,0.144,0.16,0.176,posnorm,consumption
-,N_content_beef,g N / 100 gram product,3.051,3.39,3.729,posnorm,consumption
-,N_content_pork,g N / 100 gram product,3.168,3.52,3.872,posnorm,consumption
-,N_content_sheep_meat,g N / 100 gram product,2.934,3.26,3.586,posnorm,consumption
-,N_content_offal,g N / 100 gram product,2.142,2.38,2.618,posnorm,consumption
-,N_content_poultry_meat,g N / 100 gram product,3.195,3.55,3.905,posnorm,consumption
-,N_content_other_meat,g N / 100 gram product,2.97,3.3,3.63,posnorm,consumption
-,N_content_fish,g N / 100 gram product,2.403,2.67,2.937,posnorm,consumption
-,N_content_cream,g N / 100 gram product,0.333,0.37,0.407,posnorm,consumption
-,N_content_condensed_milk,g N / 100 gram product,0.918,1.02,1.122,posnorm,consumption
-,N_content_cheese,g N / 100 gram product,3.6,4,4.4,posnorm,consumption
-,N_content_butter,g N / 100 gram product,0.099,0.11,0.121,posnorm,consumption
-,N_content_margarine,g N / 100 gram product,0.027,0.03,0.033,posnorm,consumption
-,N_content_beer,g N / 100 gram product,0.072,0.08,0.088,posnorm,consumption
-,N_content_coffee,g N / 100 gram product,2.016,2.24,2.464,posnorm,consumption
-,N_content_black_tea,g N / 100 gram product,3.528,3.92,4.312,posnorm,consumption
-,N_content_herb_tea,g N / 100 gram product,3.528,3.92,4.312,posnorm,consumption
-,N_content_sparkling_wine,g N / 100 gram product,0.027,0.03,0.033,posnorm,consumption
-amount of waste water remaining in channel,wastewater_remain_canal,m3,990900,1101000,1211100,posnorm,consumption
-direct discharge of wastewater to ground and surface water,wastewater_direct_discharge,m3,11570400,12856000,14141600,posnorm,consumption
-fresh mass municipal organic waste,ofmsw_local,ton,31947.642,"35,497",39047.118,posnorm,waste
-fresh mass of municipal organic waste imported,ofmsw_import,ton,21562.02,"23,958",26353.58,posnorm,waste
-green waste local,green_waste_local,ton,7113.357,"7,904",8694.103,posnorm,waste
-green waste import,green_waste_import,ton,4528.845,"5,032",5535.255,posnorm,waste
-grey bin food waste,grey_bin_food_waste,ton,3861.268583,"4,290",4719.328268,posnorm,waste
-grey bin garden waste,grey_bin_garden_waste,ton,1026.413168,"1,140",1254.504983,posnorm,waste
-dry matter content organic solid waste,dm_ofmsw,share,0.234,0.2825,0.331,tnorm_0_1,waste
-dry matter content green waste,dm_green_waste,share,0.46,0.5815,0.703,tnorm_0_1,waste
-N content (% of DM) organic solid waste,N_content_ofmsw_waste,,0.023,0.0255,0.028,tnorm_0_1,waste
-N content (% of DM) green waste,N_content_green_waste,,0.0035,0.00555,0.0076,tnorm_0_1,waste
-assumed energy produced by biogas per agricultural used area,lf_to_kwel,KWel per 100 LF,17.5,21,25,posnorm,waste
-digestate per produced kwel,Kwel_to_digestate,m3 per Kwel,18,20,22,posnorm,waste
-digestate density,digestate_density,kg per m3,866,983,1100,posnorm,waste
-digestate N content,digestate_N_content,kg N per t fresh matter,4.14,4.6,5.06,posnorm,waste
-fresh matter compost to horticulture,compost_to_horticulture,,18390.573,20434,22477.367,posnorm,waste
-fresh matter compost to export,compost_to_export,,16417.98,18242,20066.42,posnorm,waste
-fresh matter compost to consumption,compost_to_consumption,,900,1000,1100,posnorm,waste
-dry matter content compost horticulture,dm_compost_horticulture,share,0.49,0.59,0.687,tnorm_0_1,waste
-dry matter content compost consumption,dm_compost_consumption,share,0.56,0.69,0.81,tnorm_0_1,waste
-N content compost horticulture,N_content_compost_horticulture,share,0.012015,0.01335,0.014685,tnorm_0_1,waste
-N content compost consumption,N_content_compost_consumption,share,0.011025,0.01225,0.013475,tnorm_0_1,waste
-N content sewage sludge,N_content_sewage_sludge,share of N to total mass,0.0513,0.057,0.0627,tnorm_0_1,waste
-share of kept N for agriculture,share_N_sewage_for_agriculture,,0.065761589,0.073,0.080375276,tnorm_0_1,waste
-total waste water,waste_water,m3,24621300,27357000,30092700,posnorm,waste
-share of waste water with denitrification and P elimination,share_wastewater_denitrified,,0.587498629,0.653,0.71805388,tnorm_0_1,waste
-N content waste warer,N_content_wastewater,mg N per L,62.55,69.5,76.45,posnorm,waste
-loss rate sewage during treatment,lossrate_wastewater,,0.684,0.76,0.836,tnorm_0_1,waste
+﻿description,variable,unit,lower,median,upper,distribution,subsystem,range_from_source
+Winter wheat,share_winter_wheat,,0.169,0.211,0.253,tnorm_0_1,crop,
+Summer wheat (weizen),share_summer_wheat,,0.0008,0.001,0.0012,tnorm_0_1,crop,
+Rye (rogge),share_rye,,0.0008,0.001,0.0012,tnorm_0_1,crop,
+Winter barley (gerste),share_winter_barley,,0.057,0.071,0.085,tnorm_0_1,crop,
+Summer barley,share_summer_barley,,0.002,0.003,0.004,tnorm_0_1,crop,
+Common oat (hafer),share_oat,,0.0008,0.001,0.0012,tnorm_0_1,crop,
+Triticale,share_triticale,,0.011,0.014,0.017,tnorm_0_1,crop,
+Corn mais 2,share_corn,,0.033,0.041,0.049,tnorm_0_1,crop,
+Fodder peas (erbsen),share_fodder_peas,,0.005,0.006,0.007,tnorm_0_1,crop,
+Beans (ackerbohnen),share_beans,,0.012,0.015,0.018,tnorm_0_1,crop,
+winter koolzaad (raps),share_oilseed_rape,,0.018,0.022,0.026,tnorm_0_1,crop,
+Potato 3,share_potato,,0.095,0.119,0.143,tnorm_0_1,crop,
+Sugar beet 4,share_sugar_beet,,0.057,0.071,0.085,tnorm_0_1,crop,
+Mais silage 5,share_mais_silage,,0.264,0.33,0.396,tnorm_0_1,crop,
+total share of arable land,share_crop_land,,0.906,0.906,0.906,const,crop,
+arable land in ha,arable_land,,49585,49585,49585,const,crop,
+Winter wheat,yield_winter_wheat,,70.13,82.5,94.88,posnorm,crop,
+Summer wheat (weizen),yield_summer_wheat,,57.04,67.1,77.17,posnorm,crop,
+Rye (rogge),yield_rye,,42.67,50.2,57.73,posnorm,crop,
+Winter barley (gerste),yield_winter_barley,,58.74,69.1,79.47,posnorm,crop,
+Summer barley,yield_summer_barley,,52.87,62.2,71.53,posnorm,crop,
+Common oat (hafer),yield_oat,,49.98,58.8,67.62,posnorm,crop,
+Triticale,yield_triticale,,59.5,70,80.5,posnorm,crop,
+Corn mais 2,yield_corn,,62.05,73,83.95,posnorm,crop,
+Fodder peas (erbsen),yield_fodder_peas,,42.84,50.4,57.96,posnorm,crop,
+Beans (ackerbohnen),yield_beans,,35.7,42,48.3,posnorm,crop,
+winter koolzaad (raps),yield_oilseed_rape,,33.83,39.8,45.77,posnorm,crop,
+Potato 3,yield_potato,,514.25,605,695.75,posnorm,crop,
+Sugar beet 4,yield_sugar_beet,,576.3,678,779.7,posnorm,crop,
+Mais silage 5,yield_mais_silage,,351.05,413,474.95,posnorm,crop,
+Winter wheat,dm_winter_wheat,,0.82,0.86,0.9,tnorm_0_1,crop,
+Summer wheat,dm_summer_wheat,,0.82,0.86,0.9,tnorm_0_1,crop,
+Rye,dm_rye,,0.82,0.86,0.9,tnorm_0_1,crop,
+Winter barley,dm_winter_barley,,0.82,0.86,0.9,tnorm_0_1,crop,
+Summer barley,dm_summer_barley,,0.82,0.86,0.9,tnorm_0_1,crop,
+Oat,dm_oat,,0.82,0.86,0.9,tnorm_0_1,crop,
+Triticale,dm_triticale,,0.82,0.86,0.9,tnorm_0_1,crop,
+Corn,dm_corn,,0.82,0.86,0.9,tnorm_0_1,crop,
+Fodder peas,dm_fodder_peas,,0.82,0.86,0.9,tnorm_0_1,crop,
+Beans,dm_beans,,0.82,0.86,0.9,tnorm_0_1,crop,
+Oilseed rape,dm_oilseed_rape,,0.86,0.91,0.96,tnorm_0_1,crop,
+Potato,dm_potato,,0.21,0.22,0.23,tnorm_0_1,crop,
+Sugar beet,dm_sugar_beet,,0.22,0.23,0.24,tnorm_0_1,crop,
+Mais silage,dm_mais_silage,,0.31,0.33,0.35,tnorm_0_1,crop,
+Winter wheat,N_yield_winter_weat,,1.58,1.75,1.93,posnorm,crop,
+Summer wheat,N_yield_summer_weat,,1.58,1.75,1.93,posnorm,crop,
+Rye,N_yield_rye,,1.42,1.58,1.74,posnorm,crop,
+Winter barley,N_yield_winter_barley,,1.55,1.72,1.89,posnorm,crop,
+Summer barley,N_yield_summer_barley,,1.55,1.72,1.89,posnorm,crop,
+Oat,N_yield_oat,,1.42,1.58,1.74,posnorm,crop,
+Triticale,N_yield_triticale,,1.55,1.72,1.89,posnorm,crop,
+Corn,N_yield_corn,,1.31,1.45,1.6,posnorm,crop,
+Fodder peas,N_yield_fodder_peas,,3.24,3.6,3.96,posnorm,crop,
+Beans,N_yield_beans,,3.69,4.1,4.51,posnorm,crop,
+Oilseed rape,N_yield_oilseed_rape,,3.02,3.35,3.69,posnorm,crop,
+Potato,N_yield_potato,,0.32,0.35,0.39,posnorm,crop,
+Sugar beet,N_yield_sugar_beet,,0.16,0.18,0.2,posnorm,crop,
+Mais silage,N_yield_mais_silage,,0.72,0.8,0.88,posnorm,crop,
+Winter wheat,N_leftover_winter_wheat,,0.48,0.5,0.53,posnorm,crop,
+Summer wheat,N_leftover_summer_wheat,,0.48,0.5,0.53,posnorm,crop,
+Rye,N_leftover_rye,,0.48,0.5,0.53,posnorm,crop,
+Winter barley,N_leftover_winter_barley,,0.48,0.5,0.53,posnorm,crop,
+Summer barley,N_leftover_summer_barley,,0.48,0.5,0.53,posnorm,crop,
+Oat,N_leftover_oat,,0.48,0.5,0.53,posnorm,crop,
+Triticale,N_leftover_triticale,,0.48,0.5,0.53,posnorm,crop,
+Corn,N_leftover_corn,,0.86,0.9,0.95,posnorm,crop,
+Fodder peas,N_leftover_foder_peas,,1.43,1.5,1.58,posnorm,crop,
+Beans,N_leftover_beans,,1.43,1.5,1.58,posnorm,crop,
+Oilseed rape,N_leftover_oilseed_rape,,0.67,0.7,0.74,posnorm,crop,
+Potato,N_leftover_potato,,0.19,0.2,0.21,posnorm,crop,
+Sugar beet,N_leftover_sugar_beet,,0.38,0.4,0.42,posnorm,crop,
+Mais silage,N_leftover_mais_silage,,0,0,0,const,crop,
+Winter wheat,yield_share_winter_wheat,,0.42,0.444444444,0.47,tnorm_0_1,crop,
+Summer wheat,yield_share_summer_wheat,,0.42,0.444444444,0.47,tnorm_0_1,crop,
+Rye,yield_share_rye,,0.45,0.473684211,0.5,tnorm_0_1,crop,
+Winter barley,yield_share_winter_barley,,0.39,0.411764706,0.43,tnorm_0_1,crop,
+Summer barley,yield_share_summer_barley,,0.42,0.444444444,0.47,tnorm_0_1,crop,
+Oat,yield_share_oat,,0.5,0.523809524,0.55,tnorm_0_1,crop,
+Triticale,yield_share_triticale,,0.45,0.473684211,0.5,tnorm_0_1,crop,
+Corn,yield_share_corn,,0.48,0.5,0.53,tnorm_0_1,crop,
+Fodder peas,yield_share_fodder_peas,,0.48,0.5,0.53,tnorm_0_1,crop,
+Beans,yield_share_beans,,0.48,0.5,0.53,tnorm_0_1,crop,
+Oilseed rape,yield_share_oilseed_rape,,0.6,0.62962963,0.66,tnorm_0_1,crop,
+Potato,yield_share_potato,,0.16,0.166666667,0.18,tnorm_0_1,crop,
+Sugar beet,yield_share_sugar_beet,,0.39,0.411764706,0.43,tnorm_0_1,crop,
+Mais silage,yield_share_mais_silage,,1,1,1,const,crop,
+share of straw harvested and used for animal bedding of cereals,straw_share,,0.33,0.33,0.33,const,crop,
+Winter wheat,winter_wheat_to_animal,,0,0,0,const,crop,
+Summer wheat,summer_wheat_to_animal,,0,0,0,const,crop,
+Rye,rye_to_animal,,1,1,1,const,crop,
+Winter barley,winter_barley_to_animal,,1,1,1,const,crop,
+Summer barley,summer_barley_to_animal,,0.5,0.5,0.5,const,crop,
+Common oat,oat_to_animal,,0.5,0.5,0.5,const,crop,
+Triticale,triticale_to_animal,,1,1,1,const,crop,
+Corn,corn_to_animal,,0,0,0,const,crop,
+Fodder peas,fodder_peas_to_animal,,1,1,1,const,crop,
+Beans,beans_to_animal,,1,1,1,const,crop,
+Oilseed rape,oilseed_rape_to_animal,,0.5,0.5,0.5,const,crop,
+Potato,potato_to_animal,,0.25,0.25,0.25,const,crop,
+Sugar beet,sugar_beet_to_animal,,0.5,0.5,0.5,const,crop,
+Mais silage,mais_silage_to_animal,,0.75,0.75,0.75,const,crop,
+Winter wheat,winter_wheat_to_consumption,,1,1,1,const,crop,
+Summer wheat,summer_wheat_to_consumption,,1,1,1,const,crop,
+Rye,rye_to_consumption,,0,0,0,const,crop,
+Winter barley,winter_barley_to_consumption,,0,0,0,const,crop,
+Summer barley,summer_barley_to_consumption,,0.5,0.5,0.5,const,crop,
+Common oat,oat_to_consumption,,0.5,0.5,0.5,const,crop,
+Triticale,triticale_to_consumption,,0,0,0,const,crop,
+Corn,corn_to_consumption,,1,1,1,const,crop,
+Fodder peas,fodder_peas_to_consumption,,0,0,0,const,crop,
+Beans,beans_to_consumption,,0,0,0,const,crop,
+Oilseed rape,oilseed_rape_to_consumption,,0.5,0.5,0.5,const,crop,
+Potato,potato_to_ponsumption,,0.75,0.75,0.75,const,crop,
+Sugar beet,sugar_beet_to_sunsumption,,0.5,0.5,0.5,const,crop,
+Mais silage,mais_silage_to_consumption,,0,0,0,const,crop,
+,mais_silage_to_biogas,,0.25,0.25,0.25,const,crop,
+,area_grassland,,21254,"21,254",21254,const,crop,
+share of grazzland grazed; mowing is 1- the value,share_grazing,,0.4,0.5,0.6,tnorm_0_1,crop,
+"grazing, N harvested kg/ha",N_yield_grazing,,117,130,143,posnorm,crop,
+"silage mowing (max 20% hay), N harvested kg/ha",N_yield_mowing,,220.5,245,269.5,posnorm,crop,
+,share_N_biogas_input_animal,share,0.33,0.38,0.44,tnorm_0_1,crop,
+sweet_corn,land_sweet_corn_ha,,13.5,15,16.5,posnorm,crop,
+veggie_peas,land_veggie_peas_ha,,531,590,649,posnorm,crop,
+cabbage,land_cabbage_ha,,180,200,220,posnorm,crop,
+arugula,land_arugula_ha,,45,50,55,posnorm,crop,
+pumpkin,land_pumpkin_ha,,81,90,99,posnorm,crop,
+onion,land_onion_ha,,144,160,176,posnorm,crop,
+carrot,land_carrot_ha,,306,340,374,posnorm,crop,
+green_bean,land_green_bean_ha,,139.5,155,170.5,posnorm,crop,
+lambs_lettuce,land_lambs_lettuce_ha,,90,100,110,posnorm,crop,
+lettuce,land_lettuce_ha,,288,320,352,posnorm,crop,
+spinash,land_spinash_ha,,36,40,44,posnorm,crop,
+radishes,land_radishes_ha,,36,40,44,posnorm,crop,
+celery,land_celery_ha,,94.5,105,115.5,posnorm,crop,
+parsley,land_parsley_ha,,22.5,25,27.5,posnorm,crop,
+strawberry,land_strawberry_ha,,49.5,55,60.5,posnorm,crop,
+apple,land_apple_ha,,45,50,55,posnorm,crop,
+stone_fruit,land_stone_fruit_ha,,18,20,22,posnorm,crop,
+berries,land_berries_ha,,121.5,135,148.5,posnorm,crop,
+rhubarb,land_rhubarb_ha,,9,10,11,posnorm,crop,
+asparagus,land_asparagus_ha,,261,290,319,posnorm,crop,
+horticultural area,land_horticulture_ha,,2790,2790,2790,const,crop,
+sweet_corn,yield_sweet_corn_dt_ha,,84.51,93.9,103.29,posnorm,crop,
+veggie_peas,yield_veggie_peas_dt_ha,,56.88,63.2,69.52,posnorm,crop,
+cabbage,yield_cabbage_dt_ha,,634.77,705.3,775.83,posnorm,crop,
+arugula,yield_arugula_dt_ha,,125.01,138.9,152.79,posnorm,crop,
+pumpkin,yield_pumpkin_dt_ha,,324.36,360.4,396.44,posnorm,crop,
+onion,yield_onion_dt_ha,,463.77,515.3,566.83,posnorm,crop,
+carrot,yield_carrot_dt_ha,,539.01,598.9,658.79,posnorm,crop,
+green_bean,yield_green_bean_dt_ha,,106.02,117.8,129.58,posnorm,crop,
+lambs_lettuce,yield_lambs_lettuce_dt_ha,,100.89,112.1,123.31,posnorm,crop,
+lettuce,yield_lettuce_dt_ha,,318.96,354.4,389.84,posnorm,crop,
+spinash,yield_spinash_dt_ha,,204.12,226.8,249.48,posnorm,crop,
+radishes,yield_radishes_dt_ha,,467.82,519.8,571.78,posnorm,crop,
+celery,yield_celery_dt_ha,,394.92,438.8,482.68,posnorm,crop,
+parsley,yield_parsley_dt_ha,,19.3185,21,23.6115,posnorm,crop,
+strawberry,yield_strawberry_dt_ha,,87.3,97,106.7,posnorm,crop,
+apple,yield_apple_dt_ha,,229.5,255,280.5,posnorm,crop,
+stone_fruit,yield_stone_fruit_dt_ha,,87.3,97,106.7,posnorm,crop,
+berries,yield_berries_dt_ha,,112.5,125,137.5,posnorm,crop,
+rhubarb,yield_rhubarb_dt_ha,,248.76,276.4,304.04,posnorm,crop,
+asparagus,yield_asparagus_dt_ha,,25.92,28.8,31.68,posnorm,crop,
+sweet_corn,N_content_sweet_corn_gr_100gr,,0.468,0.52,0.572,posnorm,crop,
+veggie_peas,N_content_veggie_peas_gr_100gr,,0.945,1.05,1.155,posnorm,crop,
+cabbage,N_content_cabbage_gr_100gr,,0.198,0.22,0.242,posnorm,crop,
+arugula,N_content_arugula_gr_100gr,,0.378,0.42,0.462,posnorm,crop,
+pumpkin,N_content_pumpkin_gr_100gr,,0.162,0.18,0.198,posnorm,crop,
+onion,N_content_onion_gr_100gr,,0.171,0.19,0.209,posnorm,crop,
+carrot,N_content_carrot_gr_100gr,,0.144,0.16,0.176,posnorm,crop,
+green_bean,N_content_green_bean_gr_100gr,,0.945,1.05,1.155,posnorm,crop,
+lambs_lettuce,N_content_lambs_lettuce_gr_100gr,,0.261,0.29,0.319,posnorm,crop,
+lettuce,N_content_lettuce_gr_100gr,,0.171,0.19,0.209,posnorm,crop,
+spinash,N_content_spinash_gr_100gr,,0.405,0.45,0.495,posnorm,crop,
+radishes,N_content_radishes_gr_100gr,,0.216,0.24,0.264,posnorm,crop,
+celery,N_content_celery_gr_100gr,,0.171,0.19,0.209,posnorm,crop,
+parsley,N_content_parsley_gr_100gr,,0.639,0.71,0.781,posnorm,crop,
+strawberry,N_content_strawberry_gr_100gr,,0.117,0.13,0.143,posnorm,crop,
+apple,N_content_apple_gr_100gr,,0.045,0.05,0.055,posnorm,crop,
+stone_fruit,N_content_stone_fruit_gr_100gr,,0.09,0.1,0.11,posnorm,crop,
+berries,N_content_berries_gr_100gr,,0.162,0.18,0.198,posnorm,crop,
+rhubarb,N_content_rhubarb_gr_100gr,,0.09,0.1,0.11,posnorm,crop,
+asparagus,N_content_asparagus_gr_100gr,,0.279,0.31,0.341,posnorm,crop,
+amount of digestate staying in Kleve,N_digestate_kg_ha,,12.69,14.1,15.51,posnorm,crop,
+import of inorganic fertilizer based on the ha,import_inorganic_N_kg_LF,kg per LF,100,112.5,125,posnorm,crop,
+taken from Nährstoffreport,import_organic_N_kg,,1125822.6,1250914,1376005.4,posnorm,crop,
+taken from Nährstoffreport,export_manure_N_kg,,1692378,1880420,2068462,posnorm,crop,
+calculated from total export - animal derived export,export_other_organic_N_kg,,391309.2,434788,478266.8,posnorm,crop,
+yearly precipitation sum taken from climate-data.org,precipitation_sum,mm,848,848,848,const,crop,
+average ackerzahl,ackerzahl,,54,60,66,posnorm,crop,
+livestock density,livestock_density,LU per ha,1.6,1.85,2.1,posnorm,crop,
+Nährstoffbericht said only larger than 160,fertilization_rate,kg per ha per year,160,170,180,posnorm,crop,
+from unvermeidbare nährstoffverluste,ammonia_loss_rate_fertilizer,,0.018,0.02,0.022,tnorm_0_1,crop,
+share of groundwater influenced grasslands,share_gorundwater_influenced_grassland,,0.09,0.1,0.11,tnorm_0_1,crop,
+pauschale ammoniak verluste ackerland,flatrate_ammonia_losses,,3.6,4,4.4,posnorm,crop,
+Dairy cattle 4,n_slaughter_dairy_cattle,individuals,215.9,254,292.1,posnorm,animal,
+Oxes,n_slaughter_oxes,individuals,79.9,94,108.1,posnorm,animal,
+Bulls,n_slaughter_bulls,individuals,487.05,573,658.95,posnorm,animal,
+Female cattle (before calving),n_slaughter_female_cattle,individuals,1193.4,1404,1614.6,posnorm,animal,
+Younstock ≤ 8 months,n_slaughter_younstock_youngage,individuals,150.45,177,203.55,posnorm,animal,
+Younstock ≥ 8 and ≤ 12 months 15,n_slaughter_younstock_midage,individuals,23.8,28,32.2,posnorm,animal,
+,n_slaughter_pig,individuals,614689.4,723164,831638.6,posnorm,animal,
+,n_slaughter_poultry,individuals,914362.2,1015958,1117553.8,posnorm,animal,
+,n_slaughter_lamb,individuals,0,0,0,const,animal,
+,n_slaughter_sheep,individuals,1905.7,2242,2578.3,posnorm,animal,
+,n_slaughter_goat,individuals,15.3,18,20.7,posnorm,animal,
+,n_slaughter_horse,individuals,13.6,16,18.4,posnorm,animal,
+,n_slaughter_import_dairy_cattle,individuals,2.55,3,3.45,posnorm,animal,
+,n_slaughter_import_oxes,individuals,0,0,0,const,animal,
+,n_slaughter_import_bulls,individuals,0,0,0,const,animal,
+,n_slaughter_import_female_cattle,individuals,0,0,0,const,animal,
+,n_slaughter_import_younstock_youngage,individuals,0,0,0,const,animal,
+,n_slaughter_import_younstock_midage,individuals,0,0,0,const,animal,
+,n_slaughter_import_pig,individuals,121435.25,142865,164294.75,posnorm,animal,
+,n_slaughter_import_poultry,individuals,0,0,0,const,animal,
+,n_slaughter_import_lamb,individuals,0,0,0,const,animal,
+,n_slaughter_import_sheep,individuals,0,0,0,const,animal,
+,n_slaughter_import_goat,individuals,0,0,0,const,animal,
+,n_slaughter_import_horse,individuals,0,0,0,const,animal,
+Dairy cattle 4,slaughter_weight_dairy_cattle,kg,247.259909,290.8940106,334.5281122,posnorm,animal,
+Oxes,slaughter_weight_oxes,kg,289.1367959,340.1609364,391.1850769,posnorm,animal,
+Bulls,slaughter_weight_bulls,kg,340.9754121,401.1475436,461.3196751,posnorm,animal,
+Female cattle (before calving),slaughter_weight_female_cattle,kg,230.4829006,271.1563536,311.8298066,posnorm,animal,
+Younstock ≤ 8 months,slaughter_weight_younstock_youngage,kg,128.4100927,151.0706973,173.7313019,posnorm,animal,
+Younstock ≥ 8 and ≤ 12 months 15,slaughter_weight_younstock_midage,kg,149.9812189,176.4484928,202.9157667,posnorm,animal,
+,slaughter_weight_pig,kg,81.85769807,96.3031742,110.7486503,posnorm,animal,
+,slaughter_weight_poultry,kg,1.7,2,2.3,posnorm,animal,
+,slaughter_weight_lamb,kg,15.30175983,18.00207039,20.70238095,posnorm,animal,
+,slaughter_weight_sheep,kg,25.49339549,29.99222999,34.49106449,posnorm,animal,
+,slaughter_weight_goat,kg,15.09769094,17.76198934,20.42628774,posnorm,animal,
+,slaughter_weight_horse,kg,224.4408074,264.0480087,303.65521,posnorm,animal,
+,slaughter_weight_fraction_cattle,share,0.493,0.58,0.667,tnorm_0_1,animal,
+,slaughter_weight_fraction_pig,share,0.6375,0.75,0.8625,tnorm_0_1,animal,
+,slaughter_weight_fraction_poultry,share,0.6035,0.71,0.8165,tnorm_0_1,animal,
+,slaughter_weight_fraction_others,share,0.527,0.62,0.713,tnorm_0_1,animal,
+,edible_fraction_cattle,share,0.442,0.52,0.598,tnorm_0_1,animal,
+,edible_fraction_pig,share,0.578,0.68,0.782,tnorm_0_1,animal,
+,edible_fraction_poultry,share,0.544,0.64,0.736,tnorm_0_1,animal,
+,edible_fraction_other,share,0.476,0.56,0.644,tnorm_0_1,animal,
+,N_content_female_cattle,gr N / 100 gram product,2.125,2.5,2.875,posnorm,animal,
+,N_content_male_cattle,gr N / 100 gram product,2.295,2.7,3.105,posnorm,animal,
+,N_content_pig,gr N / 100 gram product,2.176,2.56,2.944,posnorm,animal,
+,N_content_poultry,gr N / 100 gram product,2.7625,3.25,3.7375,posnorm,animal,
+,N_content_sheep,gr N / 100 gram product,2.21,2.6,2.99,posnorm,animal,
+,N_content_horse,gr N / 100 gram product,2.55,3,3.45,posnorm,animal,
+,P_content_female_cattle,g P2O5 / 100 g,1.233,1.37,1.507,posnorm,animal,
+,P_content_male_cattle,g P2O5 / 100 g,1.341,1.49,1.639,posnorm,animal,
+,P_content_pig,g P2O5 / 100 g,1.08,1.2,1.32,posnorm,animal,
+,P_content_poultry,g P2O5 / 100 g,0.99,1.1,1.21,posnorm,animal,
+,P_content_sheep,g P2O5 / 100 g,1.233,1.37,1.507,posnorm,animal,
+,P_content_horse,g P2O5 / 100 g,1.566,1.74,1.914,posnorm,animal,
+,K_content_female_cattle,g K2O / 100 g,0.261,0.29,0.319,posnorm,animal,
+,K_content_male_cattle,g K2O / 100 g,0.261,0.29,0.319,posnorm,animal,
+,K_content_pig,g K2O / 100 g,0.216,0.24,0.264,posnorm,animal,
+,K_content_poultry,g K2O / 100 g,0.279,0.31,0.341,posnorm,animal,
+,K_content_sheep,g K2O / 100 g,0.216,0.24,0.264,posnorm,animal,
+,K_content_horse,g K2O / 100 g,0.261,0.29,0.319,posnorm,animal,
+number of chicken in Kleve (assuming that the number of eggs in correct),n_chicken,individuals,165704.1,194946,224187.9,posnorm,animal,
+egg laying rate (consumable eggs),egg_per_chicken,egg per chicken,238,280,322,posnorm,animal,
+weight of average egg,egg-weight,g,53.465,62.9,72.335,posnorm,animal,
+gr N / 100 gram product,N_content_egg,gr N / 100 gram product,1.7,2,2.3,posnorm,animal,
+,P_content_egg,mg P / 100 g,189,210,231,posnorm,animal,
+,K_content_egg,mg K / 100 g,132.3,147,161.7,posnorm,animal,
+calculated based on total milk,N_content_milk,gr N / 100 gram product,0.442,0.52,0.598,posnorm,animal,
+,P_content_milk,mg P / 100 g,82.8,92,101.2,posnorm,animal,
+,K_content_milk,mg K / 100 g,141.3,157,172.7,posnorm,animal,
+calculated based on total milk,share_milk_to_factory,share,0.65365,0.769,0.88435,tnorm_0_1,animal,
+calculated based on total milk,share_milk_fed_farm,share,0.0102,0.012,0.0138,tnorm_0_1,animal,
+calculated based on total milk,share_milk_direct_sale,share,0.0034,0.004,0.0046,tnorm_0_1,animal,
+calculated based on total milk,share_milk_other_use,share,0.18275,0.215,0.24725,tnorm_0_1,animal,
+taken IT.NRW for 2016,n_dairy_cow,individuals,48274.9,"56,794",65313.1,posnorm,animal,
+calculated based on cow number and milk output,milk_per_cow,kg per cow ,6520.69,7671.4,8822.11,posnorm,animal,
+calculated on LLU units in Nährstoffreport,n_other_poultry,individuals,370124,435440,500756,posnorm,animal,
+weeks until turkey is slaughtered,weeks_to_grow,weeks,17,20,23,posnorm,animal,
+Regionalstatistik 2016,n_bull,individuals,6282.35,7391,8499.65,posnorm,animal,
+Regionalstatistik 2016,n_heifer,individuals,34712.3,40838,46963.7,posnorm,animal,
+Regionalstatistik 2016,n_calf,individuals,20742.55,24403,28063.45,posnorm,animal,
+"N excretion per ""Stellpletz"" and year",N_excretion_dairy,kg N / animal / year,97.155,114.3,131.445,posnorm,animal,
+,N_excretion_bull,kg N / animal / year,39.95,47,54.05,posnorm,animal,
+,N_excretion_heifer,kg N / animal / year,43.35,51,58.65,posnorm,animal,
+,N_exctretion_calf,kg N / animal / year,12.75,15,17.25,posnorm,animal,
+,N_excretion_hen,kg N / animal / year,0.6375,0.75,0.8625,posnorm,animal,
+,N_excretion_other_poultry,kg N / animal / year,0.136,0.16,0.184,posnorm,animal,
+,N_excretion_sheep,kg N / animal / year,14.45,17,19.55,posnorm,animal,
+,N_excretion_pig,kg N / animal / year,9.35,11,12.65,posnorm,animal,
+,n_sheep,individuals,5202.85,6121,7039.15,posnorm,animal,
+,n_pig,individuals,310630.8,365448,420265.2,posnorm,animal,
+share of cattle kept on liquid manure catchment systems,cattle_on_slurry,share,0.8835,0.93,0.9765,tnorm_0_1,animal,
+share of pig kept on liquid manure catchment systems,pig_on_slurry,share,0.7125,0.75,0.7875,tnorm_0_1,animal,
+"calculated as 1-rate in the Nährstoffreport, share of manure lost in storage process",cattle_housingloss_rate_liquid,share,0.1425,0.15,0.1575,tnorm_0_1,animal,
+,cattle_housingloss_rate_solid,share,0.285,0.3,0.315,tnorm_0_1,animal,
+,pig_housinglosss_rate_liquid,share,0.19,0.2,0.21,tnorm_0_1,animal,
+,pig_housinglosss_rate_solid,share,0.285,0.3,0.315,tnorm_0_1,animal,
+,others_housingloss_rate,share,0.38,0.4,0.42,tnorm_0_1,animal,
+,manure_N_to_PtwoOfive_dairy,share,0.2857,,0.4483,tnorm_0_1,animal,yes
+,manure_N_to_PtwoOfive_bull,share,0.32553,0.3617,0.39787,tnorm_0_1,animal,no
+,manure_N_to_PtwoOfive_heifer,share,0.27702,0.3078,0.33858,tnorm_0_1,animal,no
+,manure_N_to_PtwoOfive_calf,share,0.38403,0.4267,0.46937,tnorm_0_1,animal,no
+range of sow to fattening pig,manure_N_to_PtwoOfive_pig,share,0.3636,,0.4516,tnorm_0_1,animal,yes
+,manure_N_to_PtwoOfive_hen,share,0.44397,0.4933,0.54263,tnorm_0_1,animal,no
+,manure_N_to_PtwoOfive_other_poultry,share,0.46125,0.5125,0.56375,tnorm_0_1,animal,no
+,manure_N_to_PtwoOfive_sheep,share,0.39069,0.4341,0.47751,tnorm_0_1,animal,no
+,manure_N_to_KOtwo,share,0,0,0,const,animal,
+,P_housing_losses,switch,0,0,0,const,animal,
+,K_housing_losses,switch,0,0,0,const,animal,
+,N_biogas_input,kg N,2155393.011,2535756.48,2916119.956,posnorm,animal,
+,convert_phosphorous_pentoxide_to_p,conversion factor,0.4364,0.4364,0.4364,const,,
+,convert_potassium_oxide_to_k,conversion factor,0.8301,0.8301,0.8301,const,,
+,population,persons,310329,310329,310329,const,consumption,
+,consume_wheat,kg / person / year,58.5,65,71.5,posnorm,consumption,
+,consume_rye,kg / person / year,6.84,7.6,8.36,posnorm,consumption,
+,consume_rice,kg / person / year,4.59,5.1,5.61,posnorm,consumption,
+,consume_legumes,kg / person / year,0.99,1.1,1.21,posnorm,consumption,
+,consume_potato,kg / person / year,52.11,57.9,63.69,posnorm,consumption,
+,consume_potato_starch,kg / person / year,9.63,10.7,11.77,posnorm,consumption,
+,consume_sugar,kg / person / year,30.6,34,37.4,posnorm,consumption,
+,consume_honey,kg / person / year,0.99,1.1,1.21,posnorm,consumption,
+,consume_cocoa,kg / person / year,3.24,3.6,3.96,posnorm,consumption,
+,consume_tree_fruits,kg / person / year,59.13,65.7,72.27,posnorm,consumption,
+,consume_citrus_fruits,kg / person / year,32.85,36.5,40.15,posnorm,consumption,
+,consume_nuts,kg / person / year,4.23,4.7,5.17,posnorm,consumption,
+,consume_dried_fruit,kg / person / year,1.26,1.4,1.54,posnorm,consumption,
+,consume_vegetables,kg / person / year,88.65,98.5,108.35,posnorm,consumption,
+beef and veal,consume_beef,kg / person / year,12.6,14,15.4,posnorm,consumption,
+pork meat,consume_pork,kg / person / year,45.09,50.1,55.11,posnorm,consumption,
+sheep and goat meat,consume_sheep,kg / person / year,0.81,0.9,0.99,posnorm,consumption,
+offal,consume_offal,kg / person / year,0.45,0.5,0.55,posnorm,consumption,
+poultry,consume_poultry,kg / person / year,18.81,20.9,22.99,posnorm,consumption,
+"other meat (game, rabbit)",consume_other_meat,kg / person / year,1.17,1.3,1.43,posnorm,consumption,
+fish and fish products (catch weight),consume_fish,kg / person / year,12.69,14.1,15.51,posnorm,consumption,
+fresh milk products,consume_milk,kg / person / year,75.51,83.9,92.29,posnorm,consumption,
+cream,consume_cream,kg / person / year,5.4,6,6.6,posnorm,consumption,
+condensed milk (product weight),consume_condensed_milk,kg / person / year,1.53,1.7,1.87,posnorm,consumption,
+cheese incl. Cheese spread (product weight),consume_cheese,kg / person / year,22.23,24.7,27.17,posnorm,consumption,
+butter (product weight),consume_butter,kg / person / year,5.4,6,6.6,posnorm,consumption,
+margarine,consume_margarine,kg / person / year,2.43,2.7,2.97,posnorm,consumption,
+,consume_beer,l / person,84.6,94,103.4,posnorm,consumption,
+egg,consume_egg,kg / person / year,11.88,13.2,14.52,posnorm,consumption,
+,consume_coffee,l / person,145.8,162,178.2,posnorm,consumption,
+,consume_black_tea,l / person,23.76,26.4,29.04,posnorm,consumption,
+,consume_herb_tea,l / person,48.06,53.4,58.74,posnorm,consumption,
+,consume_sparkling_wine,l / person,3.123,3.47,3.817,posnorm,consumption,
+,convert_coffee,g per liter,49.5,55,60.5,posnorm,consumption,
+,convert_black_tea,g per liter,18,20,22,posnorm,consumption,
+,convert_herb_tea,g per liter,18,20,22,posnorm,consumption,
+,N_content_wheat,g N / 100 gram product,1.53,1.7,1.87,posnorm,consumption,
+,N_content_rye,g N / 100 gram product,0.999,1.11,1.221,posnorm,consumption,
+,N_content_rice,g N / 100 gram product,1.062,1.18,1.298,posnorm,consumption,
+,N_content_legumes,g N / 100 gram product,0.945,1.05,1.155,posnorm,consumption,
+,N_content_potato,g N / 100 gram product,0.297,0.33,0.363,posnorm,consumption,
+,N_content_potato_starch,g N / 100 gram product,0.09,0.1,0.11,posnorm,consumption,
+,N_content_sugar,g N / 100 gram product,0,0,0,const,consumption,
+,N_content_honey,g N / 100 gram product,0.054,0.06,0.066,posnorm,consumption,
+,N_content_cocoa,g N / 100 gram product,1.323,1.47,1.617,posnorm,consumption,
+,N_content_tree_fruits,g N / 100 gram product,0.045,0.05,0.055,posnorm,consumption,
+,N_content_citrus_fruits,g N / 100 gram product,0.099,0.11,0.121,posnorm,consumption,
+,N_content_nuts,g N / 100 gram product,4.284,4.76,5.236,posnorm,consumption,
+,N_content_dried_fruit,g N / 100 gram product,0.198,0.22,0.242,posnorm,consumption,
+,N_content_vegetables,g N / 100 gram product,0.144,0.16,0.176,posnorm,consumption,
+,N_content_beef,g N / 100 gram product,3.051,3.39,3.729,posnorm,consumption,
+,N_content_pork,g N / 100 gram product,3.168,3.52,3.872,posnorm,consumption,
+,N_content_sheep_meat,g N / 100 gram product,2.934,3.26,3.586,posnorm,consumption,
+,N_content_offal,g N / 100 gram product,2.142,2.38,2.618,posnorm,consumption,
+,N_content_poultry_meat,g N / 100 gram product,3.195,3.55,3.905,posnorm,consumption,
+,N_content_other_meat,g N / 100 gram product,2.97,3.3,3.63,posnorm,consumption,
+,N_content_fish,g N / 100 gram product,2.403,2.67,2.937,posnorm,consumption,
+,N_content_cream,g N / 100 gram product,0.333,0.37,0.407,posnorm,consumption,
+,N_content_condensed_milk,g N / 100 gram product,0.918,1.02,1.122,posnorm,consumption,
+,N_content_cheese,g N / 100 gram product,3.6,4,4.4,posnorm,consumption,
+,N_content_butter,g N / 100 gram product,0.099,0.11,0.121,posnorm,consumption,
+,N_content_margarine,g N / 100 gram product,0.027,0.03,0.033,posnorm,consumption,
+,N_content_beer,g N / 100 gram product,0.072,0.08,0.088,posnorm,consumption,
+,N_content_coffee,g N / 100 gram product,2.016,2.24,2.464,posnorm,consumption,
+,N_content_black_tea,g N / 100 gram product,3.528,3.92,4.312,posnorm,consumption,
+,N_content_herb_tea,g N / 100 gram product,3.528,3.92,4.312,posnorm,consumption,
+,N_content_sparkling_wine,g N / 100 gram product,0.027,0.03,0.033,posnorm,consumption,
+amount of waste water remaining in channel,wastewater_remain_canal,m3,990900,1101000,1211100,posnorm,consumption,
+direct discharge of wastewater to ground and surface water,wastewater_direct_discharge,m3,11570400,12856000,14141600,posnorm,consumption,
+fresh mass municipal organic waste,ofmsw_local,ton,31947.642,"35,497",39047.118,posnorm,waste,
+fresh mass of municipal organic waste imported,ofmsw_import,ton,21562.02,"23,958",26353.58,posnorm,waste,
+green waste local,green_waste_local,ton,7113.357,"7,904",8694.103,posnorm,waste,
+green waste import,green_waste_import,ton,4528.845,"5,032",5535.255,posnorm,waste,
+grey bin food waste,grey_bin_food_waste,ton,3861.268583,"4,290",4719.328268,posnorm,waste,
+grey bin garden waste,grey_bin_garden_waste,ton,1026.413168,"1,140",1254.504983,posnorm,waste,
+dry matter content organic solid waste,dm_ofmsw,share,0.234,0.2825,0.331,tnorm_0_1,waste,
+dry matter content green waste,dm_green_waste,share,0.46,0.5815,0.703,tnorm_0_1,waste,
+N content (% of DM) organic solid waste,N_content_ofmsw_waste,,0.023,0.0255,0.028,tnorm_0_1,waste,
+N content (% of DM) green waste,N_content_green_waste,,0.0035,0.00555,0.0076,tnorm_0_1,waste,
+assumed energy produced by biogas per agricultural used area,lf_to_kwel,KWel per 100 LF,17.5,21,25,posnorm,waste,
+digestate per produced kwel,Kwel_to_digestate,m3 per Kwel,18,20,22,posnorm,waste,
+digestate density,digestate_density,kg per m3,866,983,1100,posnorm,waste,
+digestate N content,digestate_N_content,kg N per t fresh matter,4.14,4.6,5.06,posnorm,waste,
+fresh matter compost to horticulture,compost_to_horticulture,,18390.573,20434,22477.367,posnorm,waste,
+fresh matter compost to export,compost_to_export,,16417.98,18242,20066.42,posnorm,waste,
+fresh matter compost to consumption,compost_to_consumption,,900,1000,1100,posnorm,waste,
+dry matter content compost horticulture,dm_compost_horticulture,share,0.49,0.59,0.687,tnorm_0_1,waste,
+dry matter content compost consumption,dm_compost_consumption,share,0.56,0.69,0.81,tnorm_0_1,waste,
+N content compost horticulture,N_content_compost_horticulture,share,0.012015,0.01335,0.014685,tnorm_0_1,waste,
+N content compost consumption,N_content_compost_consumption,share,0.011025,0.01225,0.013475,tnorm_0_1,waste,
+N content sewage sludge,N_content_sewage_sludge,share of N to total mass,0.0513,0.057,0.0627,tnorm_0_1,waste,
+share of kept N for agriculture,share_N_sewage_for_agriculture,,0.065761589,0.073,0.080375276,tnorm_0_1,waste,
+total waste water,waste_water,m3,24621300,27357000,30092700,posnorm,waste,
+share of waste water with denitrification and P elimination,share_wastewater_denitrified,,0.587498629,0.653,0.71805388,tnorm_0_1,waste,
+N content waste warer,N_content_wastewater,mg N per L,62.55,69.5,76.45,posnorm,waste,
+loss rate sewage during treatment,lossrate_wastewater,,0.684,0.76,0.836,tnorm_0_1,waste,
