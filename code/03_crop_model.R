@@ -1,20 +1,20 @@
 #try out how to solve the problem of several percantages in input table 
 #which need to add up to 1
 # 
-# library(decisionSupport)
-# 
-# crop_input <- read.csv('data/crop_input.csv')
-# 
-# make_variables<-function(est,n=1)
-# { x<-random(rho=est, n=n)
-# for(i in colnames(x)) assign(i,
-#                              as.numeric(x[1,i]),envir=.GlobalEnv)
-# }
-# 
-# crop_input$lower <- as.numeric(crop_input$lower)
-# crop_input$upper <- as.numeric(crop_input$upper)
-# 
-# #make_variables(as.estimate(crop_input),n=1)
+library(decisionSupport)
+
+crop_input <- read.csv('data/input-all.csv')
+
+make_variables<-function(est,n=1)
+{ x<-random(rho=est, n=n)
+for(i in colnames(x)) assign(i,
+                             as.numeric(x[1,i]),envir=.GlobalEnv)
+}
+
+crop_input$lower <- as.numeric(crop_input$lower)
+crop_input$upper <- as.numeric(crop_input$upper)
+
+make_variables(as.estimate(crop_input),n=1)
 
 crop_function <- function(share_beans, share_corn, share_fodder_peas, 
                             share_mais_silage, share_oat, 
@@ -136,6 +136,62 @@ crop_function <- function(share_beans, share_corn, share_fodder_peas,
                                        N_leftover_sugar_beet,N_leftover_summer_barley,
                                        N_leftover_summer_wheat,N_leftover_triticale,
                                        N_leftover_winter_barley,N_leftover_winter_wheat),
+                        P_yield = c(P_yield_beans,
+                                    P_yield_corn,
+                                    P_yield_fodder_peas,
+                                    P_yield_mais_silage,
+                                    P_yield_oat,
+                                    P_yield_oilseed_rape,
+                                    P_yield_potato,
+                                    P_yield_rye,
+                                    P_yield_sugar_beet,
+                                    P_yield_summer_barley,
+                                    P_yield_summer_weat,
+                                    P_yield_triticale,
+                                    P_yield_winter_barley,
+                                    P_yield_winter_weat),
+                        P_leftover = c(P_leftover_beans,
+                                       P_leftover_corn,
+                                       P_leftover_foder_peas,
+                                       P_leftover_mais_silage,
+                                       P_leftover_oat,
+                                       P_leftover_oilseed_rape,
+                                       P_leftover_potato,
+                                       P_leftover_rye,
+                                       P_leftover_sugar_beet,
+                                       P_leftover_summer_barley,
+                                       P_leftover_summer_wheat,
+                                       P_leftover_triticale,
+                                       P_leftover_winter_barley,
+                                       P_leftover_winter_wheat),
+                        K_yield = c(K_yield_beans,
+                                    K_yield_corn,
+                                    K_yield_fodder_peas,
+                                    K_yield_mais_silage,
+                                    K_yield_oat,
+                                    K_yield_oilseed_rape,
+                                    K_yield_potato,
+                                    K_yield_rye,
+                                    K_yield_sugar_beet,
+                                    K_yield_summer_barley,
+                                    K_yield_summer_weat,
+                                    K_yield_triticale,
+                                    K_yield_winter_barley,
+                                    K_yield_winter_weat),
+                        K_leftover = c(K_leftover_beans,
+                                       K_leftover_corn,
+                                       K_leftover_foder_peas,
+                                       K_leftover_mais_silage,
+                                       K_leftover_oat,
+                                       K_leftover_oilseed_rape,
+                                       K_leftover_potato,
+                                       K_leftover_rye,
+                                       K_leftover_sugar_beet,
+                                       K_leftover_summer_barley,
+                                       K_leftover_summer_wheat,
+                                       K_leftover_triticale,
+                                       K_leftover_winter_barley,
+                                       K_leftover_winter_wheat),
                         share_leftover_straw = c(rep(0,4),straw_share,0,0,straw_share, 0, rep(straw_share,5)),
                         share_to_animal = c(beans_to_animal,corn_to_animal,fodder_peas_to_animal,
                                             mais_silage_to_animal,oat_to_animal, oilseed_rape_to_animal,
@@ -161,59 +217,101 @@ crop_function <- function(share_beans, share_corn, share_fodder_peas,
   
   #get N of consumable part
   crop_df$N_main <- crop_df$yield_total * crop_df$yield_share * crop_df$N_yield
+  crop_df$P_main <- crop_df$yield_total * crop_df$yield_share * crop_df$P_yield
+  #K is expressed as share of DM total yield
+  crop_df$K_main <- crop_df$yield_total * crop_df$yield_share * crop_df$dm * crop_df$K_yield * 100
   
   
   #distributute main N by animal and human consumption and by with or without processing ----
   
   #human consumption with processing
   crop_df$N_crop_human_consumption_processed <- crop_df$N_main * crop_df$share_to_consumption * crop_df$through_processing
+  crop_df$P_crop_human_consumption_processed <- crop_df$P_main * crop_df$share_to_consumption * crop_df$through_processing
+  crop_df$K_crop_human_consumption_processed <- crop_df$K_main * crop_df$share_to_consumption * crop_df$through_processing
   
   #human consumption without processing
   crop_df$N_crop_human_consumption_unprocessed <- crop_df$N_main * crop_df$share_to_consumption * (1 - crop_df$through_processing)
+  crop_df$P_crop_human_consumption_unprocessed <- crop_df$P_main * crop_df$share_to_consumption * (1 - crop_df$through_processing)
+  crop_df$K_crop_human_consumption_unprocessed <- crop_df$K_main * crop_df$share_to_consumption * (1 - crop_df$through_processing)
   
   #to animal consumption with processing
   crop_df$N_crop_animal_feeding_processed <- crop_df$N_main * crop_df$share_to_animal * crop_df$through_processing
+  crop_df$P_crop_animal_feeding_processed <- crop_df$P_main * crop_df$share_to_animal * crop_df$through_processing
+  crop_df$K_crop_animal_feeding_processed <- crop_df$K_main * crop_df$share_to_animal * crop_df$through_processing
   
   #to animal consumption without processing
   crop_df$N_crop_animal_feeding_unprocessed <- crop_df$N_main * crop_df$share_to_animal * ( 1 - crop_df$through_processing )
+  crop_df$P_crop_animal_feeding_unprocessed <- crop_df$P_main * crop_df$share_to_animal * ( 1 - crop_df$through_processing )
+  crop_df$K_crop_animal_feeding_unprocessed <- crop_df$K_main * crop_df$share_to_animal * ( 1 - crop_df$through_processing )
+  
+  
   
   
   ######
-  #to biogas
+  # BIOGAS
+  ######
+  
   #(actually stream from crop to waste)
-  ######
-  crop_df$N_crop_biogas <- crop_df$N_main * crop_df$share_to_biogas 
+  
+  crop_df$N_crop_biogas <- crop_df$N_main * crop_df$share_to_biogas
+  crop_df$P_crop_biogas <- crop_df$P_main * crop_df$share_to_biogas
+  crop_df$K_crop_biogas <- crop_df$K_main * crop_df$share_to_biogas
+  
+  
+  
   
   #get N of not consumable part
   crop_df$N_rest <- crop_df$yield_total * (1-crop_df$yield_share) * crop_df$N_leftover
+  crop_df$P_rest <- crop_df$yield_total * (1-crop_df$yield_share) * crop_df$P_leftover
+  crop_df$K_rest <- crop_df$yield_total * (1-crop_df$yield_share) * crop_df$K_leftover
   
   #calculate N in straw which is used for animal bedding
   crop_df$N_straw <- crop_df$N_rest * crop_df$share_leftover_straw
+  crop_df$P_straw <- crop_df$P_rest * crop_df$share_leftover_straw
+  crop_df$K_straw <- crop_df$K_rest * crop_df$share_leftover_straw
   
 
   
   #sum up the columns of interest ----
   N_crop_main <- sum(crop_df$N_main)
+  P_crop_main <- sum(crop_df$P_main)
+  K_crop_main <- sum(crop_df$K_main)
   
   N_straw <- sum(crop_df$N_straw)
+  P_straw <- sum(crop_df$P_straw)
+  K_straw <- sum(crop_df$K_straw)
   
   #part which neither straw nor consumable yield
   N_crop_rest <- sum(crop_df$N_rest) - N_straw
+  P_crop_rest <- sum(crop_df$P_rest) - P_straw
+  K_crop_rest <- sum(crop_df$K_rest) - K_straw
   
   
   N_crop_human_consumption_processed <- sum(crop_df$N_crop_human_consumption_processed)
+  P_crop_human_consumption_processed <- sum(crop_df$P_crop_human_consumption_processed)
+  K_crop_human_consumption_processed <- sum(crop_df$K_crop_human_consumption_processed)
   
   N_crop_human_consumption_unprocessed <- sum(crop_df$N_crop_human_consumption_unprocessed)
+  P_crop_human_consumption_unprocessed <- sum(crop_df$P_crop_human_consumption_unprocessed)
+  K_crop_human_consumption_unprocessed <- sum(crop_df$K_crop_human_consumption_unprocessed)
   
   N_crop_animal_feeding_processed <- sum(crop_df$N_crop_animal_feeding_processed)
+  P_crop_animal_feeding_processed <- sum(crop_df$P_crop_animal_feeding_processed)
+  K_crop_animal_feeding_processed <- sum(crop_df$K_crop_animal_feeding_processed)
   
   N_crop_animal_feeding_unprocessed <- sum(crop_df$N_crop_animal_feeding_unprocessed)
+  P_crop_animal_feeding_unprocessed <- sum(crop_df$P_crop_animal_feeding_unprocessed)
+  K_crop_animal_feeding_unprocessed <- sum(crop_df$K_crop_animal_feeding_unprocessed)
   
   N_crop_biogas <- sum(crop_df$N_crop_biogas)
+  P_crop_biogas <- sum(crop_df$P_crop_biogas)
+  K_crop_biogas <- sum(crop_df$K_crop_biogas)
   
   
   
-  #vegetables +  frutis ----
+  ################
+  # HORTICULTURE
+  ################
   
   #NOTE: used N content of peas for green bean because no value in the excel file
   #NOTE II: ha of vegetables add to only 60% of non-crop land
@@ -265,7 +363,48 @@ crop_function <- function(share_beans, share_corn, share_fodder_peas,
                                                N_content_stone_fruit_gr_100gr,
                                                N_content_strawberry_gr_100gr,
                                                N_content_sweet_corn_gr_100gr,
-                                               N_content_veggie_peas_gr_100gr))
+                                               N_content_veggie_peas_gr_100gr),
+                        P_content_mg_100gr = c(P_content_apple_gr_100gr,
+                                               P_content_arugula_gr_100gr,
+                                               P_content_asparagus_gr_100gr,
+                                               P_content_berries_gr_100gr,
+                                               P_content_cabbage_gr_100gr,
+                                               P_content_carrot_gr_100gr,
+                                               P_content_celery_gr_100gr,
+                                               P_content_green_bean_gr_100gr,
+                                               P_content_lambs_lettuce_gr_100gr,
+                                               P_content_lettuce_gr_100gr,
+                                               P_content_onion_gr_100gr,
+                                               P_content_parsley_gr_100gr,
+                                               P_content_pumpkin_gr_100gr,
+                                               P_content_radishes_gr_100gr,
+                                               P_content_rhubarb_gr_100gr,
+                                               P_content_spinash_gr_100gr,
+                                               P_content_stone_fruit_gr_100gr,
+                                               P_content_strawberry_gr_100gr,
+                                               P_content_sweet_corn_gr_100gr,
+                                               P_content_veggie_peas_gr_100gr),
+                        K_content_mg_100gr = c(K_content_apple_gr_100gr,
+                                               K_content_arugula_gr_100gr,
+                                               K_content_asparagus_gr_100gr,
+                                               K_content_berries_gr_100gr,
+                                               K_content_cabbage_gr_100gr,
+                                               K_content_carrot_gr_100gr,
+                                               K_content_celery_gr_100gr,
+                                               K_content_green_bean_gr_100gr,
+                                               K_content_lambs_lettuce_gr_100gr,
+                                               K_content_lettuce_gr_100gr,
+                                               K_content_onion_gr_100gr,
+                                               K_content_parsley_gr_100gr,
+                                               K_content_pumpkin_gr_100gr,
+                                               K_content_radishes_gr_100gr,
+                                               K_content_rhubarb_gr_100gr,
+                                               K_content_spinash_gr_100gr,
+                                               K_content_stone_fruit_gr_100gr,
+                                               K_content_strawberry_gr_100gr,
+                                               K_content_sweet_corn_gr_100gr,
+                                               K_content_veggie_peas_gr_100gr)
+                        )
   
   #calculate modelled horticultural land to actual land and calculate correction_factor
   estimated_vegetable_land <- sum(horti_df$area_ha)
@@ -280,21 +419,35 @@ crop_function <- function(share_beans, share_corn, share_fodder_peas,
   
   #calculate total N (kg)
   horti_df$total_N_kg <- horti_df$total_yield_kg * horti_df$N_content_gr_100gr * 10 / 1000
+  horti_df$total_P_kg <- horti_df$total_yield_kg * horti_df$P_content_mg_100gr * 10 / 1000000
+  horti_df$total_K_kg <- horti_df$total_yield_kg * horti_df$K_content_mg_100gr * 10 / 1000000
   
   #get total N from horticultural production
   horti_N_kg <- sum(horti_df$total_N_kg)
+  horti_P_kg <- sum(horti_df$total_P_kg)
+  horti_K_kg <- sum(horti_df$total_K_kg)
   
   
   
   
-  # import of inorganic fertilizers ----
+  
+  ###########
+  # IMPORT INORGANIC FERTILIZER
+  ###########
+  
   #this is only coupled to the LF, but it should be affected by the amount of available animal N otherwise
   imported_inorganic_N <- import_inorganic_N_kg_LF * (area_grassland + arable_land)
-  
-  
+  imported_inorganic_P <- import_inorganic_P2O5_kg_LF * (area_grassland + arable_land) * convert_phosphorous_pentoxide_to_p
+  imported_inorganic_K <- import_inorganic_K2O_t * convert_potassium_oxide_to_k
 
     
-  #N losses
+  
+  
+  
+  ########
+  # N-LOSSES after AG Düngung
+  ########
+  
   if(precipitation_sum < 600){
     
     if(ackerzahl <45){
@@ -433,13 +586,26 @@ crop_function <- function(share_beans, share_corn, share_fodder_peas,
   
   
   
-  
-  # grassland ----
-  N_grazing <- area_grassland * share_grazing * N_yield_grazing
-  
+  ##########
+  # GRASSLAND
+  ###########
+
   N_mowing <- area_grassland * (1 - share_grazing) * N_yield_mowing
+  P_mowing <- area_grassland * (1 - share_grazing) * P_yield_mowing * convert_phosphorous_pentoxide_to_p
+  K_mowing <- area_grassland * (1 - share_grazing) * K_yield_mowing * convert_potassium_oxide_to_k
+  
+  
+  #P2O5 and K2O yield of grazing not known, so assumed to be in the same N:P:K as mowing
+  P_yield_grazing <- P_yield_mowing / N_yield_mowing * N_yield_grazing
+  K_yield_grazing <- K_yield_mowing / N_yield_mowing * N_yield_grazing
+  
+  N_grazing <- area_grassland * share_grazing * N_yield_grazing
+  P_grazing <- area_grassland * share_grazing * P_yield_grazing * convert_phosphorous_pentoxide_to_p
+  K_grazing <- area_grassland * share_grazing * K_yield_grazing * convert_potassium_oxide_to_k
   
   N_grassland <- N_grazing + N_mowing
+  P_grassland <- P_grazing + P_mowing
+  K_grassland <- K_grazing + K_mowing
   
   
 
@@ -449,13 +615,34 @@ crop_function <- function(share_beans, share_corn, share_fodder_peas,
   
   
   
-  return(list(N_crop_main = N_crop_main, N_crop_rest = N_crop_rest,
-              N_straw = N_straw, N_crop_human_consumption_processed = N_crop_human_consumption_processed,
+  return(list(N_crop_main = N_crop_main, 
+              P_crop_main = P_crop_main,
+              K_crop_main = K_crop_main,
+              N_crop_rest = N_crop_rest,
+              P_crop_rest = P_crop_rest,
+              K_crop_rest = K_crop_rest,
+              N_straw = N_straw,
+              P_straw = P_straw,
+              K_straw = K_straw,
+              N_crop_human_consumption_processed = N_crop_human_consumption_processed,
+              P_crop_human_consumption_processed = P_crop_human_consumption_processed,
+              K_crop_human_consumption_processed = K_crop_human_consumption_processed,
               N_crop_human_consumption_unprocessed = N_crop_human_consumption_unprocessed,
+              P_crop_human_consumption_unprocessed = P_crop_human_consumption_unprocessed,
+              K_crop_human_consumption_unprocessed = K_crop_human_consumption_unprocessed,
               N_crop_animal_feeding_processed = N_crop_animal_feeding_processed,
+              P_crop_animal_feeding_processed = P_crop_animal_feeding_processed,
+              K_crop_animal_feeding_processed = K_crop_animal_feeding_processed,
               N_crop_animal_feeding_unprocessed = N_crop_animal_feeding_unprocessed,
+              P_crop_animal_feeding_unprocessed = P_crop_animal_feeding_unprocessed,
+              K_crop_animal_feeding_unprocessed = K_crop_animal_feeding_unprocessed,
               N_crop_biogas = N_crop_biogas,
+              P_crop_biogas = P_crop_biogas,
+              K_crop_biogas = K_crop_biogas,
               N_grassland = N_grassland,
+              P_grassland = P_grassland,
+              K_grassland = K_grassland,
+              
               share_beans = new_share_beans, 
               share_corn = new_share_corn,
               share_fodder_peas = new_share_fodder_peas, 
@@ -490,8 +677,14 @@ crop_function <- function(share_beans, share_corn, share_fodder_peas,
               land_strawberry_ha = horti_df$corrected_area_ha[18],
               land_sweet_corn_ha = horti_df$corrected_area_ha[19],
               land_veggie_peas_ha = horti_df$corrected_area_ha[20],
+              
               total_N_horticulture = horti_N_kg,
+              total_P_horticulture = horti_P_kg,
+              total_K_horticulture = horti_K_kg,
               imported_inorganic_N = imported_inorganic_N,
+              imported_inorganic_P = imported_inorganic_P,
+              imported_inorganic_K = imported_inorganic_K,
+              
               inevitable_N_losses = inevitable_N_losses
               ))
 }
