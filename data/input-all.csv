@@ -544,10 +544,14 @@ green waste local,green_waste_local,ton,7113.357,"7,904",8694.103,posnorm,waste,
 green waste import,green_waste_import,ton,4528.845,"5,032",5535.255,posnorm,waste,
 grey bin food waste,grey_bin_food_waste,ton,3861.268583,"4,290",4719.328268,posnorm,waste,
 grey bin garden waste,grey_bin_garden_waste,ton,1026.413168,"1,140",1254.504983,posnorm,waste,
-dry matter content organic solid waste,dm_ofmsw,share,0.234,0.2825,0.331,tnorm_0_1,waste,
-dry matter content green waste,dm_green_waste,share,0.46,0.5815,0.703,tnorm_0_1,waste,
-N content (% of DM) organic solid waste,N_content_ofmsw_waste,kg N / FM dt,0.023,0.0255,0.028,tnorm_0_1,waste,
-N content (% of DM) green waste,N_content_green_waste,kg N / FM dt,0.0035,0.00555,0.0076,tnorm_0_1,waste,
+dry matter content organic solid waste,dm_ofmsw,share,0.234,0.2825,0.331,tnorm_0_1,waste,yes
+dry matter content green waste,dm_green_waste,share,0.46,0.5815,0.703,tnorm_0_1,waste,yes
+N content (% of DM) organic solid waste,N_content_ofmsw_waste,kg N / kg DM,0.023,0.0255,0.028,tnorm_0_1,waste,yes
+,P_content_ofmsw_waste,kg P / kg DM,0.002,,0.005,tnorm_0_1,waste,yes
+,K_content_ofmsw_waste,kg K / kg DM,0.0009,,0.0011,tnorm_0_1,waste,yes
+N content (% of DM) green waste,N_content_green_waste,kg N / kg DM,0.0035,0.00555,0.0076,tnorm_0_1,waste,yes
+,P_content_green_waste,kg P / kg DM,0.0006,,0.0017,tnorm_0_1,waste,yes
+,K_content_green_waste,kg K / kg DM,0.00053,,0.0014,tnorm_0_1,waste,yes
 assumed energy produced by biogas per agricultural used area,lf_to_kwel,KWel per 100 LF,17.5,21,25,posnorm,waste,
 digestate per produced kwel,Kwel_to_digestate,m3 per Kwel,18,20,22,posnorm,waste,
 digestate density,digestate_density,kg per m3,866,983,1100,posnorm,waste,
@@ -555,13 +559,21 @@ digestate N content,digestate_N_content,kg N per t fresh matter,4.14,4.6,5.06,po
 fresh matter compost to horticulture,compost_to_horticulture,kg compost / FM dt,18390.573,20434,22477.367,posnorm,waste,
 fresh matter compost to export,compost_to_export,kg compost / FM dt,16417.98,18242,20066.42,posnorm,waste,
 fresh matter compost to consumption,compost_to_consumption,kg compost / FM dt,900,1000,1100,posnorm,waste,
-dry matter content compost horticulture,dm_compost_horticulture,share,0.49,0.59,0.687,tnorm_0_1,waste,
-dry matter content compost consumption,dm_compost_consumption,share,0.56,0.69,0.81,tnorm_0_1,waste,
-N content compost horticulture,N_content_compost_horticulture,share,0.012015,0.01335,0.014685,tnorm_0_1,waste,
-N content compost consumption,N_content_compost_consumption,share,0.011025,0.01225,0.013475,tnorm_0_1,waste,
+dry matter content compost horticulture,dm_compost_horticulture,share,0.49,0.59,0.687,tnorm_0_1,waste,yes
+dry matter content compost consumption,dm_compost_consumption,share,0.56,0.69,0.81,tnorm_0_1,waste,yes
+N content compost horticulture,N_content_compost_horticulture,kg N / kg DM,0.012015,0.01335,0.014685,tnorm_0_1,waste,no
+,P_content_compost_horticulture,kg P / kg DM,0.00477,0.0053,0.00583,tnorm_0_1,waste,no
+,K_content_compost_horticulture,kg K2O/ kg DM,0.008739,0.00971,0.010681,tnorm_0_1,waste,no
+N content compost consumption,N_content_compost_consumption,kg N / kg DM,0.011025,0.01225,0.013475,tnorm_0_1,waste,no
+,P_content_compost_consumption,kg P / kg DM,0.00477,0.0053,0.00583,tnorm_0_1,waste,no
+,K_content_compost_consumption,kg K2O/ kg DM,0.006795,0.00755,0.008305,tnorm_0_1,waste,no
 N content sewage sludge,N_content_sewage_sludge,share of N to total mass,0.0513,0.057,0.0627,tnorm_0_1,waste,
-share of kept N for agriculture,share_N_sewage_for_agriculture,kg share / FM dt,0.065761589,0.073,0.080375276,tnorm_0_1,waste,
+calculated from excel file,share_sewage_for_agriculture,kg share / FM dt,0.065761589,0.073,0.080375276,tnorm_0_1,waste,
 total waste water,waste_water,m3,24621300,27357000,30092700,posnorm,waste,
 share of waste water with denitrification and P elimination,share_wastewater_denitrified,kg share / FM dt,0.587498629,0.653,0.71805388,tnorm_0_1,waste,
-N content waste warer,N_content_wastewater,mg N per L,62.55,69.5,76.45,posnorm,waste,
-loss rate sewage during treatment,lossrate_wastewater,kg lossrate / FM dt,0.684,0.76,0.836,tnorm_0_1,waste,
+N content waste warer,N_content_wastewater,mg N per L,62.55,69.5,76.45,posnorm,waste,no
+,P_content_wastewater,mg P per L,8.64,9.6,10.56,posnorm,waste,no
+,K_content_wastewater,mg K per L,28.8,32,35.2,posnorm,waste,no
+loss rate sewage during treatment (calculated as 1-efficiency),lossrate_N_wastewater,kg lossrate / FM dt,0.684,0.76,0.836,tnorm_0_1,waste,no
+,lossrate_P_wastewater,kg lossrate / FM dt,0.072,0.08,0.088,tnorm_0_1,waste,no
+set range by myselg because othewise too large upper end,lossrate_K_wastewater,kg lossrate / FM dt,0.961,0.98,0.999,tnorm_0_1,waste,yes
