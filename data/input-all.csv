@@ -178,6 +178,8 @@ share of grazzland grazed; mowing is 1- the value,share_grazing,kg share / FM dt
 ,P_yield_mowing,kg P2O5 / FM dt,81,90,99,posnorm,crop,no
 ,K_yield_mowing,kg K2O / FM dt,243,270,297,posnorm,crop,no
 ,share_N_biogas_input_animal,share,0.33,0.38,0.44,tnorm_0_1,crop,
+,share_P_biogas_input_animal,share,0,0,0,const,crop,
+,share_K_biogas_input_animal,share,0,0,0,const,crop,
 sweet_corn,land_sweet_corn_ha,kg land / FM dt,13.5,15,16.5,posnorm,crop,
 veggie_peas,land_veggie_peas_ha,kg land / FM dt,531,590,649,posnorm,crop,
 cabbage,land_cabbage_ha,kg land / FM dt,180,200,220,posnorm,crop,
@@ -284,8 +286,14 @@ import of inorganic fertilizer based on the ha,import_inorganic_N_kg_LF,kg per L
 ,import_inorganic_P2O5_kg_LF,kg per LF,8,,12,posnorm,crop,yes
 ,import_inorganic_K2O_t,t,405,450,495,posnorm,crop,no
 taken from Nährstoffreport,import_organic_N_kg,kg import / FM dt,1125822.6,1250914,1376005.4,posnorm,crop,
+taken from Nährstoffreport,import_organic_P_kg,kg import / FM dt,0,0,0,const,crop,
+taken from Nährstoffreport,import_organic_K_kg,kg import / FM dt,0,0,0,const,crop,
 taken from Nährstoffreport,export_manure_N_kg,kg export / FM dt,1692378,1880420,2068462,posnorm,crop,
+taken from Nährstoffreport,export_manure_P_kg,kg export / FM dt,0,0,0,const,crop,
+taken from Nährstoffreport,export_manure_K_kg,kg export / FM dt,0,0,0,const,crop,
 calculated from total export - animal derived export,export_other_organic_N_kg,kg export / FM dt,391309.2,434788,478266.8,posnorm,crop,
+calculated from total export - animal derived export,export_other_organic_P_kg,kg export / FM dt,0,0,0,const,crop,
+calculated from total export - animal derived export,export_other_organic_K_kg,kg export / FM dt,0,0,0,const,crop,
 yearly precipitation sum taken from climate-data.org,precipitation_sum,mm,848,848,848,const,crop,
 average ackerzahl,ackerzahl,kg ackerzahl / FM dt,54,60,66,posnorm,crop,
 livestock density,livestock_density,LU per ha,1.6,1.85,2.1,posnorm,crop,
@@ -404,6 +412,8 @@ range of sow to fattening pig,manure_N_to_PtwoOfive_pig,share,0.3636,,0.4516,tno
 ,P_housing_losses,switch,0,0,0,const,animal,
 ,K_housing_losses,switch,0,0,0,const,animal,
 ,N_biogas_input,kg N,2155393.011,2535756.48,2916119.956,posnorm,animal,
+,P_biogas_input,kg N,0,0,0,const,animal,
+,K_biogas_input,kg N,0,0,0,const,animal,
 ,convert_phosphorous_pentoxide_to_p,conversion factor,0.4364,0.4364,0.4364,const,,
 ,convert_potassium_oxide_to_k,conversion factor,0.8301,0.8301,0.8301,const,,
 ,population,persons,310329,310329,310329,const,consumption,
@@ -556,6 +566,8 @@ assumed energy produced by biogas per agricultural used area,lf_to_kwel,KWel per
 digestate per produced kwel,Kwel_to_digestate,m3 per Kwel,18,20,22,posnorm,waste,
 digestate density,digestate_density,kg per m3,866,983,1100,posnorm,waste,
 digestate N content,digestate_N_content,kg N per t fresh matter,4.14,4.6,5.06,posnorm,waste,
+digestate N content,digestate_P_content,kg N per t fresh matter,0,0,0,const,waste,
+digestate N content,digestate_K_content,kg N per t fresh matter,0,0,0,const,waste,
 fresh matter compost to horticulture,compost_to_horticulture,kg compost / FM dt,18390.573,20434,22477.367,posnorm,waste,
 fresh matter compost to export,compost_to_export,kg compost / FM dt,16417.98,18242,20066.42,posnorm,waste,
 fresh matter compost to consumption,compost_to_consumption,kg compost / FM dt,900,1000,1100,posnorm,waste,
