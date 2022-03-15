@@ -16,25 +16,48 @@
 # 
 # make_variables(as.estimate(crop_input),n=1)
 
-crop_function <- function(share_beans, share_corn, share_fodder_peas, 
-                            share_mais_silage, share_oat, 
-                            share_oilseed_rape, share_potato, share_rye,
-                            share_sugar_beet, share_summer_barley,
-                            share_summer_wheat, share_triticale,
-                            share_winter_barley, share_winter_wheat,
-                            share_crop_land,
+crop_function <- function(arable_land,
+                          land_horticulture_ha,
+                          estimated_vegetable_land,
+                          share_beans, share_corn, share_fodder_peas, 
+                          share_mais_silage, share_oat, 
+                          share_oilseed_rape, share_potato, share_rye,
+                          share_sugar_beet, share_summer_barley,
+                          share_summer_wheat, share_triticale,
+                          share_winter_barley, share_winter_wheat,
+                          share_crop_land,
                             yield_beans, yield_corn, yield_fodder_peas,
                             yield_mais_silage, yield_oat, yield_oilseed_rape,
                             yield_potato, yield_rye, yield_sugar_beet,
                             yield_summer_barley, yield_summer_wheat,
                             yield_triticale, yield_winter_barley,
                             yield_winter_wheat,
-                          N_yield_beans,N_yield_corn,N_yield_fodder_peas,
-                          N_yield_mais_silage,N_yield_oat,
-                          N_yield_oilseed_rape,N_yield_potato,
-                          N_yield_rye,N_yield_sugar_beet,N_yield_summer_barley,
-                          N_yield_summer_weat,N_yield_triticale,
-                          N_yield_winter_barley,N_yield_winter_weat,
+                          yield_share_beans,yield_share_corn,
+                          yield_share_fodder_peas,
+                          yield_share_mais_silage,yield_share_oat,
+                          yield_share_oilseed_rape,
+                          yield_share_potato,yield_share_rye,
+                          yield_share_sugar_beet,yield_share_summer_barley,
+                          yield_share_summer_wheat,yield_share_triticale,
+                          yield_share_winter_barley,yield_share_winter_wheat,
+                          dm_beans, 
+                          dm_corn, 
+                          dm_fodder_peas,
+                          dm_mais_silage,
+                          dm_oat, 
+                          dm_oilseed_rape,
+                          dm_potato,dm_rye,
+                          dm_sugar_beet,
+                          dm_summer_barley,
+                          dm_summer_wheat,
+                          dm_triticale,dm_winter_barley,
+                          dm_winter_wheat,
+                            N_yield_beans,N_yield_corn,N_yield_fodder_peas,
+                            N_yield_mais_silage,N_yield_oat,
+                            N_yield_oilseed_rape,N_yield_potato,
+                            N_yield_rye,N_yield_sugar_beet,N_yield_summer_barley,
+                            N_yield_summer_weat,N_yield_triticale,
+                            N_yield_winter_barley,N_yield_winter_weat,
                           N_leftover_beans,N_leftover_corn,
                           N_leftover_foder_peas,N_leftover_mais_silage,
                           N_leftover_oat,N_leftover_oilseed_rape,
@@ -42,12 +65,12 @@ crop_function <- function(share_beans, share_corn, share_fodder_peas,
                           N_leftover_sugar_beet,N_leftover_summer_barley,
                           N_leftover_summer_wheat,N_leftover_triticale,
                           N_leftover_winter_barley,N_leftover_winter_wheat,
-                          P_yield_beans,P_yield_corn,P_yield_fodder_peas,
-                          P_yield_mais_silage,P_yield_oat,
-                          P_yield_oilseed_rape,P_yield_potato,
-                          P_yield_rye,P_yield_sugar_beet,P_yield_summer_barley,
-                          P_yield_summer_weat,P_yield_triticale,
-                          P_yield_winter_barley,P_yield_winter_weat,
+                            P_yield_beans,P_yield_corn,P_yield_fodder_peas,
+                            P_yield_mais_silage,P_yield_oat,
+                            P_yield_oilseed_rape,P_yield_potato,
+                            P_yield_rye,P_yield_sugar_beet,P_yield_summer_barley,
+                            P_yield_summer_weat,P_yield_triticale,
+                            P_yield_winter_barley,P_yield_winter_weat,
                           P_leftover_beans,P_leftover_corn,
                           P_leftover_foder_peas,P_leftover_mais_silage,
                           P_leftover_oat,P_leftover_oilseed_rape,
@@ -55,12 +78,12 @@ crop_function <- function(share_beans, share_corn, share_fodder_peas,
                           P_leftover_sugar_beet,P_leftover_summer_barley,
                           P_leftover_summer_wheat,P_leftover_triticale,
                           P_leftover_winter_barley,P_leftover_winter_wheat,
-                          K_yield_beans,K_yield_corn,K_yield_fodder_peas,
-                          K_yield_mais_silage,K_yield_oat,
-                          K_yield_oilseed_rape,K_yield_potato,
-                          K_yield_rye,K_yield_sugar_beet,K_yield_summer_barley,
-                          K_yield_summer_weat,K_yield_triticale,
-                          K_yield_winter_barley,K_yield_winter_weat,
+                            K_yield_beans,K_yield_corn,K_yield_fodder_peas,
+                            K_yield_mais_silage,K_yield_oat,
+                            K_yield_oilseed_rape,K_yield_potato,
+                            K_yield_rye,K_yield_sugar_beet,K_yield_summer_barley,
+                            K_yield_summer_weat,K_yield_triticale,
+                            K_yield_winter_barley,K_yield_winter_weat,
                           K_leftover_beans,K_leftover_corn,
                           K_leftover_foder_peas,K_leftover_mais_silage,
                           K_leftover_oat,K_leftover_oilseed_rape,
@@ -167,7 +190,8 @@ crop_function <- function(share_beans, share_corn, share_fodder_peas,
                           K_content_strawberry_gr_100gr,
                           K_content_sweet_corn_gr_100gr,
                           K_content_veggie_peas_gr_100gr,
-                          imported_inorganic_N, imported_inorganic_P, imported_inorganic_K){
+                          import_inorganic_N_kg_LF, import_inorganic_P2O5_kg_LF, import_inorganic_K2O_t,
+                          convert_phosphorous_pentoxide_to_p, convert_potassium_oxide_to_k){
   
   #correct land shares ----
   #the land shares of the crops are randomly drawn, but they need to add up to 100%
@@ -552,146 +576,146 @@ crop_function <- function(share_beans, share_corn, share_fodder_peas,
     
   
   
-  
-  ########
-  # N-LOSSES after AG Düngung
-  ########
-  
-  if(precipitation_sum < 600){
-    
-    if(ackerzahl <45){
-      
-      arable_N_leached <- 30 * arable_land
-      
-    } else if(ackerzahl >= 45 & ackerzahl <= 65){
-      
-      arable_N_leached <- 25 * arable_land
-      
-    } else if(ackerzahl >65 & ackerzahl <= 85){
-      
-      arable_N_leached <- 15 * arable_land
-      
-    } else if(ackerzahl > 85){
-      
-      arable_N_leached <- 5 * arable_land
-      
-    }
-    
-  } else if(precipitation_sum >= 600 & precipitation_sum <= 750 ){
-    
-    if(ackerzahl <45){
-      
-      arable_N_leached <- 35 * arable_land
-      
-    } else if(ackerzahl >= 45 & ackerzahl <= 65){
-      
-      arable_N_leached <- 30 * arable_land
-      
-    } else if(ackerzahl >65 & ackerzahl <= 85){
-      
-      arable_N_leached <- 20 * arable_land
-      
-    } else if(ackerzahl > 85){
-      
-      arable_N_leached <- 10 * arable_land
-      
-    }
-    
-  } else if(precipitation_sum > 750){
-    
-    if(ackerzahl <45){
-      
-      arable_N_leached <- 40 * arable_land
-      
-    } else if(ackerzahl >= 45 & ackerzahl <= 65){
-      
-      arable_N_leached <- 35 * arable_land
-      
-    } else if(ackerzahl >65 & ackerzahl <= 85){
-      
-      arable_N_leached <- 25 * arable_land
-      
-    } else if(ackerzahl > 85){
-      
-      arable_N_leached <- 15 * arable_land
-      
-    }
-  }
-  
-  
-  #modifiy arable N losses by certain criteria:
-  #fertilization intensity of organic fertilizer
-  #fertilization intensity of inorganic fertilizer
-  #share of vulnerable crops
-  
-  if(livestock_density < 0.5){
-    arable_N_leached <- arable_N_leached
-  } else if(livestock_density >= 0.5 & livestock_density <= 1){
-    arable_N_leached <- arable_N_leached * 1.1
-  }  else if(livestock_density > 1 & livestock_density <= 1.5){
-    arable_N_leached <- arable_N_leached * 1.2
-  }  else if(livestock_density > 1.5 & livestock_density <= 2.0){
-    arable_N_leached <- arable_N_leached * 1.3
-  }  else if(livestock_density > 2 & livestock_density <= 2.5){
-    arable_N_leached <- arable_N_leached * 1.45
-  }  else if(livestock_density  > 2.5){
-    arable_N_leached <- arable_N_leached * 1.6
-  } 
-  
-  #additional losses depending inorganic fertilization regime
-  if(fertilization_rate < 50){
-    arable_N_leached <- arable_N_leached
-  }  else if(fertilization_rate >= 50 & fertilization_rate <= 100){
-    arable_N_leached <- arable_N_leached * 1.2
-  } else if(fertilization_rate > 100 & fertilization_rate <= 150){
-    arable_N_leached <- arable_N_leached * 1.3
-  } else if(fertilization_rate > 150 & fertilization_rate <= 200){
-    arable_N_leached <- arable_N_leached * 1.4
-  } else if(fertilization_rate > 200){
-    arable_N_leached <- arable_N_leached * 1.6
-  }
-  
-  #additional losses if high share of loss vulnerable crops
-  share_vulnerable_area <- share_beans + share_fodder_peas + share_oilseed_rape + (land_horticulture_ha / (land_horticulture_ha+arable_land))
-  
-  if(share_vulnerable_area < 0.20){
-    arable_N_leached <- arable_N_leached
-  } else if(share_vulnerable_area >= 0.20 & share_vulnerable_area <= 0.45){
-    arable_N_leached <- arable_N_leached * 1.3
-  } else if(share_vulnerable_area > 0.45 & share_vulnerable_area <= 0.70){
-    arable_N_leached <- arable_N_leached * 1.5
-  } else if(share_vulnerable_area > 0.7){
-    arable_N_leached <- arable_N_leached * 1.8
-  }
-  
-  #arable land amminioa losses
-  
-  #roughly 2% of applied inorganic fertilizer
-  arable_ammonia_losses <-  import_organic_N_kg * ammonia_loss_rate_fertilizer
-  
-  
-  #in the manual for unvermeidbare düngungsverluste it sais there is a constant loss of 4 kg N which is added ontop after modifying
-  #mostly for losses from plant material, especially if mulch is used intensively
-  
-  arable_ammonia_losses <- arable_ammonia_losses + (arable_land * flatrate_ammonia_losses) 
-  
-  #further losses if ammonia rich fertilizer is applied, ignored for now
-  
-  
-  #further N losses from grassland (leached)
-  grassland_N_losses <- (area_grassland * share_gorundwater_influenced_grassland * 30) + 
-    (area_grassland * (1-share_gorundwater_influenced_grassland) * 20)
-  
-  
-  #these are the losses calculated after the approach of bundesarbeitskreis düngung, 
-  #alternatively it is also possible to calculate losses as difference between input and output
-  #of nitrogen
-  inevitable_N_losses <- grassland_N_losses + arable_ammonia_losses + arable_N_leached
-    
-  
-  #add rapeseed, peas, beans and horticultural area together
-  #if larger than 20 then add extra share of losses to loss calculation
-  #(quite unlikely, because by current numbers ~15%)
+  # 
+  # ########
+  # # N-LOSSES after AG Düngung
+  # ########
+  # 
+  # if(precipitation_sum < 600){
+  #   
+  #   if(ackerzahl <45){
+  #     
+  #     arable_N_leached <- 30 * arable_land
+  #     
+  #   } else if(ackerzahl >= 45 & ackerzahl <= 65){
+  #     
+  #     arable_N_leached <- 25 * arable_land
+  #     
+  #   } else if(ackerzahl >65 & ackerzahl <= 85){
+  #     
+  #     arable_N_leached <- 15 * arable_land
+  #     
+  #   } else if(ackerzahl > 85){
+  #     
+  #     arable_N_leached <- 5 * arable_land
+  #     
+  #   }
+  #   
+  # } else if(precipitation_sum >= 600 & precipitation_sum <= 750 ){
+  #   
+  #   if(ackerzahl <45){
+  #     
+  #     arable_N_leached <- 35 * arable_land
+  #     
+  #   } else if(ackerzahl >= 45 & ackerzahl <= 65){
+  #     
+  #     arable_N_leached <- 30 * arable_land
+  #     
+  #   } else if(ackerzahl >65 & ackerzahl <= 85){
+  #     
+  #     arable_N_leached <- 20 * arable_land
+  #     
+  #   } else if(ackerzahl > 85){
+  #     
+  #     arable_N_leached <- 10 * arable_land
+  #     
+  #   }
+  #   
+  # } else if(precipitation_sum > 750){
+  #   
+  #   if(ackerzahl <45){
+  #     
+  #     arable_N_leached <- 40 * arable_land
+  #     
+  #   } else if(ackerzahl >= 45 & ackerzahl <= 65){
+  #     
+  #     arable_N_leached <- 35 * arable_land
+  #     
+  #   } else if(ackerzahl >65 & ackerzahl <= 85){
+  #     
+  #     arable_N_leached <- 25 * arable_land
+  #     
+  #   } else if(ackerzahl > 85){
+  #     
+  #     arable_N_leached <- 15 * arable_land
+  #     
+  #   }
+  # }
+  # 
+  # 
+  # #modifiy arable N losses by certain criteria:
+  # #fertilization intensity of organic fertilizer
+  # #fertilization intensity of inorganic fertilizer
+  # #share of vulnerable crops
+  # 
+  # if(livestock_density < 0.5){
+  #   arable_N_leached <- arable_N_leached
+  # } else if(livestock_density >= 0.5 & livestock_density <= 1){
+  #   arable_N_leached <- arable_N_leached * 1.1
+  # }  else if(livestock_density > 1 & livestock_density <= 1.5){
+  #   arable_N_leached <- arable_N_leached * 1.2
+  # }  else if(livestock_density > 1.5 & livestock_density <= 2.0){
+  #   arable_N_leached <- arable_N_leached * 1.3
+  # }  else if(livestock_density > 2 & livestock_density <= 2.5){
+  #   arable_N_leached <- arable_N_leached * 1.45
+  # }  else if(livestock_density  > 2.5){
+  #   arable_N_leached <- arable_N_leached * 1.6
+  # } 
+  # 
+  # #additional losses depending inorganic fertilization regime
+  # if(fertilization_rate < 50){
+  #   arable_N_leached <- arable_N_leached
+  # }  else if(fertilization_rate >= 50 & fertilization_rate <= 100){
+  #   arable_N_leached <- arable_N_leached * 1.2
+  # } else if(fertilization_rate > 100 & fertilization_rate <= 150){
+  #   arable_N_leached <- arable_N_leached * 1.3
+  # } else if(fertilization_rate > 150 & fertilization_rate <= 200){
+  #   arable_N_leached <- arable_N_leached * 1.4
+  # } else if(fertilization_rate > 200){
+  #   arable_N_leached <- arable_N_leached * 1.6
+  # }
+  # 
+  # #additional losses if high share of loss vulnerable crops
+  # share_vulnerable_area <- share_beans + share_fodder_peas + share_oilseed_rape + (land_horticulture_ha / (land_horticulture_ha+arable_land))
+  # 
+  # if(share_vulnerable_area < 0.20){
+  #   arable_N_leached <- arable_N_leached
+  # } else if(share_vulnerable_area >= 0.20 & share_vulnerable_area <= 0.45){
+  #   arable_N_leached <- arable_N_leached * 1.3
+  # } else if(share_vulnerable_area > 0.45 & share_vulnerable_area <= 0.70){
+  #   arable_N_leached <- arable_N_leached * 1.5
+  # } else if(share_vulnerable_area > 0.7){
+  #   arable_N_leached <- arable_N_leached * 1.8
+  # }
+  # 
+  # #arable land amminioa losses
+  # 
+  # #roughly 2% of applied inorganic fertilizer
+  # arable_ammonia_losses <-  import_organic_N_kg * ammonia_loss_rate_fertilizer
+  # 
+  # 
+  # #in the manual for unvermeidbare düngungsverluste it sais there is a constant loss of 4 kg N which is added ontop after modifying
+  # #mostly for losses from plant material, especially if mulch is used intensively
+  # 
+  # arable_ammonia_losses <- arable_ammonia_losses + (arable_land * flatrate_ammonia_losses) 
+  # 
+  # #further losses if ammonia rich fertilizer is applied, ignored for now
+  # 
+  # 
+  # #further N losses from grassland (leached)
+  # grassland_N_losses <- (area_grassland * share_gorundwater_influenced_grassland * 30) + 
+  #   (area_grassland * (1-share_gorundwater_influenced_grassland) * 20)
+  # 
+  # 
+  # #these are the losses calculated after the approach of bundesarbeitskreis düngung, 
+  # #alternatively it is also possible to calculate losses as difference between input and output
+  # #of nitrogen
+  # inevitable_N_losses <- grassland_N_losses + arable_ammonia_losses + arable_N_leached
+  #   
+  # 
+  # #add rapeseed, peas, beans and horticultural area together
+  # #if larger than 20 then add extra share of losses to loss calculation
+  # #(quite unlikely, because by current numbers ~15%)
   
   
   
@@ -792,9 +816,7 @@ crop_function <- function(share_beans, share_corn, share_fodder_peas,
               total_K_horticulture = horti_K_kg,
               imported_inorganic_N = imported_inorganic_N,
               imported_inorganic_P = imported_inorganic_P,
-              imported_inorganic_K = imported_inorganic_K,
-              
-              inevitable_N_losses = inevitable_N_losses
+              imported_inorganic_K = imported_inorganic_K
               ))
 }
 

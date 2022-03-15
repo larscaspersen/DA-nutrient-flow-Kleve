@@ -48,7 +48,11 @@ waste_function <- function( waste_water,
                             K_content_ofmsw_waste,
                             N_content_green_waste,
                             P_content_green_waste,
-                            K_content_green_waste
+                            K_content_green_waste,
+                            lossrate_N_wastewater,
+                            lossrate_P_wastewater,
+                            lossrate_K_wastewater,
+                            convert_potassium_oxide_to_k
   
 ){
   

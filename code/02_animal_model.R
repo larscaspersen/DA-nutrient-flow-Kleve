@@ -17,10 +17,10 @@
 # }
 # 
 # make_variables(as.estimate(input),n=1)
-# 
-# 
-# #detailed_input <- read.csv('data/input-table-detailed.csv')
-# #make_median(detailed_input)
+# # 
+# # 
+# # #detailed_input <- read.csv('data/input-table-detailed.csv')
+# # #make_median(detailed_input)
 
 
 
@@ -80,7 +80,11 @@ calc_animal <- function(n_slaughter_dairy_cattle, n_slaughter_female_cattle,
                         cattle_on_slurry, pig_on_slurry,
                         cattle_housingloss_rate_liquid, cattle_housingloss_rate_solid,
                         pig_housinglosss_rate_liquid, pig_housinglosss_rate_solid,
-                        others_housingloss_rate ){
+                        others_housingloss_rate,
+                        convert_phosphorous_pentoxide_to_p,
+                        convert_potassium_oxide_to_k,
+                        P_housing_losses,
+                        K_housing_losses){
   
   #slaughtering -----
   
@@ -257,9 +261,6 @@ calc_animal <- function(n_slaughter_dairy_cattle, n_slaughter_female_cattle,
   slaughter_df$K_slaughter_waste <- (slaughter_df$total_slaughter_waste / 100 * slaughter_df$K_content_slaughter) * convert_potassium_oxide_to_k
   slaughter_df$K_slaughter_waste_local <- (slaughter_df$total_slaughter_waste_local / 100 * slaughter_df$K_content_slaughter) * convert_potassium_oxide_to_k
   slaughter_df$K_slaughter_waste_import <- (slaughter_df$total_slaughter_waste_import / 100 * slaughter_df$K_content_slaughter) * convert_potassium_oxide_to_k
-  
-  
-  
   
   
   
