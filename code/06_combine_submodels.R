@@ -25,7 +25,7 @@ input <- read.csv('data/input-all.csv')
 #combined_input[duplicated(combined_input$variable),]
 #combined_input <- combined_input[!duplicated(input$variable),]
 
-make_variables(as.estimate(input))
+#make_variables(as.estimate(input))
 
 
 #create function for mc-simulation
@@ -941,112 +941,7 @@ combined_function <- function(){
     K_animal_balance <- K_animal_in - K_animal_out
     
     
-    #parameters to evaluate model output:
-    #
-    #- total N self supplied: 
-    #- total N input from external
-    #- total N lost (exported)
-    #- SSE: self supplied * 100 / (self supplied + import - export)
-    #- total N supplied outside of Kleve (in forms of products
-    
-    self_supplied_N <- N_manure_to_crop + crop_output$N_crop_animal_feeding_unprocessed +
-      crop_output$N_grassland + N_local_animal_products_consumed + N_digestate +
-      N_local_vegetal_products_consumed + crop_output$N_crop_animal_feeding_processed +
-      waste_output$N_compost_crop + waste_output$N_compost_consumption + 
-      waste_output$N_sewage_to_crop + crop_output$N_straw
-    
-    self_supplied_P <- P_manure_to_crop + crop_output$P_crop_animal_feeding_unprocessed +
-      crop_output$P_grassland + P_local_animal_products_consumed + P_digestate +
-      P_local_vegetal_products_consumed + crop_output$P_crop_animal_feeding_processed +
-      waste_output$P_compost_crop + waste_output$P_compost_consumption + 
-      waste_output$P_sewage_to_crop + crop_output$P_straw
-    
-    self_supplied_K <- K_manure_to_crop + crop_output$K_crop_animal_feeding_unprocessed +
-      crop_output$K_grassland + K_local_animal_products_consumed + K_digestate +
-      K_local_vegetal_products_consumed + crop_output$K_crop_animal_feeding_processed +
-      waste_output$K_compost_crop + waste_output$K_compost_consumption + 
-      waste_output$K_sewage_to_crop + crop_output$K_straw
-    
-    
-    
-    external_input_N <- N_feed_import + crop_output$imported_inorganic_N +
-      import_organic_N_kg + N_vegetable_import + waste_output$N_ofmsw_import + 
-      waste_output$N_green_waste_import + N_egg_import + N_meat_import + N_dairy_import
-    
-    external_input_P <- P_feed_import + crop_output$imported_inorganic_P +
-      import_organic_P_kg + P_vegetable_import + waste_output$P_ofmsw_import + 
-      waste_output$P_green_waste_import + P_egg_import + P_meat_import + P_dairy_import
-    
-    external_input_K <- K_feed_import + crop_output$imported_inorganic_K +
-      import_organic_K_kg + K_vegetable_import + waste_output$K_ofmsw_import + 
-      waste_output$K_green_waste_import + K_egg_import + K_meat_import + K_dairy_import
-    
-    
-    
-    system_output_N  <- export_manure_N_kg + N_dairy_export + N_egg_export + N_meat_export + 
-      N_vegetable_export + export_other_organic_N_kg + 
-      waste_output$N_sewage_exported + waste_output$N_compost_export
-    
-    system_output_P  <- export_manure_P_kg + P_dairy_export + P_egg_export + P_meat_export + 
-      P_vegetable_export + export_other_organic_P_kg + 
-      waste_output$P_sewage_exported + waste_output$P_compost_export
-    
-    system_output_K  <- export_manure_K_kg + K_dairy_export + K_egg_export + K_meat_export + 
-      K_vegetable_export + export_other_organic_K_kg + 
-      waste_output$K_sewage_exported + waste_output$K_compost_export
-    
-    
-    
-    system_losses_N <- crop_output$inevitable_N_losses + animal_output$N_housing_loss + 
-      waste_output$N_sewage_lost + animal_output$N_slaughter_waste + 
-      N_wastewater_direct_discharge 
-    
-    system_losses_P <- crop_output$inevitable_P_losses + animal_output$P_housing_loss + 
-      waste_output$P_sewage_lost + animal_output$P_slaughter_waste + 
-      P_wastewater_direct_discharge 
-    
-    system_losses_K <- crop_output$inevitable_K_losses + animal_output$K_housing_loss + 
-      waste_output$K_sewage_lost + animal_output$K_slaughter_waste + 
-      K_wastewater_direct_discharge 
-    
-    
-    
-    SSE_N <- (self_supplied_N * 100) / (self_supplied_N + external_input_N - system_output_N)
-    
-    SSE_P <- (self_supplied_P * 100) / (self_supplied_P + external_input_P - system_output_P)
-    
-    SSE_K <- (self_supplied_K * 100) / (self_supplied_K + external_input_K - system_output_K)
-    
-    
-    
-    
-    #this is about stuff which would have been possible to supply locally 
-    supplied_by_outside_N <- N_feed_import +  crop_output$imported_inorganic_N  +
-      import_organic_N_kg + N_egg_import + N_meat_import + 
-      N_dairy_import + 
-      (N_vegetable_import - consumption_output$consumed_N_foreign_vegetable)
-    
-    supplied_by_outside_P <- P_feed_import +  crop_output$imported_inorganic_P  +
-      import_organic_P_kg + P_egg_import + P_meat_import + 
-      P_dairy_import + 
-      (P_vegetable_import - consumption_output$consumed_P_foreign_vegetable)
-    
-    supplied_by_outside_K <- K_feed_import +  crop_output$imported_inorganic_K  +
-      import_organic_K_kg + K_egg_import + K_meat_import + 
-      K_dairy_import + 
-      (K_vegetable_import - consumption_output$consumed_K_foreign_vegetable)
-    
-    
-    
-    model_evaluation <- list(scenario = c(model_evaluation$scenario, scenario),
-                               self_supplied = c(model_evaluation$self_supplied, self_supplied_N),
-                               external_input = c(model_evaluation$external_input, external_input_N),
-                               system_output = c(model_evaluation$system_output, system_output_N),
-                               system_losses =  c(model_evaluation$system_losses, system_losses_N),
-                               SSE = c(model_evaluation$SSE, SSE_N),
-                               supplied_by_outside = c(model_evaluation$supplied_by_outside, supplied_by_outside_N),
-                               N_manure_to_crop = c(model_evaluation$N_manure_to_crop, N_manure_to_crop))
-    
+
     #extract the flows shown in Bernous model and return those
     #give them same name as in the chart
     #also I need to return the correct area of crops and horticultural products, because the original input got adjusted in the submodel
@@ -1211,12 +1106,278 @@ combined_function <- function(){
     
     
 
-    
-  }
+  }#end of the loop for the different scenarios
   
-  #decide what to return
-  return_flows <- TRUE
   
+  
+  #parameters to evaluate model output:
+  #   one calculation for the two / three different scenarios
+  #   that is why outside the loop
+  
+  #amount of nutrients imported to the system
+  
+  total_input_N <- combined_output$net_feed_import_N + 
+    combined_output$imported_vegetal_products_N +
+    combined_output$import_inorganic_fertilizer_N + 
+    combined_output$import_organic_fertilizer_N + 
+    combined_output$import_OFMSW_N + 
+    combined_output$imported_animal_products_N
+  
+  total_input_P <- combined_output$net_feed_import_P + 
+    combined_output$imported_vegetal_products_P +
+    combined_output$import_inorganic_fertilizer_P + 
+    combined_output$import_organic_fertilizer_P + 
+    combined_output$import_OFMSW_P + 
+    combined_output$imported_animal_products_P
+  
+  total_input_K <- combined_output$net_feed_import_K + 
+    combined_output$imported_vegetal_products_K +
+    combined_output$import_inorganic_fertilizer_K + 
+    combined_output$import_organic_fertilizer_K + 
+    combined_output$import_OFMSW_K + 
+    combined_output$imported_animal_products_K
+  
+  
+  #use efficiency
+  #
+  #percentage of all input (also locally sourced) into crop and animal leads 
+  #to products (manure not considered a product of animal production but as 
+  #input to crop production, vegetal biogas substrate and manure not seen as 
+  #product output from resp. crop and animal production, but digestate as an input into crop production)
+  
+  use_efficiency_N <- ((combined_output$feed_crops_N +
+                          combined_output$straw_N + 
+                          combined_output$grassbased_feed_N + 
+                          combined_output$food_and_feed_crops_N + 
+                          combined_output$fruit_and_vegetable_N + 
+                          combined_output$egg_and_dairy_N +
+                          combined_output$slaughter_animal_N) / 
+                         (combined_output$manure_to_crop_N + 
+                            combined_output$net_feed_import_N + 
+                            combined_output$import_inorganic_fertilizer_N + 
+                            combined_output$feed_crops_N + 
+                            combined_output$grassbased_feed_N + 
+                            combined_output$digestate_N + 
+                            combined_output$import_organic_fertilizer_N +
+                            combined_output$feed_from_processed_crops_N + 
+                            combined_output$fresh_compost_crop_N + 
+                            combined_output$sewage_N + 
+                            combined_output$straw_N)) * 100
+  
+  use_efficiency_P <- ((combined_output$feed_crops_P +
+                          combined_output$straw_P + 
+                          combined_output$grassbased_feed_P + 
+                          combined_output$food_and_feed_crops_P + 
+                          combined_output$fruit_and_vegetable_P + 
+                          combined_output$egg_and_dairy_P +
+                          combined_output$slaughter_animal_P) / 
+                         (combined_output$manure_to_crop_P + 
+                            combined_output$net_feed_import_P + 
+                            combined_output$import_inorganic_fertilizer_P + 
+                            combined_output$feed_crops_P + 
+                            combined_output$grassbased_feed_P + 
+                            combined_output$digestate_P + 
+                            combined_output$import_organic_fertilizer_P +
+                            combined_output$feed_from_processed_crops_P + 
+                            combined_output$fresh_compost_crop_P + 
+                            combined_output$sewage_P + 
+                            combined_output$straw_P)) * 100
+  
+  use_efficiency_K <- ((combined_output$feed_crops_K +
+                          combined_output$straw_K + 
+                          combined_output$grassbased_feed_K + 
+                          combined_output$food_and_feed_crops_K + 
+                          combined_output$fruit_and_vegetable_K + 
+                          combined_output$egg_and_dairy_K +
+                          combined_output$slaughter_animal_K) / 
+                         (combined_output$manure_to_crop_K + 
+                            combined_output$net_feed_import_K + 
+                            combined_output$import_inorganic_fertilizer_K + 
+                            combined_output$feed_crops_K + 
+                            combined_output$grassbased_feed_K + 
+                            combined_output$digestate_K + 
+                            combined_output$import_organic_fertilizer_K +
+                            combined_output$feed_from_processed_crops_K + 
+                            combined_output$fresh_compost_crop_K + 
+                            combined_output$sewage_K + 
+                            combined_output$straw_K)) * 100
+  
+  
+  #share_reused_to_total_input
+  #
+  #share of local input into consumption, crop - and animal production to total input into consumption, 
+  #crop - and animal production (locally produced crops and grass is considered as reused as well as manure)
+  
+  share_reuse_to_total_input_N = ( (combined_output$manure_to_crop_N + 
+                                      combined_output$grassbased_feed_N + 
+                                      combined_output$feed_crops_N + 
+                                      combined_output$local_animal_products_consumed_N + 
+                                      combined_output$digestate_N + 
+                                      combined_output$feed_from_processed_crops_N + 
+                                      combined_output$local_vegetal_products_consumed_N +
+                                      combined_output$fresh_compost_crop_N + 
+                                      combined_output$sewage_to_crop_N + 
+                                      combined_output$straw_N) / 
+                                     (combined_output$manure_to_crop_N + 
+                                        combined_output$grassbased_feed_N + 
+                                        combined_output$feed_crops_N + 
+                                        combined_output$local_animal_products_consumed_N + 
+                                        combined_output$digestate_N + 
+                                        combined_output$feed_from_processed_crops_N + 
+                                        combined_output$local_vegetal_products_consumed_N +
+                                        combined_output$fresh_compost_crop_N + 
+                                        combined_output$sewage_to_crop_N + 
+                                        combined_output$straw_N +
+                                        combined_output$net_feed_import_N + 
+                                        combined_output$import_inorganic_fertilizer_N +
+                                        combined_output$imported_vegetal_products_N +
+                                        combined_output$imported_animal_products_N + 
+                                        combined_output$import_organic_fertilizer_N) )* 100
+  
+  share_reuse_to_total_input_P = ( (combined_output$manure_to_crop_P + 
+                                      combined_output$grassbased_feed_P + 
+                                      combined_output$feed_crops_P + 
+                                      combined_output$local_animal_products_consumed_P + 
+                                      combined_output$digestate_P + 
+                                      combined_output$feed_from_processed_crops_P + 
+                                      combined_output$local_vegetal_products_consumed_P +
+                                      combined_output$fresh_compost_crop_P + 
+                                      combined_output$sewage_to_crop_P + 
+                                      combined_output$straw_P) / 
+                                     (combined_output$manure_to_crop_P + 
+                                        combined_output$grassbased_feed_P + 
+                                        combined_output$feed_crops_P + 
+                                        combined_output$local_animal_products_consumed_P + 
+                                        combined_output$digestate_P + 
+                                        combined_output$feed_from_processed_crops_P + 
+                                        combined_output$local_vegetal_products_consumed_P +
+                                        combined_output$fresh_compost_crop_P + 
+                                        combined_output$sewage_to_crop_P + 
+                                        combined_output$straw_P +
+                                        combined_output$net_feed_import_P + 
+                                        combined_output$import_inorganic_fertilizer_P +
+                                        combined_output$imported_vegetal_products_P +
+                                        combined_output$imported_animal_products_P + 
+                                        combined_output$import_organic_fertilizer_P) )* 100
+  
+  share_reuse_to_total_input_K = ( (combined_output$manure_to_crop_K + 
+                                      combined_output$grassbased_feed_K + 
+                                      combined_output$feed_crops_K + 
+                                      combined_output$local_animal_products_consumed_K + 
+                                      combined_output$digestate_K + 
+                                      combined_output$feed_from_processed_crops_K + 
+                                      combined_output$local_vegetal_products_consumed_K +
+                                      combined_output$fresh_compost_crop_K + 
+                                      combined_output$sewage_to_crop_K + 
+                                      combined_output$straw_K) / 
+                                     (combined_output$manure_to_crop_K + 
+                                        combined_output$grassbased_feed_K + 
+                                        combined_output$feed_crops_K + 
+                                        combined_output$local_animal_products_consumed_K + 
+                                        combined_output$digestate_K + 
+                                        combined_output$feed_from_processed_crops_K + 
+                                        combined_output$local_vegetal_products_consumed_K +
+                                        combined_output$fresh_compost_crop_K + 
+                                        combined_output$sewage_to_crop_K + 
+                                        combined_output$straw_K +
+                                        combined_output$net_feed_import_K + 
+                                        combined_output$import_inorganic_fertilizer_K +
+                                        combined_output$imported_vegetal_products_K +
+                                        combined_output$imported_animal_products_K + 
+                                        combined_output$import_organic_fertilizer_K) )* 100
+  
+  #recycling_rate
+  #
+  #how much of produced biomass (manure, compost, sewage sludge, organic fert., biogas substrate) 
+  #is input locally (manure, sewage sludge, compost, biogas substrate)
+  #Effluent and gaseous losses during WwT are considered losses while direct discharge 
+  #and that what remains in canalisation are considered a potentially recyclable biomass
+  
+  recycling_rate_N <- ( (combined_output$manure_to_crop_N +
+                           combined_output$digestate_N + 
+                           combined_output$fresh_compost_crop_N +
+                           combined_output$sewage_to_crop_N) / 
+                          (combined_output$manure_to_crop_N +
+                             combined_output$digestate_N + 
+                             combined_output$fresh_compost_crop_N +
+                             combined_output$sewage_to_crop_N + 
+                             combined_output$manure_export_N + 
+                             combined_output$wastewater_direct_discharge_N + 
+                             combined_output$slaughter_waste_N + 
+                             combined_output$other_organic_fertilizer_export_N + 
+                             combined_output$sewage_sludge_export_N + 
+                             combined_output$fresh_compost_export_N) ) * 100
+  
+  recycling_rate_P <- ( (combined_output$manure_to_crop_P +
+                           combined_output$digestate_P + 
+                           combined_output$fresh_compost_crop_P +
+                           combined_output$sewage_to_crop_P) / 
+                          (combined_output$manure_to_crop_P +
+                             combined_output$digestate_P + 
+                             combined_output$fresh_compost_crop_P +
+                             combined_output$sewage_to_crop_P + 
+                             combined_output$manure_export_P + 
+                             combined_output$wastewater_direct_discharge_P + 
+                             combined_output$slaughter_waste_P + 
+                             combined_output$other_organic_fertilizer_export_P + 
+                             combined_output$sewage_sludge_export_P + 
+                             combined_output$fresh_compost_export_P) ) * 100
+  
+  recycling_rate_K <- ( (combined_output$manure_to_crop_K +
+                           combined_output$digestate_K + 
+                           combined_output$fresh_compost_crop_K +
+                           combined_output$sewage_to_crop_K) / 
+                          (combined_output$manure_to_crop_K +
+                             combined_output$digestate_K + 
+                             combined_output$fresh_compost_crop_K +
+                             combined_output$sewage_to_crop_K + 
+                             combined_output$manure_export_K + 
+                             combined_output$wastewater_direct_discharge_K + 
+                             combined_output$slaughter_waste_K + 
+                             combined_output$other_organic_fertilizer_export_K + 
+                             combined_output$sewage_sludge_export_K + 
+                             combined_output$fresh_compost_export_K) ) * 100
+  
+  
+  #losses
+  #
+  #all losses (leaching / cultivation losses, housing and storage losses, effluent / gaseous losses during SwT)
+  #Effluent and gaseous losses during WwT are considered losses while direct discharge 
+  #and that what remains in canalisation are considered a potentially recyclable biomass
+  
+  losses_N <- combined_output$crop_cultivation_losses_N + 
+    combined_output$animal_housing_and_storage_losses_N + 
+    combined_output$wastewater_effluent_gaseous_losses_N
+  
+  losses_P <- combined_output$crop_cultivation_losses_P + 
+    combined_output$animal_housing_and_storage_losses_P + 
+    combined_output$wastewater_effluent_gaseous_losses_P
+  
+  losses_K <- combined_output$crop_cultivation_losses_K + 
+    combined_output$animal_housing_and_storage_losses_K + 
+    combined_output$wastewater_effluent_gaseous_losses_K
+  
+  
+  
+  #indicators, summarizing the flows
+  model_evaluation <- list(scenario = c(model_evaluation$scenario, scenario),
+                           total_input_N = c(model_evaluation$total_input_N, total_input_N),
+                           total_input_P = c(model_evaluation$total_input_P, total_input_P),
+                           total_input_K = c(model_evaluation$total_input_K, total_input_K),
+                           use_efficiency_N = c(model_evaluation$use_efficiency_N, use_efficiency_N),
+                           use_efficiency_P = c(model_evaluation$use_efficiency_P, use_efficiency_P),
+                           use_efficiency_K = c(model_evaluation$use_efficiency_K, use_efficiency_K),
+                           share_reuse_to_total_input_N = c(model_evaluation$share_reuse_to_total_input_N, share_reuse_to_total_input_N),
+                           share_reuse_to_total_input_P = c(model_evaluation$share_reuse_to_total_input_P, share_reuse_to_total_input_P),
+                           share_reuse_to_total_input_K = c(model_evaluation$share_reuse_to_total_input_K, share_reuse_to_total_input_K),
+                           recycling_rate_N = c(model_evaluation$recycling_rate_N, recycling_rate_N),
+                           recycling_rate_P = c(model_evaluation$recycling_rate_P, recycling_rate_P),
+                           recycling_rate_K = c(model_evaluation$recycling_rate_K, recycling_rate_K),
+                           losses_N = c(model_evaluation$losses_N, losses_N),
+                           losses_P = c(model_evaluation$losses_P, losses_P),
+                           losses_K = c(model_evaluation$losses_K, losses_K))
+  
+
   if(return_flows){
     return(combined_output)
   } else{
@@ -1227,54 +1388,223 @@ combined_function <- function(){
 
 }
 
+#decide what to return
+return_flows <- FALSE
+
 #let mc simulation run, just to test if everything works out
 nitrogen_mc_simulation <- mcSimulation(estimate = as.estimate(input),
                                        model_function = combined_function,
-                                       numberOfModelRuns = 100,
+                                       numberOfModelRuns = 10000,
                                        functionSyntax = "plainNames")
 
-result_df <- data.frame(scenario = c(nitrogen_mc_simulation$y$scenario1, nitrogen_mc_simulation$y$scenario2),
-           sewage_N = as.numeric(c(nitrogen_mc_simulation$y$sewage_N1, nitrogen_mc_simulation$y$sewage_N2)),
-           ofmsw_residual_waste_N = as.numeric(c(nitrogen_mc_simulation$y$ofmsw_residual_waste_N1, nitrogen_mc_simulation$y$ofmsw_residual_waste_N2)),
-           ofmsw_N = as.numeric(c(nitrogen_mc_simulation$y$ofmsw_N1, nitrogen_mc_simulation$y$ofmsw_N2)),
-           wastewater_direct_discharge_N = as.numeric(c(nitrogen_mc_simulation$y$wastewater_direct_discharge_N1, nitrogen_mc_simulation$y$wastewater_direct_discharge_N2)),
-           compost_to_consumption_N = as.numeric(c(nitrogen_mc_simulation$y$compost_to_consumption_N1, nitrogen_mc_simulation$y$compost_to_consumption_N2)),
-           digestate_N = as.numeric(c(nitrogen_mc_simulation$y$digestate_N1, nitrogen_mc_simulation$y$digestate_N2)),
-           sewage_sludge_export_N = as.numeric(c(nitrogen_mc_simulation$y$sewage_sludge_export_N1, nitrogen_mc_simulation$y$sewage_sludge_export_N2)),
-           wastewater_effluent_gaseous_losses_N = as.numeric(c(nitrogen_mc_simulation$y$wastewater_effluent_gaseous_losses_N1, nitrogen_mc_simulation$y$wastewater_effluent_gaseous_losses_N2)),
-           fresh_compost_export_N = as.numeric(c(nitrogen_mc_simulation$y$fresh_compost_export_N1, nitrogen_mc_simulation$y$fresh_compost_crop_N2)),
-           fresh_compost_crop_N = as.numeric(c(nitrogen_mc_simulation$y$fresh_compost_crop_N1, nitrogen_mc_simulation$y$fresh_compost_crop_N2)),
-           sewage_to_crop_N = as.numeric(c(nitrogen_mc_simulation$y$sewage_to_crop_N1, nitrogen_mc_simulation$y$sewage_N2)),
-           vegetal_biogas_substrate_N = as.numeric(c(nitrogen_mc_simulation$y$vegetal_biogas_substrate_N1, nitrogen_mc_simulation$y$vegetal_biogas_substrate_N2)),
-           crop_cultivation_losses_N = as.numeric(c(nitrogen_mc_simulation$y$crop_cultivation_losses_N1, nitrogen_mc_simulation$y$crop_cultivation_losses_N2)),
-           other_organic_fertilizer_export_N = as.numeric(c(nitrogen_mc_simulation$y$other_organic_fertilizer_export_N1, nitrogen_mc_simulation$y$other_organic_fertilizer_export_N2)),
-           straw_N = as.numeric(c(nitrogen_mc_simulation$y$straw_N1, nitrogen_mc_simulation$y$straw_N2)),
-           feed_crops_N = as.numeric(c(nitrogen_mc_simulation$y$feed_crops_N1, nitrogen_mc_simulation$y$feed_crops_N2)),
-           grassbased_feed_N = as.numeric(c(nitrogen_mc_simulation$y$grassbased_feed_N1, nitrogen_mc_simulation$y$grassbased_feed_N2)),
-           fruit_and_vegetable_N = as.numeric(c(nitrogen_mc_simulation$y$fruit_and_vegetable_N1, nitrogen_mc_simulation$y$fruit_and_vegetable_N2)),
-           manure_as_biogas_substrate_N = as.numeric(c(nitrogen_mc_simulation$y$manure_as_biogas_substrate_N1, nitrogen_mc_simulation$y$manure_as_biogas_substrate_N2)),
-           manure_to_crop_N = as.numeric(c(nitrogen_mc_simulation$y$manure_to_crop_N1, nitrogen_mc_simulation$y$manure_to_crop_N2)),
-           manure_export_N = as.numeric(c(nitrogen_mc_simulation$y$manure_export_N1, nitrogen_mc_simulation$y$manure_export_N2)),
-           animal_housing_and_storage_losses_N = as.numeric(c(nitrogen_mc_simulation$y$animal_housing_and_storage_losses_N1, nitrogen_mc_simulation$y$animal_housing_and_storage_losses_N2)),
-           slaughter_animal_N = as.numeric(c(nitrogen_mc_simulation$y$slaughter_animal_N1, nitrogen_mc_simulation$y$slaughter_animal_N2)),
-           egg_and_dairy_N = as.numeric(c(nitrogen_mc_simulation$y$egg_and_dairy_N1, nitrogen_mc_simulation$y$egg_and_dairy_N2)),
-           local_vegetal_products_consumed_N = as.numeric(c(nitrogen_mc_simulation$y$local_vegetal_products_consumed_N1, nitrogen_mc_simulation$y$local_vegetal_products_consumed_N2)),
-           imported_animal_products_N = as.numeric(c(nitrogen_mc_simulation$y$imported_animal_products_N1, nitrogen_mc_simulation$y$imported_animal_products_N2)),
-           imported_vegetal_products_N = as.numeric(c(nitrogen_mc_simulation$y$imported_vegetal_products_N1, nitrogen_mc_simulation$y$imported_vegetal_products_N2)),
-           feed_from_processed_crops_N = as.numeric(c(nitrogen_mc_simulation$y$feed_from_processed_crops_N1, nitrogen_mc_simulation$y$feed_from_processed_crops_N2)),
-           import_processed_feed_N = as.numeric(c(nitrogen_mc_simulation$y$import_processed_feed_N1, nitrogen_mc_simulation$y$import_processed_feed_N2)),
-           local_animal_products_consumed_N = as.numeric(c(nitrogen_mc_simulation$y$local_animal_products_consumed_N1, nitrogen_mc_simulation$y$local_animal_products_consumed_N2)),
-           export_meat_N = as.numeric(c(nitrogen_mc_simulation$y$export_meat_N1, nitrogen_mc_simulation$y$export_meat_N2)),
-           import_meat_N = as.numeric(c(nitrogen_mc_simulation$y$import_meat_N1, nitrogen_mc_simulation$y$import_meat_N2)),
-           export_egg_N = as.numeric(c(nitrogen_mc_simulation$y$export_egg_N1, nitrogen_mc_simulation$y$export_egg_N2)),
-           slaughter_waste_N = as.numeric(c(nitrogen_mc_simulation$y$slaughter_waste_N1, nitrogen_mc_simulation$y$slaughter_waste_N2)),
-           import_OFMSW_N = as.numeric(c(nitrogen_mc_simulation$y$import_OFMSW_N1, nitrogen_mc_simulation$y$import_OFMSW_N2)),
-           import_inorganic_fertilizer_N = as.numeric(c(nitrogen_mc_simulation$y$import_inorganic_fertilizer_N1, nitrogen_mc_simulation$y$import_inorganic_fertilizer_N2)),
-           import_organic_fertilizer_N = as.numeric(c(nitrogen_mc_simulation$y$import_organic_fertilizer_N1, nitrogen_mc_simulation$y$import_organic_fertilizer_N2)),
-           net_food_import_N = as.numeric(c(nitrogen_mc_simulation$y$net_food_import_N1, nitrogen_mc_simulation$y$net_food_import_N2)),
-           net_feed_import_N = as.numeric(c(nitrogen_mc_simulation$y$net_feed_import_N1, nitrogen_mc_simulation$y$net_feed_import_N2))
-           )
 
+#somehow the resulting dataframe has one column per variable, but each variable twice: 
+#once for normal scenario and once for animal reduction scenario
+#
+#--> I extract the values and combine them to a new object
+#--> this probably causes problems for pls analysis, because now it is not linked to the inputs anymore
+# 
+# if(return_flows){
+#   result_df <- data.frame(scenario = c(nitrogen_mc_simulation$y$scenario1, nitrogen_mc_simulation$y$scenario2),
+#                           sewage_N = as.numeric(c(nitrogen_mc_simulation$y$sewage_N1, nitrogen_mc_simulation$y$sewage_N2)),
+#                           ofmsw_residual_waste_N = as.numeric(c(nitrogen_mc_simulation$y$ofmsw_residual_waste_N1, nitrogen_mc_simulation$y$ofmsw_residual_waste_N2)),
+#                           ofmsw_N = as.numeric(c(nitrogen_mc_simulation$y$ofmsw_N1, nitrogen_mc_simulation$y$ofmsw_N2)),
+#                           wastewater_direct_discharge_N = as.numeric(c(nitrogen_mc_simulation$y$wastewater_direct_discharge_N1, nitrogen_mc_simulation$y$wastewater_direct_discharge_N2)),
+#                           compost_to_consumption_N = as.numeric(c(nitrogen_mc_simulation$y$compost_to_consumption_N1, nitrogen_mc_simulation$y$compost_to_consumption_N2)),
+#                           digestate_N = as.numeric(c(nitrogen_mc_simulation$y$digestate_N1, nitrogen_mc_simulation$y$digestate_N2)),
+#                           sewage_sludge_export_N = as.numeric(c(nitrogen_mc_simulation$y$sewage_sludge_export_N1, nitrogen_mc_simulation$y$sewage_sludge_export_N2)),
+#                           wastewater_effluent_gaseous_losses_N = as.numeric(c(nitrogen_mc_simulation$y$wastewater_effluent_gaseous_losses_N1, nitrogen_mc_simulation$y$wastewater_effluent_gaseous_losses_N2)),
+#                           fresh_compost_export_N = as.numeric(c(nitrogen_mc_simulation$y$fresh_compost_export_N1, nitrogen_mc_simulation$y$fresh_compost_crop_N2)),
+#                           fresh_compost_crop_N = as.numeric(c(nitrogen_mc_simulation$y$fresh_compost_crop_N1, nitrogen_mc_simulation$y$fresh_compost_crop_N2)),
+#                           sewage_to_crop_N = as.numeric(c(nitrogen_mc_simulation$y$sewage_to_crop_N1, nitrogen_mc_simulation$y$sewage_N2)),
+#                           vegetal_biogas_substrate_N = as.numeric(c(nitrogen_mc_simulation$y$vegetal_biogas_substrate_N1, nitrogen_mc_simulation$y$vegetal_biogas_substrate_N2)),
+#                           crop_cultivation_losses_N = as.numeric(c(nitrogen_mc_simulation$y$crop_cultivation_losses_N1, nitrogen_mc_simulation$y$crop_cultivation_losses_N2)),
+#                           other_organic_fertilizer_export_N = as.numeric(c(nitrogen_mc_simulation$y$other_organic_fertilizer_export_N1, nitrogen_mc_simulation$y$other_organic_fertilizer_export_N2)),
+#                           straw_N = as.numeric(c(nitrogen_mc_simulation$y$straw_N1, nitrogen_mc_simulation$y$straw_N2)),
+#                           feed_crops_N = as.numeric(c(nitrogen_mc_simulation$y$feed_crops_N1, nitrogen_mc_simulation$y$feed_crops_N2)),
+#                           grassbased_feed_N = as.numeric(c(nitrogen_mc_simulation$y$grassbased_feed_N1, nitrogen_mc_simulation$y$grassbased_feed_N2)),
+#                           fruit_and_vegetable_N = as.numeric(c(nitrogen_mc_simulation$y$fruit_and_vegetable_N1, nitrogen_mc_simulation$y$fruit_and_vegetable_N2)),
+#                           manure_as_biogas_substrate_N = as.numeric(c(nitrogen_mc_simulation$y$manure_as_biogas_substrate_N1, nitrogen_mc_simulation$y$manure_as_biogas_substrate_N2)),
+#                           manure_to_crop_N = as.numeric(c(nitrogen_mc_simulation$y$manure_to_crop_N1, nitrogen_mc_simulation$y$manure_to_crop_N2)),
+#                           manure_export_N = as.numeric(c(nitrogen_mc_simulation$y$manure_export_N1, nitrogen_mc_simulation$y$manure_export_N2)),
+#                           animal_housing_and_storage_losses_N = as.numeric(c(nitrogen_mc_simulation$y$animal_housing_and_storage_losses_N1, nitrogen_mc_simulation$y$animal_housing_and_storage_losses_N2)),
+#                           slaughter_animal_N = as.numeric(c(nitrogen_mc_simulation$y$slaughter_animal_N1, nitrogen_mc_simulation$y$slaughter_animal_N2)),
+#                           egg_and_dairy_N = as.numeric(c(nitrogen_mc_simulation$y$egg_and_dairy_N1, nitrogen_mc_simulation$y$egg_and_dairy_N2)),
+#                           local_vegetal_products_consumed_N = as.numeric(c(nitrogen_mc_simulation$y$local_vegetal_products_consumed_N1, nitrogen_mc_simulation$y$local_vegetal_products_consumed_N2)),
+#                           imported_animal_products_N = as.numeric(c(nitrogen_mc_simulation$y$imported_animal_products_N1, nitrogen_mc_simulation$y$imported_animal_products_N2)),
+#                           imported_vegetal_products_N = as.numeric(c(nitrogen_mc_simulation$y$imported_vegetal_products_N1, nitrogen_mc_simulation$y$imported_vegetal_products_N2)),
+#                           feed_from_processed_crops_N = as.numeric(c(nitrogen_mc_simulation$y$feed_from_processed_crops_N1, nitrogen_mc_simulation$y$feed_from_processed_crops_N2)),
+#                           import_processed_feed_N = as.numeric(c(nitrogen_mc_simulation$y$import_processed_feed_N1, nitrogen_mc_simulation$y$import_processed_feed_N2)),
+#                           local_animal_products_consumed_N = as.numeric(c(nitrogen_mc_simulation$y$local_animal_products_consumed_N1, nitrogen_mc_simulation$y$local_animal_products_consumed_N2)),
+#                           export_meat_N = as.numeric(c(nitrogen_mc_simulation$y$export_meat_N1, nitrogen_mc_simulation$y$export_meat_N2)),
+#                           import_meat_N = as.numeric(c(nitrogen_mc_simulation$y$import_meat_N1, nitrogen_mc_simulation$y$import_meat_N2)),
+#                           export_egg_N = as.numeric(c(nitrogen_mc_simulation$y$export_egg_N1, nitrogen_mc_simulation$y$export_egg_N2)),
+#                           slaughter_waste_N = as.numeric(c(nitrogen_mc_simulation$y$slaughter_waste_N1, nitrogen_mc_simulation$y$slaughter_waste_N2)),
+#                           import_OFMSW_N = as.numeric(c(nitrogen_mc_simulation$y$import_OFMSW_N1, nitrogen_mc_simulation$y$import_OFMSW_N2)),
+#                           import_inorganic_fertilizer_N = as.numeric(c(nitrogen_mc_simulation$y$import_inorganic_fertilizer_N1, nitrogen_mc_simulation$y$import_inorganic_fertilizer_N2)),
+#                           import_organic_fertilizer_N = as.numeric(c(nitrogen_mc_simulation$y$import_organic_fertilizer_N1, nitrogen_mc_simulation$y$import_organic_fertilizer_N2)),
+#                           net_food_import_N = as.numeric(c(nitrogen_mc_simulation$y$net_food_import_N1, nitrogen_mc_simulation$y$net_food_import_N2)),
+#                           net_feed_import_N = as.numeric(c(nitrogen_mc_simulation$y$net_feed_import_N1, nitrogen_mc_simulation$y$net_feed_import_N2))
+#   )
+# } else {
+#   result_df <- data.frame(scenario = c(nitrogen_mc_simulation$y$scenario1, nitrogen_mc_simulation$y$scenario2),
+#                            self_supplied = c(nitrogen_mc_simulation$y$self_supplied1, nitrogen_mc_simulation$y$self_supplied2),
+#                            external_input = c(nitrogen_mc_simulation$y$external_input1, nitrogen_mc_simulation$y$external_input2),
+#                            system_output = c(nitrogen_mc_simulation$y$system_output1, nitrogen_mc_simulation$y$system_output2),
+#                            system_losses =  c(nitrogen_mc_simulation$y$system_losses1, nitrogen_mc_simulation$y$system_losses2),
+#                            SSE = c(nitrogen_mc_simulation$y$SSE1, nitrogen_mc_simulation$y$SSE2),
+#                            supplied_by_outside = c(nitrogen_mc_simulation$y$supplied_by_outside1, nitrogen_mc_simulation$y$supplied_by_outside2),
+#                            N_manure_to_crop = c(nitrogen_mc_simulation$y$N_manure_to_crop1, nitrogen_mc_simulation$y$N_manure_to_crop2))
+# }
+
+#nitrogen_mc_simulation$y <- result_df
+
+#nitrogen_mc_simulation$x <- rbind(nitrogen_mc_simulation$x, nitrogen_mc_simulation$x)
+
+#add scenario as input variable
+#nitrogen_mc_simulation$x$scenario <- as.factor(nitrogen_mc_simulation$y$scenario)
+#--> looks like PLS cant handle factors, so split it?
+
+
+#should I use the PLS to analyse the outcomes of the scenario
+#or should I use it to analyse the CHANGE in the variable
+
+#somehow number were characters, so change back to numeric
+nitrogen_mc_simulation$y[, 2:31] <- sapply(nitrogen_mc_simulation$y[, 2:31], as.numeric)
+
+
+nitrogen_mc_simulation$y$total_input_N_change <- nitrogen_mc_simulation$y$total_input_N1 - nitrogen_mc_simulation$y$total_input_N2
+nitrogen_mc_simulation$y$total_input_P_change <- nitrogen_mc_simulation$y$total_input_P1 - nitrogen_mc_simulation$y$total_input_P2
+nitrogen_mc_simulation$y$total_input_K_change <- nitrogen_mc_simulation$y$total_input_K1  - nitrogen_mc_simulation$y$total_input_K2
+  
+nitrogen_mc_simulation$y$use_efficiency_N_change <- nitrogen_mc_simulation$y$use_efficiency_N1  - nitrogen_mc_simulation$y$use_efficiency_N2 
+nitrogen_mc_simulation$y$use_efficiency_P_change <- nitrogen_mc_simulation$y$use_efficiency_P1  - nitrogen_mc_simulation$y$use_efficiency_P2 
+nitrogen_mc_simulation$y$use_efficiency_K_change <- nitrogen_mc_simulation$y$use_efficiency_K1  - nitrogen_mc_simulation$y$use_efficiency_K2 
+
+nitrogen_mc_simulation$y$share_reuse_to_total_input_N_change <- nitrogen_mc_simulation$y$share_reuse_to_total_input_N1  - nitrogen_mc_simulation$y$share_reuse_to_total_input_N2 
+nitrogen_mc_simulation$y$share_reuse_to_total_input_P_change <- nitrogen_mc_simulation$y$share_reuse_to_total_input_P1  - nitrogen_mc_simulation$y$share_reuse_to_total_input_P2 
+nitrogen_mc_simulation$y$share_reuse_to_total_input_K_change <- nitrogen_mc_simulation$y$share_reuse_to_total_input_K1  - nitrogen_mc_simulation$y$share_reuse_to_total_input_K2 
+
+nitrogen_mc_simulation$y$recycling_rate_N_change <- nitrogen_mc_simulation$y$recycling_rate_N1  - nitrogen_mc_simulation$y$recycling_rate_N2 
+nitrogen_mc_simulation$y$recycling_rate_P_change <- nitrogen_mc_simulation$y$recycling_rate_P1  - nitrogen_mc_simulation$y$recycling_rate_P2 
+nitrogen_mc_simulation$y$recycling_rate_K_change <- nitrogen_mc_simulation$y$recycling_rate_K1  - nitrogen_mc_simulation$y$recycling_rate_K2 
+
+nitrogen_mc_simulation$y$losses_N_change <- nitrogen_mc_simulation$y$losses_N1  - nitrogen_mc_simulation$y$losses_N2 
+nitrogen_mc_simulation$y$losses_P_change <- nitrogen_mc_simulation$y$losses_P1  - nitrogen_mc_simulation$y$losses_P2 
+nitrogen_mc_simulation$y$losses_K_change <- nitrogen_mc_simulation$y$losses_K1  - nitrogen_mc_simulation$y$losses_K2 
+
+
+#PLS----
+#what variable should be used for it?
+
+pls_result <- plsr.mcSimulation(object = nitrogen_mc_simulation,
+                                resultName = names(nitrogen_mc_simulation$y['total_input_N_change']), ncomp = 1)
+VIP <- function(object) {
+  if (object$method != "oscorespls") 
+    stop("Only implemented for orthogonal scores algorithm.  Refit with 'method = \"oscorespls\"'")
+  if (nrow(object$Yloadings) > 1) 
+    stop("Only implemented for single-response models")
+  SS <- c(object$Yloadings)^2 * colSums(object$scores^2)
+  Wnorm2 <- colSums(object$loading.weights^2)
+  SSW <- sweep(object$loading.weights^2, 2, SS/Wnorm2, 
+               "*")
+  sqrt(nrow(SSW) * apply(SSW, 1, cumsum)/cumsum(SS))
+}
+
+library(tidyverse)
+
+#function to return ordered and filtered vip scores
+
+get_clean_VIP <- function(object, vip_threshold = 0.8){
+  #calculate VIP
+  scores <- VIP(object)
+  
+  #filter scores by threshold
+  scores <- scores[scores >= vip_threshold]
+  
+  #order by decreasing vip score
+  scores <- scores[order(scores, decreasing = T)]
+  
+  #create dataframe which will be returned
+  scores_df <- data.frame(variable = names(scores), vip = scores)
+  
+  #reset rownames()
+  rownames(scores_df) <- NULL
+  
+  
+  return(scores_df)
+}
+
+#loop over all variables I want to make a pls analysis with 
+pls_names <- c('total_input_N_change', 'total_input_P_change', 'total_input_K_change',
+               'use_efficiency_N_change', 'use_efficiency_P_change', 'use_efficiency_K_change',
+               'share_reuse_to_total_input_N_change', 'share_reuse_to_total_input_P_change', 'share_reuse_to_total_input_K_change',
+               'recycling_rate_N_change', 'recycling_rate_P_change', 'recycling_rate_K_change',
+               'losses_N_change', 'losses_P_change', 'losses_K_change')
+
+pls_list <- list()
+for(var in pls_names){
+  #make pls analysis
+  pls_result <- plsr.mcSimulation(object = nitrogen_mc_simulation,
+                                  resultName = names(nitrogen_mc_simulation$y[var]), ncomp = 1)
+  #get clean vip score, filtered and ordered
+  vip <- get_clean_VIP(pls_result)
+  
+  #add from which flow it is calculated
+  vip$indicator <- var
+  
+  vip$vip <- round(vip$vip, digits = 2)
+  
+  #save to list
+  pls_list[[var]] <- vip
+}
+
+library(openxlsx)
+
+
+#change some names because they are too long
+names(pls_list)[7:9] <- c('share_reuse_N_change', 'share_reuse_P_change', 
+                          'share_reuse_K_change')
+
+#export each data frame to separate sheets in same Excel file
+openxlsx::write.xlsx(pls_list, file = 'data/vip/vip_per_indicator.xlsx') 
+
+
+
+
+
+
+
+# EVPI----
+#all the flows are positive and that is why the evpi doesnt yield a sensible result
+#I need the difference of the two to find something meaningful
+boxplot(as.numeric(nitrogen_mc_simulation$y$total_input_N1) - as.numeric(nitrogen_mc_simulation$y$total_input_N2))
+
+
+#here we subset the outputs from the mcSimulation function (y) by selecting the correct variables
+# this should be done by the user (be sure to run the multi_EVPI only on the variables that the user wants)
+mcSimulation_table <- data.frame(nitrogen_mc_simulation$x, nitrogen_mc_simulation$y[2])
+
+#its always positive
+#--> its always a good "decision"
+mcSimulation_table$total_input_N1 <- as.numeric(mcSimulation_table$total_input_N1)
+
+
+
+mcSimulation_table
+
+evpi <- multi_EVPI(mc = mcSimulation_table, first_out_var = "total_input_N1")
+
+
+
+plot_evpi(evpi, decision_vars = "NPV_decision_do")
+
+
+
+
+
+
+#summarise the flows for bernou
 library(tidyverse)
 
 sum_result <- psych::describeBy(result_df, result_df$scenario, mat = TRUE)
