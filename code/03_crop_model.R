@@ -352,7 +352,7 @@ crop_function <- function(arable_land,
   crop_df$N_main <- crop_df$yield_total * crop_df$yield_share * crop_df$N_yield
   crop_df$P_main <- crop_df$yield_total * crop_df$yield_share * crop_df$P_yield
   #K is expressed as share of DM total yield
-  crop_df$K_main <- crop_df$yield_total * crop_df$yield_share * crop_df$dm * crop_df$K_yield * 100
+  crop_df$K_main <- crop_df$yield_total * crop_df$yield_share * crop_df$dm * crop_df$K_yield
   
   
   #distributute main N by animal and human consumption and by with or without processing ----
