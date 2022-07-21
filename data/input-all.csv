@@ -347,7 +347,7 @@ dry matter content compost horticulture,dm_compost_horticulture,share,0.49,0.59,
 Oat,yield_share_oat,kg yield / FM dt,0.47143,0.52381,0.57619,tnorm_0_1,crop,no,unchanged
 ,P_yield_beans,kg P / FM dt,0.468,0.52,0.572,posnorm,crop,no,unchanged
 sweet_corn,N_content_sweet_corn_gr_100gr,g N / 100 gram product,0.468,0.52,0.572,posnorm,crop,no,unchanged
-,manure_N_to_PtwoOfive_other_poultry,share,0.46125,0.5125,0.56375,tnorm_0_1,animal,no,
+calculated from Nährstoffbericht,manure_N_to_PtwoOfive_other_poultry,share,0.46125,0.5125,0.56375,tnorm_0_1,animal,no,
 dry matter content green waste,dm_green_waste,share,0.46,0.5815,0.703,tnorm_0_1,waste,yes,unchanged
 Winter wheat,K_yield_winter_weat,percent,0.45,0.5,0.55,tnorm_0_1,crop,no,unchanged
 ,K_yield_summer_weat,percent,0.45,0.5,0.55,tnorm_0_1,crop,no,unchanged
@@ -370,7 +370,7 @@ Fodder peas,yield_share_fodder_peas,kg yield / FM dt,0.45,0.5,0.55,tnorm_0_1,cro
 Beans,yield_share_beans,kg yield / FM dt,0.45,0.5,0.55,tnorm_0_1,crop,no,unchanged
 share of grazzland grazed; mowing is 1- the value,share_grazing,kg share / FM dt,0.45,0.5,0.55,tnorm_0_1,crop,no,unchanged
 offal,consume_offal,kg / person / year,0.45,0.5,0.55,posnorm,consumption,,unchanged
-,manure_N_to_PtwoOfive_hen,share,0.44397,0.4933,0.54263,tnorm_0_1,animal,no,
+calculatef from Nährstoffbericht,manure_N_to_PtwoOfive_hen,share,0.44397,0.4933,0.54263,tnorm_0_1,animal,no,
 ,edible_fraction_cattle,share,0.442,0.52,0.598,tnorm_0_1,animal,,unchanged
 calculated based on total milk,N_content_milk,gr N / 100 gram product,0.442,0.52,0.598,posnorm,animal,no,unchanged
 ,convert_phosphorous_pentoxide_to_p,conversion factor,0.4364,0.4364,0.4364,const,,,unchanged
@@ -384,14 +384,14 @@ Winter wheat,yield_share_winter_wheat,kg yield / FM dt,0.4,0.44444,0.48889,tnorm
 Summer wheat,yield_share_summer_wheat,kg yield / FM dt,0.4,0.44444,0.48889,tnorm_0_1,crop,no,unchanged
 Summer barley,yield_share_summer_barley,kg yield / FM dt,0.4,0.44444,0.48889,tnorm_0_1,crop,no,unchanged
 ,K_content_potato,g K / 100 gram product,0.4,0.45,0.5,posnorm,consumption,yes,unchanged
-,manure_N_to_PtwoOfive_sheep,share,0.39069,0.4341,0.47751,tnorm_0_1,animal,no,
-,manure_N_to_PtwoOfive_calf,share,0.38403,0.4267,0.46937,tnorm_0_1,animal,no,
+calulcated from Nährstoffbericht 2017 p. 25,manure_N_to_PtwoOfive_sheep,share,0.39069,0.4341,0.47751,tnorm_0_1,animal,no,
+calulcated from Nährstoffbericht 2017 p. 25,manure_N_to_PtwoOfive_calf,share,0.38403,0.4267,0.46937,tnorm_0_1,animal,no,
 ,others_housingloss_rate,share,0.38,0.4,0.42,tnorm_0_1,animal,,
 arugula,N_content_arugula_gr_100gr,g N / 100 gram product,0.378,0.42,0.462,posnorm,crop,no,unchanged
 ,K_yield_corn,percent,0.3735,0.415,0.4565,tnorm_0_1,crop,no,unchanged
 Winter barley,yield_share_winter_barley,kg yield / FM dt,0.37059,0.41176,0.45294,tnorm_0_1,crop,no,unchanged
 Sugar beet,yield_share_sugar_beet,kg yield / FM dt,0.37059,0.41176,0.45294,tnorm_0_1,crop,no,unchanged
-range of sow to fattening pig,manure_N_to_PtwoOfive_pig,share,0.3636,0.4076,0.4516,tnorm_0_1,animal,yes,
+calulcated from Nährstoffbericht 2017 p. 25,manure_N_to_PtwoOfive_pig,share,0.3636,0.4076,0.4516,tnorm_0_1,animal,yes,
 Sugar beet,N_leftover_sugar_beet,kg N / FM dt,0.36,0.4,0.44,posnorm,crop,no,unchanged
 ,share_N_biogas_input_animal,share,0.342,0.38,0.418,tnorm_0_1,crop,,2020
 ,P_content_nuts,g P / 100 gram product,0.34,0.403,0.466,posnorm,consumption,yes,unchanged
@@ -400,7 +400,7 @@ Sugar beet,N_leftover_sugar_beet,kg N / FM dt,0.36,0.4,0.44,posnorm,crop,no,unch
 share of straw harvested and used for animal bedding of cereals,straw_share,kg straw / FM dt,0.33,0.33,0.33,const,crop,no,unchanged
 ,K_content_fish,g K / 100 gram product,0.33,0.379,0.428,posnorm,consumption,yes,unchanged
 Mais silage 5,share_mais_silage,share of total agricultural area,0.3258,0.362,0.3982,tnorm_0_1,crop,no,2020
-,manure_N_to_PtwoOfive_bull,share,0.32553,0.3617,0.39787,tnorm_0_1,animal,no,
+calulcated from Nährstoffbericht 2017 p. 25,manure_N_to_PtwoOfive_bull,share,0.32553,0.3617,0.39787,tnorm_0_1,animal,no,
 ,K_yield_mais_silage,share,0.3195,0.355,0.3905,posnorm,crop,no,unchanged
 ,K_content_vegetables,g K / 100 gram product,0.318,0.354,0.39,posnorm,consumption,yes,unchanged
 Winter wheat,P_yield_winter_weat,kg P / FM dt,0.315,0.35,0.385,posnorm,crop,no,unchanged
@@ -417,7 +417,7 @@ Potato,N_yield_potato,kg N / FM dt,0.315,0.35,0.385,posnorm,crop,no,unchanged
 Mais silage,dm_mais_silage,,0.297,0.33,0.363,tnorm_0_1,crop,no,unchanged
 ,N_content_potato,g N / 100 gram product,0.297,0.33,0.363,posnorm,consumption,,unchanged
 ,K_content_condensed_milk,g K / 100 gram product,0.295,0.326,0.357,posnorm,consumption,yes,unchanged
-,manure_N_to_PtwoOfive_dairy,share,0.2857,0.367,0.4483,tnorm_0_1,animal,yes,
+calulcated from Nährstoffbericht 2017 p. 25,manure_N_to_PtwoOfive_dairy,share,0.2857,0.367,0.4483,tnorm_0_1,animal,yes,
 ,cattle_housingloss_rate_solid,share,0.285,0.3,0.315,tnorm_0_1,animal,,
 ,pig_housinglosss_rate_solid,share,0.285,0.3,0.315,tnorm_0_1,animal,,
 ,P_content_black_tea,g P / 100 gram product,0.2826,0.314,0.3454,posnorm,consumption,no,unchanged
@@ -426,7 +426,7 @@ asparagus,N_content_asparagus_gr_100gr,g N / 100 gram product,0.279,0.31,0.341,p
 ,K_content_poultry,g K2O / 100 g,0.279,0.31,0.341,posnorm,animal,,unchanged
 ,P_content_offal,g P / 100 gram product,0.279,0.306,0.333,posnorm,consumption,yes,unchanged
 ,P_content_herb_tea,g P / 100 gram product,0.279,0.31,0.341,posnorm,consumption,no,unchanged
-,manure_N_to_PtwoOfive_heifer,share,0.27702,0.3078,0.33858,tnorm_0_1,animal,no,
+calulcated from Nährstoffbericht 2017 p. 25,manure_N_to_PtwoOfive_heifer,share,0.27702,0.3078,0.33858,tnorm_0_1,animal,no,
 ,K_leftover_potato,kg K / FM dt,0.27,0.3,0.33,posnorm,crop,no,unchanged
 ,K_content_other_meat,g K / 100 gram product,0.2646,0.294,0.3234,posnorm,consumption,no,unchanged
 lambs_lettuce,N_content_lambs_lettuce_gr_100gr,g N / 100 gram product,0.261,0.29,0.319,posnorm,crop,no,unchanged
@@ -609,3 +609,11 @@ share of other animals livestock units in local feed scenario,scenario_share_oth
 allocation of animal manure to export in a local feed scenario,scenario_allocate_manure_export,,0.001,,0.43,tnorm_0_1,animal,,survey stakeholders
 allocation of animal manure to biogas in a local feed scenario,scenario_allocate_manure_biogas,,0.05,,0.4,tnorm_0_1,animal,,survey stakeholders
 allocation of animal manure to crop in a local feed scenario,scenario_allocate_manure_crop,,0.26,,0.95,tnorm_0_1,animal,,survey stakeholders
+amount of K2O for one N manure; taken from https://ag.umass.edu/crops-dairy-livestock-equine/fact-sheets/plant-nutrients-from-manure,manure_N_to_KtwoO_dairy,share,0.803571429,0.892857143,0.982142857,posnorm,animal,,
+amount of K2O for one N manure; taken from https://ag.umass.edu/crops-dairy-livestock-equine/fact-sheets/plant-nutrients-from-manure,manure_N_to_KtwoO_calf,share,0.9,1,1.1,posnorm,animal,,
+amount of K2O for one N manure; taken from https://ag.umass.edu/crops-dairy-livestock-equine/fact-sheets/plant-nutrients-from-manure,manure_N_to_KtwoO_bull,share,0.514285714,0.571428571,0.628571429,posnorm,animal,,
+amount of K2O for one N manure; taken from https://ag.umass.edu/crops-dairy-livestock-equine/fact-sheets/plant-nutrients-from-manure,manure_N_to_KtwoO_pig,share,0.375,,0.6,posnorm,animal,,
+amount of K2O for one N manure; taken from https://ag.umass.edu/crops-dairy-livestock-equine/fact-sheets/plant-nutrients-from-manure,manure_N_to_KtwoO_horse,share,0.675,0.75,0.825,posnorm,animal,,
+amount of K2O for one N manure; taken from https://ag.umass.edu/crops-dairy-livestock-equine/fact-sheets/plant-nutrients-from-manure,manure_N_to_KtwoO_sheep,share,0.782608696,0.869565217,0.956521739,posnorm,animal,,
+amount of K2O for one N manure; taken from https://ag.umass.edu/crops-dairy-livestock-equine/fact-sheets/plant-nutrients-from-manure,manure_N_to_KtwoO_chicken,share,0.638888889,,0.970588235,posnorm,animal,,
+amount of K2O for one N manure; taken from https://ag.umass.edu/crops-dairy-livestock-equine/fact-sheets/plant-nutrients-from-manure,manure_N_to_KtwoO_turkey,share,0.675,,0.722222222,posnorm,animal,,
