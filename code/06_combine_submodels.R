@@ -35,11 +35,12 @@ combined_function <- function() {
 
 
   # loop for the scenarios
-  for (scenario in c("normal", "local_feed", "technology")) {
+  for (scenario in c("normal", "local_feed", "local_feed_stakeholders")) {
 
-    # factor deciding how much manure input into biogas is reduced by scenario
+    # factor to scale biogas output to input in local feed scenario
     # default value is 1.0, so no reduction
-    rf_manure_biogas_scenario <- 1.0
+    rf_biogas_input_N <- rf_biogas_input_P <- rf_biogas_input_K <- 1.0
+    
 
     # change factor for animal composition under local feed scenario
     # set to 1 in the beginning, so it doesnt affect normal scenario
@@ -48,13 +49,7 @@ combined_function <- function() {
     cf_pig_local_feed <- 1
     cf_poultry_local_feed <- 1
     cf_others_local_feed <- 1
-
-    # this scenario is not worked out yet, so skip it in the loop
-    if (scenario == "technology") {
-      next()
-    }
-
-
+    
     # at first calculate the crop production system
 
     #-------------------#
@@ -242,6 +237,10 @@ combined_function <- function() {
 
     if(scenario == 'local_feed'){
       
+      #-----------------------------------#
+      # relative changes in crop allocation
+      #-----------------------------------#
+      
       #output of crop system that stays in Kleve (so without export and without losses)
       total_vegetable_production_without_export <- combined_output$vegetal_biogas_substrate_N[1] +
         combined_output$straw_N[1] + combined_output$feed_crops_N[1] +
@@ -274,9 +273,78 @@ combined_function <- function() {
       cf_crop_to_feed <- scenario_allocate_crop_feed_corrected / current_allocation_crop_animal
       cf_crop_to_food <- scenario_allocate_crop_food_corrected / current_allocation_crop_human
       
-      #multiply streams with the change factor
-      #but when?
+      
+      #--------------------------------------#
+      # calculate net-change in the allocation
+      #--------------------------------------#
+      
+      #amount of non-maize given to the biogas
+      #this will yet not be included in the accounting, only subtracted from
+      #this will be used as a buffer to keep the vegetal to animal biogas input 
+      #the same
+      change_nonmaize_veg_to_biogas_N <- ((combined_output$vegetal_biogas_substrate_N - crop_output$N_crop_biogas) * cf_crop_to_biogas) - (combined_output$vegetal_biogas_substrate_N - crop_output$N_crop_biogas)
+      change_nonmaize_veg_to_biogas_P <- ((combined_output$vegetal_biogas_substrate_P - crop_output$P_crop_biogas) * cf_crop_to_biogas) - (combined_output$vegetal_biogas_substrate_P - crop_output$P_crop_biogas)
+      change_nonmaize_veg_to_biogas_K <- ((combined_output$vegetal_biogas_substrate_K - crop_output$K_crop_biogas) * cf_crop_to_biogas) - (combined_output$vegetal_biogas_substrate_K - crop_output$K_crop_biogas)
+      
+      #change in maize grown for biogas
+      change_maize_to_biogas_N <- (crop_output$N_crop_biogas * cf_crop_to_biogas) - crop_output$N_crop_biogas
+      change_maize_to_biogas_P <- (crop_output$P_crop_biogas * cf_crop_to_biogas) - crop_output$P_crop_biogas
+      change_maize_to_biogas_K <- (crop_output$K_crop_biogas * cf_crop_to_biogas) - crop_output$K_crop_biogas
+      
+      #for the sake of simplicity I pump the changes always in one chanel
+      #(--> processed feed and local processed feed)
+      #I need to increase the "all the crop to animal streams" and then chanel that increase in one
+      #stream (or more, but this is up to bernou)
+      current_crop_to_animal_N <- (combined_output$straw_N[1] + combined_output$feed_crops_N[1] +
+        combined_output$grassbased_feed_N[1] + combined_output$feed_from_processed_crops_N[1]) 
+      current_crop_to_animal_P <- (combined_output$straw_P[1] + combined_output$feed_crops_P[1] +
+                                     combined_output$grassbased_feed_P[1] + 
+                                     combined_output$feed_from_processed_crops_P[1]) 
+      current_crop_to_animal_K <- (combined_output$straw_K[1] + combined_output$feed_crops_K[1] +
+                                     combined_output$grassbased_feed_K[1] + 
+                                     combined_output$feed_from_processed_crops_K[1]) 
+      
+      change_allocated_crop_to_feed_N <- (current_crop_to_animal_N * cf_crop_to_feed) - current_crop_to_animal_N
+      change_allocated_crop_to_feed_P <- (current_crop_to_animal_P * cf_crop_to_feed) - current_crop_to_animal_P
+      change_allocated_crop_to_feed_K <- (current_crop_to_animal_K * cf_crop_to_feed) - current_crop_to_animal_K 
+      
+
+      
+      #problem with crops to food: the split between local consumption and export happens later
+      #-->I need to increase only the local consumption part
+      
+      #change in crop allocated to consumption
+      change_allocated_crop_local_food_N <-  (combined_output$local_vegetal_products_consumed_N * cf_crop_to_food) - combined_output$local_vegetal_products_consumed_N
+      change_allocated_crop_local_food_P <-  (combined_output$local_vegetal_products_consumed_P * cf_crop_to_food) - combined_output$local_vegetal_products_consumed_P
+      change_allocated_crop_local_food_K <-  (combined_output$local_vegetal_products_consumed_K * cf_crop_to_food) - combined_output$local_vegetal_products_consumed_K
+
+      
+      #------------------------------------------#
+      #apply changes in crop allocation to streams
+      #------------------------------------------#
+      
+      #crop to biogas: maize
+      crop_output$N_crop_biogas <- crop_output$N_crop_biogas + change_maize_to_biogas_N
+      crop_output$P_crop_biogas <- crop_output$P_crop_biogas + change_maize_to_biogas_P
+      crop_output$K_crop_biogas <- crop_output$K_crop_biogas + change_maize_to_biogas_K
+      
+      #crop to biogas: crop non-maize, taken from processed crop to human consumption
+      crop_output$N_crop_human_consumption_processed <- crop_output$N_crop_human_consumption_processed + change_nonmaize_veg_to_biogas_N
+      crop_output$P_crop_human_consumption_processed <- crop_output$P_crop_human_consumption_processed + change_nonmaize_veg_to_biogas_P
+      crop_output$K_crop_human_consumption_processed <- crop_output$K_crop_human_consumption_processed + change_nonmaize_veg_to_biogas_K
+      
+      #crop to feed
+      crop_output$N_crop_animal_feeding_processed <-  crop_output$N_crop_animal_feeding_processed + change_allocated_crop_to_feed_N
+      crop_output$P_crop_animal_feeding_processed <-  crop_output$P_crop_animal_feeding_processed + change_allocated_crop_to_feed_P
+      crop_output$K_crop_animal_feeding_processed <-  crop_output$K_crop_animal_feeding_processed + change_allocated_crop_to_feed_K
+      
+      #crop to local human consumption
+      crop_output$N_crop_human_consumption_processed <- crop_output$N_crop_human_consumption_processed + change_allocated_crop_local_food_N
+      crop_output$P_crop_human_consumption_processed <- crop_output$P_crop_human_consumption_processed + change_allocated_crop_local_food_P
+      crop_output$K_crop_human_consumption_processed <- crop_output$K_crop_human_consumption_processed + change_allocated_crop_local_food_K
+    
     }
+    
     #---------------------#
     # ANIMAL SUBSYSTEM ####
     #---------------------#
@@ -465,15 +533,15 @@ combined_function <- function() {
       animal_output$K_remaining_manure + animal_output$K_housing_loss +
       animal_output$K_to_slaughter
 
-    N_animal_local_input <- crop_output$N_straw + crop_output$N_grassland +
+    N_animal_local_input <- (crop_output$N_straw + crop_output$N_grassland +
       crop_output$N_crop_animal_feeding_processed +
-      crop_output$N_crop_animal_feeding_unprocessed
-    P_animal_local_input <- crop_output$P_straw + crop_output$P_grassland +
+      crop_output$N_crop_animal_feeding_unprocessed) * cf_crop_to_feed
+    P_animal_local_input <- (crop_output$P_straw + crop_output$P_grassland +
       crop_output$P_crop_animal_feeding_processed +
-      crop_output$P_crop_animal_feeding_unprocessed
-    K_animal_local_input <- crop_output$K_straw + crop_output$K_grassland +
+      crop_output$P_crop_animal_feeding_unprocessed)  * cf_crop_to_feed
+    K_animal_local_input <- (crop_output$K_straw + crop_output$K_grassland +
       crop_output$K_crop_animal_feeding_processed +
-      crop_output$K_crop_animal_feeding_unprocessed
+      crop_output$K_crop_animal_feeding_unprocessed)  * cf_crop_to_feed
 
     # in bernous file the unprocessed feed is much higher
     # is there an error in the calculations or are numbers just so different from 2016 to 2020?
@@ -483,9 +551,9 @@ combined_function <- function() {
     K_feed_import <- max(K_animal_output_produced - K_animal_local_input, 0)
 
 
-    #--------------------------------#
-    ## reduction factor livestock ####
-    #--------------------------------#
+    #---------------------------------------------------------#
+    ## reduce herdsize according to locally available feed ####
+    #---------------------------------------------------------#
 
     if (scenario == "local_feed") {
 
@@ -494,20 +562,25 @@ combined_function <- function() {
       rf_local_feed_P <- P_animal_local_input / (P_animal_local_input + P_feed_import)
       rf_local_feed_K <- K_animal_local_input / (K_animal_local_input + K_feed_import)
 
-      #--> Phosphorous is much more limiting than Nitrogen, is that realistic?
-
       # reduction by Nitrogen, because farmers wouldnt care for P or K
       rf_local_feed <- rf_local_feed_N
 
       # stakeholders came up with different reduction factor
       rf_stakeholder <- 1 - scenario_overall_livestock_reduction
 
+      
+      #-------------------------------------------------------------#
       ### temp
+      
+      #idead: compare the strict local feed-stuff oriented reduction with
+      #stakeholder proposed reduction of herd-size
 
       rf_local_feed <- c(rf_local_feed, rf_stakeholder)
 
       ### tmep
-
+      #--------------------------------------------------------------------#
+      
+      
       # if reduction by P would be larger, say that the animals just excrete less P
       # because they were fed excess P anyway
 
@@ -523,6 +596,11 @@ combined_function <- function() {
       N_feed_import <- 0
       P_feed_import <- 0
       K_feed_import <- 0
+      
+      
+      #---------------------------------#
+      #reduce herd size and slaughter animals according to reduction factor
+      #---------------------------------#
 
       # here I could change the individual animal stocks, right now I will reduce them evenly
       n_dairy_cow_reduced <- n_dairy_cow * rf_local_feed
@@ -554,54 +632,8 @@ combined_function <- function() {
       n_slaughter_oxes_reduced <- n_slaughter_oxes * rf_local_feed
 
 
-      # is the import of slaughter animals set to zero or is it going to be the same?
-      # for now I leave it the same
-
-
       # run the animal subsystem again now with the changed animal stocks
       # and with reduced local slaughter animal number
-
-
-      #-------------------------#
-      ## Manure after biogas ====
-      #-------------------------#
-
-      # get manure potentially available for crops after biogas
-      # according to business as usual calculations
-
-      # manure going to biogas
-      N_biogas_input_animal <- N_biogas_input * share_N_biogas_input_animal
-      P_biogas_input_animal <- P_biogas_input * share_P_biogas_input_animal
-      K_biogas_input_animal <- K_biogas_input * share_K_biogas_input_animal
-
-      # calculate manure remaining after biogas
-      N_manure_after_biogas_old <- animal_output$N_remaining_manure - N_biogas_input_animal
-      P_manure_after_biogas_old <- animal_output$P_remaining_manure - P_biogas_input_animal
-      K_manure_after_biogas_old <- animal_output$K_remaining_manure - K_biogas_input_animal
-
-
-      # check if allocation of manure adds up to 1, otherwise correct like
-      # in crop land or animal composition
-      sum_scenario_manure_allocation <- scenario_allocate_manure_biogas + scenario_allocate_manure_crop + scenario_allocate_manure_export
-      correction_factor <- 1 / sum_scenario_manure_allocation
-
-      # correct manure allocation values
-      scenario_allocate_manure_biogas_corrected <- scenario_allocate_manure_biogas * correction_factor
-      scenario_allocate_manure_crop_corrected <- scenario_allocate_manure_crop * correction_factor
-      scenario_allocate_manure_export_corrected <- scenario_allocate_manure_export * correction_factor
-
-
-      # calculate share of manure to total manure which went to the biogas
-      share_N_manure_allocated_biogas <- N_biogas_input_animal / animal_output$N_remaining_manure
-
-      # problem: allocation of manure is sofar not done by allocation rules but by
-      # variable which explicitly states the amount of animal-derived biogas input
-
-      # change factor: reduction of animal manure going to biogas
-      cf_manure_to_biogas <- scenario_allocate_manure_biogas_corrected / share_N_manure_allocated_biogas
-
-
-
 
 
       #--------------------------------------------------#
@@ -611,7 +643,8 @@ combined_function <- function() {
       animal_output <- list()
       
       for(i in 1:length(rf_local_feed)){
-        animal_output <- c(animal_output, list(calc_animal(
+        #do animal calculations with the stakeholders reduction factor
+        intermed_output <- calc_animal(
           n_slaughter_dairy_cattle = n_slaughter_dairy_cattle_reduced[i],
           n_slaughter_female_cattle = n_slaughter_female_cattle_reduced[i],
           n_slaughter_bulls = n_slaughter_bulls_reduced[i],
@@ -722,116 +755,218 @@ combined_function <- function() {
           convert_potassium_oxide_to_k = convert_potassium_oxide_to_k,
           P_housing_losses = P_housing_losses,
           K_housing_losses = K_housing_losses
-        )))
-      }
+        )
+        
+        #append output to list
+        animal_output <- list(
+          N_to_slaughter = c(animal_output$N_to_slaughter, intermed_output$N_to_slaughter),
+          P_to_slaughter = c(animal_output$P_to_slaughter, intermed_output$P_to_slaughter),
+          K_to_slaughter = c(animal_output$K_to_slaughter, intermed_output$K_to_slaughter),
+          N_to_slaughter_import = c(animal_output$N_to_slaughter_import, intermed_output$N_to_slaughter_import),
+          P_to_slaughter_import = c(animal_output$P_to_slaughter_import, intermed_output$P_to_slaughter_import),
+          K_to_slaughter_import = c(animal_output$K_to_slaughter_import, intermed_output$K_to_slaughter_import),
+          N_meat_local_to_consumption = c(animal_output$N_meat_local_to_consumption, intermed_output$N_meat_local_to_consumption),
+          P_meat_local_to_consumption = c(animal_output$P_meat_local_to_consumption, intermed_output$P_meat_local_to_consumption),
+          K_meat_local_to_consumption = c(animal_output$K_meat_local_to_consumption, intermed_output$K_meat_local_to_consumption),
+          N_meat_local_to_consumption_import = c(animal_output$N_meat_local_to_consumption_import, intermed_output$N_meat_local_to_consumption_import),
+          P_meat_local_to_consumption_import = c(animal_output$P_meat_local_to_consumption_import, intermed_output$P_meat_local_to_consumption_import),
+          K_meat_local_to_consumption_import = c(animal_output$K_meat_local_to_consumption_import, intermed_output$K_meat_local_to_consumption_import),
+          N_slaughter_waste = c(animal_output$N_slaughter_waste, intermed_output$N_slaughter_waste),
+          P_slaughter_waste = c(animal_output$P_slaughter_waste, intermed_output$P_slaughter_waste),
+          K_slaughter_waste = c(animal_output$K_slaughter_waste, intermed_output$K_slaughter_waste),
+          N_slaughter_waste_import = c(animal_output$N_slaughter_waste_import, intermed_output$N_slaughter_waste_import),
+          P_slaughter_waste_import = c(animal_output$P_slaughter_waste_import, intermed_output$P_slaughter_waste_import),
+          K_slaughter_waste_import = c(animal_output$K_slaughter_waste_import, intermed_output$K_slaughter_waste_import),
+          N_milk_available = c(animal_output$N_milk_available, intermed_output$N_milk_available),
+          P_milk_available = c(animal_output$P_milk_available, intermed_output$P_milk_available),
+          K_milk_available = c(animal_output$K_milk_available, intermed_output$K_milk_available),
+          N_egg_available = c(animal_output$N_egg_available, intermed_output$N_egg_available),
+          P_egg_available = c(animal_output$P_egg_available, intermed_output$P_egg_available),
+          K_egg_available = c(animal_output$K_egg_available, intermed_output$K_egg_available),
+          N_total_manure = c(animal_output$N_total_manure, intermed_output$N_total_manure),
+          P_total_manure = c(animal_output$P_total_manure, intermed_output$P_total_manure),
+          K_total_manure = c(animal_output$K_total_manure, intermed_output$K_total_manure),
+          N_housing_loss = c(animal_output$N_housing_loss, intermed_output$N_housing_loss),
+          P_housing_loss = c(animal_output$P_housing_loss, intermed_output$P_housing_loss),
+          K_housing_loss = c(animal_output$K_housing_loss, intermed_output$K_housing_loss),
+          N_remaining_manure = c(animal_output$N_remaining_manure, intermed_output$N_remaining_manure),
+          P_remaining_manure = c(animal_output$P_remaining_manure, intermed_output$P_remaining_manure),
+          K_remaining_manure = c(animal_output$K_remaining_manure, intermed_output$K_remaining_manure)
+        )
+      } #end animal output calculation under local feed
       
-      N_animal_output_produced <- purrr::map_dbl(animal_output, 'N_milk_available')  + 
-        purrr::map_dbl(animal_output, 'N_egg_available') +
-        purrr::map_dbl(animal_output, 'N_remaining_manure') + 
-        purrr::map_dbl(animal_output, 'N_housing_loss') +
-        purrr::map_dbl(animal_output, 'N_to_slaughter')
-      P_animal_output_produced <- purrr::map_dbl(animal_output, 'P_milk_available')  + 
-        purrr::map_dbl(animal_output, 'P_egg_available') +
-        purrr::map_dbl(animal_output, 'P_remaining_manure') + 
-        purrr::map_dbl(animal_output, 'P_housing_loss') +
-        purrr::map_dbl(animal_output, 'P_to_slaughter')
-      K_animal_output_produced <- purrr::map_dbl(animal_output, 'K_milk_available')  + 
-        purrr::map_dbl(animal_output, 'K_egg_available') +
-        purrr::map_dbl(animal_output, 'K_remaining_manure') + 
-        purrr::map_dbl(animal_output, 'K_housing_loss') +
-        purrr::map_dbl(animal_output, 'K_to_slaughter')
+      #adjust the manure P and K content, if N wasnt really the limiting factor
+      #we assume in that case that the animals excrete less excess K and P
+      animal_output$P_remaining_manure <- animal_output$P_remaining_manure - P_reduction_manure 
+      animal_output$K_remaining_manure <- animal_output$K_remaining_manure - K_reduction_manure
       
-      # get new amount of manure after biogas
-
-      # add a factor downscaling the manure to biogas according to what farmers report
-      # this needs to go into input file
-      # this needs to be set to 1.0 in the beginning, and in the if of scenario it it set to e.g. 0.8
-      rf_manure_biogas_scenario <- cf_manure_to_biogas
-
-      N_manure_after_biogas_new <- animal_output$N_remaining_manure - (N_biogas_input_animal * rf_manure_biogas_scenario)
-      P_manure_after_biogas_new <- animal_output$P_remaining_manure - (P_biogas_input_animal * rf_manure_biogas_scenario)
-      K_manure_after_biogas_new <- animal_output$K_remaining_manure - (K_biogas_input_animal * rf_manure_biogas_scenario)
-
       
-      # apply new allocation of manure to export by stakeholders
-      export_manure_N_kg <- export_manure_N_kg * scenario_allocate_manure_export
-      export_manure_P_kg <- export_manure_P_kg * scenario_allocate_manure_export
-      export_manure_K_kg <- export_manure_K_kg * scenario_allocate_manure_export
+      #bundle of animal input and output under local feed
+      N_animal_output_produced <- animal_output$N_milk_available  + 
+        animal_output$N_egg_available +
+        animal_output$N_remaining_manure + 
+        animal_output$N_housing_loss +
+        animal_output$N_to_slaughter
+      P_animal_output_produced <- animal_output$P_milk_available  + 
+        animal_output$P_egg_available +
+        animal_output$P_remaining_manure + 
+        animal_output$P_housing_loss +
+        animal_output$P_to_slaughter
+      K_animal_output_produced <- animal_output$K_milk_available  + 
+        animal_output$K_egg_available +
+        animal_output$K_remaining_manure + 
+        animal_output$K_housing_loss +
+        animal_output$K_to_slaughter
       
+      
+      
+      #-------------------------------------------------#
+      ## Manure allocation under local feed scenario ====
+      #-------------------------------------------------#
+      
+      # check if allocation of manure adds up to 1, otherwise correct like
+      # in crop land or animal composition
+      sum_scenario_manure_allocation <- scenario_allocate_manure_biogas + scenario_allocate_manure_crop + scenario_allocate_manure_export
+      correction_factor <- 1 / sum_scenario_manure_allocation
+      
+      # correct manure allocation values
+      scenario_allocate_manure_biogas_corrected <- scenario_allocate_manure_biogas * correction_factor
+      scenario_allocate_manure_crop_corrected <- scenario_allocate_manure_crop * correction_factor
+      scenario_allocate_manure_export_corrected <- scenario_allocate_manure_export * correction_factor
+      
+      # get manure potentially available for crops after biogas
+      # according to business as usual calculations
+      
+      total_manure_N <- animal_output$N_remaining_manure + import_organic_N_kg
+      total_manure_P <- animal_output$P_remaining_manure + import_organic_P_kg
+      total_manure_K <- animal_output$K_remaining_manure + import_organic_K_kg
+      
+      #----------------------------------------------------#
+      #distribute manure according to stakeholder allocation
+      #----------------------------------------------------#
+      
+      #allocate manure according to the stakeholders
+      export_manure_N_kg <- total_manure_N * scenario_allocate_manure_export_corrected
+      export_manure_P_kg <- total_manure_P * scenario_allocate_manure_export_corrected
+      export_manure_K_kg <- total_manure_K * scenario_allocate_manure_export_corrected
+      
+      N_biogas_input_animal <- total_manure_N * scenario_allocate_manure_biogas_corrected
+      P_biogas_input_animal <- total_manure_P * scenario_allocate_manure_biogas_corrected
+      K_biogas_input_animal <- total_manure_K * scenario_allocate_manure_biogas_corrected
+      
+      #attention: now the import is included in this number, but actually this
+      #flow is supposed to be only going from animal to crop
+      #subtract the import at the end, otherwise it is accounted twice
+      #import needed to be part of total manure, because the stakeholders answer allocation included imported manure
+      N_manure_to_crop <- (total_manure_N * scenario_allocate_manure_crop_corrected) - import_organic_N_kg
+      P_manure_to_crop <- (total_manure_P * scenario_allocate_manure_crop_corrected) - import_organic_P_kg
+      K_manure_to_crop <- (total_manure_K * scenario_allocate_manure_crop_corrected) - import_organic_K_kg
+      
+      
+      #check how much less manure is applied to crops
+      #--> the difference is imported as inorganic fertilizer
+    
       # get the difference in manure available for crops, this difference needs 
       # to be imported in other ways for example by inorganic fertilizer
-
-      N_manure_missing <- N_manure_after_biogas_old - N_manure_after_biogas_new - export_manure_N_kg
-      P_manure_missing <- P_manure_after_biogas_old - P_manure_after_biogas_new - export_manure_P_kg
-      K_manure_missing <- K_manure_after_biogas_old - K_manure_after_biogas_new - export_manure_K_kg
+      N_manure_missing_for_crops <- combined_output$manure_to_crop_N - scenario_manure_N_crop
+      P_manure_missing_for_crops <- combined_output$manure_to_crop_P - scenario_manure_P_crop
+      K_manure_missing_for_crops <- combined_output$manure_to_crop_K - scenario_manure_K_crop
       
 
       # import the reduction in manure available to crops in form of inorganic fertilizer
-      crop_output$imported_inorganic_N <- crop_output$imported_inorganic_N + N_manure_missing
-      crop_output$imported_inorganic_P <- crop_output$imported_inorganic_P + P_manure_missing
-      crop_output$imported_inorganic_K <- crop_output$imported_inorganic_K + K_manure_missing
+      crop_output$imported_inorganic_N <- crop_output$imported_inorganic_N + N_manure_missing_for_crops
+      crop_output$imported_inorganic_P <- crop_output$imported_inorganic_P + P_manure_missing_for_crops
+      crop_output$imported_inorganic_K <- crop_output$imported_inorganic_K + K_manure_missing_for_crops
 
       # inorganic fertilizers have less nutrient losses when applied than organic ones
       # have a reduction factor for environmental losses
-    }
-
-
-    #-----------#
-    # BIOGAS ====
-    #-----------#
-
-    ## manure going to biogas ----
-    N_biogas_input_animal <- N_biogas_input * share_N_biogas_input_animal * rf_manure_biogas_scenario
-    P_biogas_input_animal <- P_biogas_input * share_P_biogas_input_animal * rf_manure_biogas_scenario
-    K_biogas_input_animal <- K_biogas_input * share_K_biogas_input_animal * rf_manure_biogas_scenario
-
-    # avoid that reduced manure input in local feed scenario is substituted with crops
-    # keeo track of how much less is put in, under local feed scenario
-    N_biogas_input_animal_not_used_scen <- N_biogas_input * share_N_biogas_input_animal * (1 - rf_manure_biogas_scenario)
-    P_biogas_input_animal_not_used_scen <- P_biogas_input * share_P_biogas_input_animal * (1 - rf_manure_biogas_scenario)
-    K_biogas_input_animal_not_used_scen <- K_biogas_input * share_K_biogas_input_animal * (1 - rf_manure_biogas_scenario)
-
-    # additional vegetal biomass going to biogas
-    # take from crops to humans by processing
-
-    # N_crop_biogas contains so far only maize, but there are also other crops like sugar beet used
-    # so the gap of animal based input and crop(actually maize based) input is then taken again from N_crop
-    N_biogas_crop_missing <- N_biogas_input - (crop_output$N_crop_biogas + N_biogas_input_animal + N_biogas_input_animal_not_used_scen)
-    P_biogas_crop_missing <- P_biogas_input - (crop_output$P_crop_biogas + P_biogas_input_animal + P_biogas_input_animal_not_used_scen)
-    K_biogas_crop_missing <- K_biogas_input - (crop_output$K_crop_biogas + K_biogas_input_animal + K_biogas_input_animal_not_used_scen)
-
-    # take missing input from the crops for human consumption
-    crop_output$N_crop_human_consumption_processed <- crop_output$N_crop_human_consumption_processed - N_biogas_crop_missing
-    crop_output$P_crop_human_consumption_processed <- crop_output$P_crop_human_consumption_processed - P_biogas_crop_missing
-    crop_output$K_crop_human_consumption_processed <- crop_output$K_crop_human_consumption_processed - K_biogas_crop_missing
-
-
-    # alternatively take original share of original animal to crop input for biogas and scale it down accordingly
-
-
-    # update the crop biogas iput (because in the crop out it was sofar only maize)
-    crop_output$N_crop_biogas <- N_biogas_input - N_biogas_input_animal
-    crop_output$P_crop_biogas <- P_biogas_input - P_biogas_input_animal
-    crop_output$K_crop_biogas <- K_biogas_input - K_biogas_input_animal
-
-    
-    if(scenario == "local_feed"){
-      ## manure going to crops after manure was sent to biogas and exported----
-      N_manure_to_crop <- purrr::map_dbl(animal_output, 'N_remaining_manure') - N_biogas_input_animal 
-      P_manure_to_crop <- purrr::map_dbl(animal_output, 'P_remaining_manure') - P_biogas_input_animal 
-      K_manure_to_crop <- purrr::map_dbl(animal_output, 'K_remaining_manure') - K_biogas_input_animal 
+      #still missing!!!!!!
       
-    } else {
+      
+      #--------------------------------#
+      ##BIOGAS IN scenario ####
+      #--------------------------------#
+      
+      ratio_crop_to_manure_biogas_N <- combined_output$vegetal_biogas_substrate_N / combined_output$manure_as_biogas_substrate_N
+      ratio_crop_to_manure_biogas_P <- combined_output$vegetal_biogas_substrate_P / combined_output$manure_as_biogas_substrate_P
+      ratio_crop_to_manure_biogas_K <- combined_output$vegetal_biogas_substrate_K / combined_output$manure_as_biogas_substrate_K
+      
+      #calculate missing amount of non-maize crop biomass, so that ratio crop:manure is constant
+      N_biogas_crop_missing <- (ratio_crop_to_manure_biogas_N * N_biogas_input_animal) - crop_output$N_crop_biogas
+      P_biogas_crop_missing <- (ratio_crop_to_manure_biogas_P * P_biogas_input_animal) - crop_output$P_crop_biogas
+      K_biogas_crop_missing <- (ratio_crop_to_manure_biogas_K * K_biogas_input_animal) - crop_output$K_crop_biogas
+      
+      #add the extra vegetal biogas input to biogas crop, subtract it from processed crop for food
+      crop_output$N_crop_biogas <- crop_output$N_crop_biogas + N_biogas_crop_missing
+      crop_output$P_crop_biogas <- crop_output$P_crop_biogas + P_biogas_crop_missing
+      crop_output$K_crop_biogas <- crop_output$K_crop_biogas + K_biogas_crop_missing
+      
+      crop_output$N_crop_human_consumption_processed <- crop_output$N_crop_human_consumption_processed - N_biogas_crop_missing
+      crop_output$P_crop_human_consumption_processed <- crop_output$P_crop_human_consumption_processed - P_biogas_crop_missing
+      crop_output$K_crop_human_consumption_processed <- crop_output$K_crop_human_consumption_processed - K_biogas_crop_missing
+      
+      #get factor how much biogas input is actually scaled down
+      rf_biogas_input_N <- (N_biogas_input + crop_output$N_crop_biogas) / (combined_output$vegetal_biogas_substrate_N + combined_output$manure_as_biogas_substrate_N)
+      rf_biogas_input_P <- (P_biogas_input + crop_output$P_crop_biogas) / (combined_output$vegetal_biogas_substrate_P + combined_output$manure_as_biogas_substrate_P)
+      rf_biogas_input_K <- (K_biogas_input + crop_output$K_crop_biogas) / (combined_output$vegetal_biogas_substrate_K + combined_output$manure_as_biogas_substrate_K)
+      
+    }
+    
+    if(scenario == 'normal'){
+      
+      #---------------#
+      #manure export K#
+      #---------------#
+      
+      #calculate K_manure export assuming same ratio of N:K in exported manure as in remaining manure
+      #calculate share K/N in manure, assume that K follows in the same share
+      export_manure_K_kg <- export_manure_N_kg * (animal_output$K_remaining_manure /  animal_output$N_remaining_manure)
+      
+      #------------------------------#
+      # BIOGAS IN normal scenario ####
+      #------------------------------#
+      
+      # manure going to biogas 
+      #we have less manure available, we have already allocation rule, so I could
+      #calculate new amount of manure going in the biogas
+      
+      
+      N_biogas_input_animal <- N_biogas_input * share_N_biogas_input_animal 
+      P_biogas_input_animal <- P_biogas_input * share_P_biogas_input_animal 
+      K_biogas_input_animal <- K_biogas_input * share_K_biogas_input_animal 
+      
+
+      # additional vegetal biomass going to biogas
+      # take from crops to humans by processing
+      
+      # N_crop_biogas contains so far only maize, but there are also other crops like sugar beet used
+      # so the gap of animal based input and crop(actually maize based) input is then taken again from N_crop
+      N_biogas_crop_missing <- N_biogas_input - (crop_output$N_crop_biogas  + N_biogas_input_animal)
+      P_biogas_crop_missing <- P_biogas_input - (crop_output$P_crop_biogas  + P_biogas_input_animal)
+      K_biogas_crop_missing <- K_biogas_input - (crop_output$K_crop_biogas  + K_biogas_input_animal)
+      
+      # take missing input from the crops for human consumption
+      crop_output$N_crop_human_consumption_processed <- crop_output$N_crop_human_consumption_processed - N_biogas_crop_missing
+      crop_output$P_crop_human_consumption_processed <- crop_output$P_crop_human_consumption_processed - P_biogas_crop_missing
+      crop_output$K_crop_human_consumption_processed <- crop_output$K_crop_human_consumption_processed - K_biogas_crop_missing
+      
+      
+      
+      # update the crop biogas iput (because in the crop out it was sofar only maize)
+      crop_output$N_crop_biogas <- N_biogas_input - N_biogas_input_animal
+      crop_output$P_crop_biogas <- P_biogas_input - P_biogas_input_animal
+      crop_output$K_crop_biogas <- K_biogas_input - K_biogas_input_animal
+      
+      
       N_manure_to_crop <- animal_output$N_remaining_manure - N_biogas_input_animal 
       P_manure_to_crop <- animal_output$P_remaining_manure - P_biogas_input_animal 
-      K_manure_to_crop <- animal_output$K_remaining_manure - K_biogas_input_animal 
-      
+      K_manure_to_crop <- animal_output$K_remaining_manure - K_biogas_input_animal
     }
 
-
-
-    # biogas output
-
+    #---------------#
+    # BIOGAS OUT ####
+    #---------------#
+    
     # biomass digestate (take input of animal and crop, process it for waste subsystem)
     lf_area <- arable_land + area_grassland
 
@@ -844,9 +979,9 @@ combined_function <- function() {
     # the rest of inputs is kept constant
 
 
-    N_digestate <- mass_digestate * digestate_N_content * rf_manure_biogas_scenario # result is kg
-    P_digestate <- mass_digestate * digestate_P_content * rf_manure_biogas_scenario # result is kg
-    K_digestate <- mass_digestate * digestate_K_content * rf_manure_biogas_scenario # result is kg
+    N_digestate <- mass_digestate * digestate_N_content * rf_biogas_input_N # result is kg
+    P_digestate <- mass_digestate * digestate_P_content * rf_biogas_input_P # result is kg
+    K_digestate <- mass_digestate * digestate_K_content * rf_biogas_input_K # result is kg
 
 
 
@@ -1118,53 +1253,20 @@ combined_function <- function() {
 
 
     # calculate degree of self-sufficiency for meat, egg and milk production
-    # animal_output$N_egg_available / consumption_output$consumed_N_egg
-    # animal_output$N_milk_available / consumption_output$consumed_N_dairy
-    # animal_output$N_meat_local_to_consumption / consumption_output$consumed_N_meat
-    # production of crops still not done, cant calculate the sufficiency ratio yet
-    get_scenario_import <- function(consumed, produced_list, var){
-      
-      #check if produced list contains further lists, 
-      if(is.list(produced_list[[1]])){
-        purrr::map_dbl(consumed - purrr::map_dbl(produced_list, var), function(x) max(x,0))
-      } else{
-        max(consumed - produced_list[[var]], 0)
-      }
-
-      
-    }
-    
-    
-    
-    
     # imoport is consumption - local production, prevent that lower as zero
     
-    
-    N_egg_import <- get_scenario_import(consumption_output$consumed_N_egg, animal_output, 'N_egg_available')
-    P_egg_import <- get_scenario_import(consumption_output$consumed_N_egg, animal_output, 'P_egg_available')
-    K_egg_import <- get_scenario_import(consumption_output$consumed_N_egg, animal_output, 'K_egg_available')
-    
-    # N_egg_import <- max(consumption_output$consumed_N_egg - animal_output$N_egg_available, 0)
-    # P_egg_import <- max(consumption_output$consumed_P_egg - animal_output$P_egg_available, 0)
-    # K_egg_import <- max(consumption_output$consumed_K_egg - animal_output$K_egg_available, 0)
+    N_egg_import <- max(consumption_output$consumed_N_egg - animal_output$N_egg_available, 0)
+    P_egg_import <- max(consumption_output$consumed_P_egg - animal_output$P_egg_available, 0)
+    K_egg_import <- max(consumption_output$consumed_K_egg - animal_output$K_egg_available, 0)
 
-    N_meat_import <- get_scenario_import(consumption_output$consumed_N_meat, animal_output, 'N_meat_local_to_consumption')
-    P_meat_import <- get_scenario_import(consumption_output$consumed_P_meat, animal_output, 'P_meat_local_to_consumption')
-    K_meat_import <- get_scenario_import(consumption_output$consumed_K_meat, animal_output, 'K_meat_local_to_consumption')
-    
-    # N_meat_import <- max(consumption_output$consumed_N_meat - animal_output$N_meat_local_to_consumption, 0)
-    # P_meat_import <- max(consumption_output$consumed_P_meat - animal_output$P_meat_local_to_consumption, 0)
-    # K_meat_import <- max(consumption_output$consumed_K_meat - animal_output$K_meat_local_to_consumption, 0)
+    N_meat_import <- max(consumption_output$consumed_N_meat - animal_output$N_meat_local_to_consumption, 0)
+    P_meat_import <- max(consumption_output$consumed_P_meat - animal_output$P_meat_local_to_consumption, 0)
+    K_meat_import <- max(consumption_output$consumed_K_meat - animal_output$K_meat_local_to_consumption, 0)
 
-    N_dairy_import <- get_scenario_import(consumption_output$consumed_N_dairy, animal_output, 'N_milk_available')
-    P_dairy_import <- get_scenario_import(consumption_output$consumed_P_dairy, animal_output, 'P_milk_available')
-    K_dairy_import <- get_scenario_import(consumption_output$consumed_K_dairy, animal_output, 'K_milk_available')
-    
-    # N_dairy_import <- max(consumption_output$consumed_N_dairy - animal_output$N_milk_available, 0)
-    # P_dairy_import <- max(consumption_output$consumed_P_dairy - animal_output$P_milk_available, 0)
-    # K_dairy_import <- max(consumption_output$consumed_K_dairy - animal_output$K_milk_available, 0)
+    N_dairy_import <- max(consumption_output$consumed_N_dairy - animal_output$N_milk_available, 0)
+    P_dairy_import <- max(consumption_output$consumed_P_dairy - animal_output$P_milk_available, 0)
+    K_dairy_import <- max(consumption_output$consumed_K_dairy - animal_output$K_milk_available, 0)
 
-    
     N_vegetable_import <- max(consumption_output$consumed_N_vegetable - crop_output$N_crop_human_consumption_processed, 0) + consumption_output$consumed_N_foreign_vegetable
     P_vegetable_import <- max(consumption_output$consumed_P_vegetable - crop_output$P_crop_human_consumption_processed, 0) + consumption_output$consumed_P_foreign_vegetable
     K_vegetable_import <- max(consumption_output$consumed_K_vegetable - crop_output$K_crop_human_consumption_processed, 0) + consumption_output$consumed_K_foreign_vegetable
@@ -1172,43 +1274,21 @@ combined_function <- function() {
     N_total_food_import <- N_egg_import + N_dairy_import + N_meat_import + N_vegetable_import
     P_total_food_import <- P_egg_import + P_dairy_import + P_meat_import + P_vegetable_import
     K_total_food_import <- K_egg_import + K_dairy_import + K_meat_import + K_vegetable_import
-
-
-    get_scenario_export <- function(consumed, produced_list, var){
-      
-      #check if produced list contains further lists, 
-      if(is.list(produced_list[[1]])){
-        purrr::map_dbl(purrr::map_dbl(produced_list, var) - consumed, function(x) max(x,0))
-      } else{
-        max(produced_list[[var]] - consumed, 0)
-      }
-    }
+    
 
     # food exports (prevent negative exports if consumption exceeds the production)
-    N_egg_export <- get_scenario_export(consumption_output$consumed_N_egg, animal_output, 'N_egg_available')
-    P_egg_export <- get_scenario_export(consumption_output$consumed_N_egg, animal_output, 'P_egg_available')
-    K_egg_export <- get_scenario_export(consumption_output$consumed_N_egg, animal_output, 'K_egg_available')
-    
-    # N_egg_export <- max(animal_output$N_egg_available - consumption_output$consumed_N_egg, 0)
-    # P_egg_export <- max(animal_output$P_egg_available - consumption_output$consumed_P_egg, 0)
-    # K_egg_export <- max(animal_output$K_egg_available - consumption_output$consumed_K_egg, 0)
+ 
+    N_egg_export <- max(animal_output$N_egg_available - consumption_output$consumed_N_egg, 0)
+    P_egg_export <- max(animal_output$P_egg_available - consumption_output$consumed_P_egg, 0)
+    K_egg_export <- max(animal_output$K_egg_available - consumption_output$consumed_K_egg, 0)
 
-    
-    N_meat_export <- get_scenario_export(consumption_output$consumed_N_meat, animal_output, 'N_meat_local_to_consumption')
-    P_meat_export <- get_scenario_export(consumption_output$consumed_P_meat, animal_output, 'P_meat_local_to_consumption')
-    K_meat_export <- get_scenario_export(consumption_output$consumed_K_meat, animal_output, 'K_meat_local_to_consumption')
-    
-    # N_meat_export <- max(animal_output$N_meat_local_to_consumption - consumption_output$consumed_N_meat, 0)
-    # P_meat_export <- max(animal_output$P_meat_local_to_consumption - consumption_output$consumed_P_meat, 0)
-    # K_meat_export <- max(animal_output$K_meat_local_to_consumption - consumption_output$consumed_K_meat, 0)
+    N_meat_export <- max(animal_output$N_meat_local_to_consumption - consumption_output$consumed_N_meat, 0)
+    P_meat_export <- max(animal_output$P_meat_local_to_consumption - consumption_output$consumed_P_meat, 0)
+    K_meat_export <- max(animal_output$K_meat_local_to_consumption - consumption_output$consumed_K_meat, 0)
 
-    N_dairy_export <- get_scenario_export(consumption_output$consumed_N_dairy, animal_output, 'N_milk_available')
-    P_dairy_export <- get_scenario_export(consumption_output$consumed_P_dairy, animal_output, 'P_milk_available')
-    K_dairy_export <- get_scenario_export(consumption_output$consumed_K_dairy, animal_output, 'K_milk_available')
-    
-    # N_dairy_export <- max(animal_output$N_milk_available - consumption_output$consumed_N_dairy, 0)
-    # P_dairy_export <- max(animal_output$P_milk_available - consumption_output$consumed_P_dairy, 0)
-    # K_dairy_export <- max(animal_output$K_milk_available - consumption_output$consumed_K_dairy, 0)
+    N_dairy_export <- max(animal_output$N_milk_available - consumption_output$consumed_N_dairy, 0)
+    P_dairy_export <- max(animal_output$P_milk_available - consumption_output$consumed_P_dairy, 0)
+    K_dairy_export <- max(animal_output$K_milk_available - consumption_output$consumed_K_dairy, 0)
 
     N_vegetable_export <- max(crop_output$N_crop_human_consumption_processed - consumption_output$consumed_N_vegetable, 0)
     P_vegetable_export <- max(crop_output$P_crop_human_consumption_processed - consumption_output$consumed_P_vegetable, 0)
@@ -1218,27 +1298,16 @@ combined_function <- function() {
      
     
     # get amount of local products which also get consumed locally
-    if(scenario == 'local_feed'){
-      N_local_animal_products_consumed <- (purrr::map_dbl(animal_output, 'N_egg_available') - N_egg_export) +
-        (purrr::map_dbl(animal_output, 'N_meat_local_to_consumption') - N_meat_export) +
-        (purrr::map_dbl(animal_output, 'N_milk_available') - N_dairy_export)
-      P_local_animal_products_consumed <- (purrr::map_dbl(animal_output, 'P_egg_available') - P_egg_export) +
-        (purrr::map_dbl(animal_output, 'P_meat_local_to_consumption') - P_meat_export) +
-        (purrr::map_dbl(animal_output, 'P_milk_available') - P_dairy_export)
-      K_local_animal_products_consumed <- (purrr::map_dbl(animal_output, 'K_egg_available') - K_egg_export) +
-        (purrr::map_dbl(animal_output, 'K_meat_local_to_consumption') - K_meat_export) +
-        (purrr::map_dbl(animal_output, 'K_milk_available') - K_dairy_export)
-    } else{
-      N_local_animal_products_consumed <- (animal_output$N_egg_available - N_egg_export) +
-        (animal_output$N_meat_local_to_consumption - N_meat_export) +
-        (animal_output$N_milk_available - N_dairy_export)
-      P_local_animal_products_consumed <- (animal_output$P_egg_available - P_egg_export) +
-        (animal_output$P_meat_local_to_consumption - P_meat_export) +
-        (animal_output$K_milk_available - P_dairy_export)
-      K_local_animal_products_consumed <- (animal_output$K_egg_available - K_egg_export) +
-        (animal_output$K_meat_local_to_consumption - K_meat_export) +
-        (animal_output$K_milk_available - K_dairy_export)
-    }
+    N_local_animal_products_consumed <- (animal_output$N_egg_available - N_egg_export) +
+      (animal_output$N_meat_local_to_consumption - N_meat_export) +
+      (animal_output$N_milk_available - N_dairy_export)
+    P_local_animal_products_consumed <- (animal_output$P_egg_available - P_egg_export) +
+      (animal_output$P_meat_local_to_consumption - P_meat_export) +
+      (animal_output$K_milk_available - P_dairy_export)
+    K_local_animal_products_consumed <- (animal_output$K_egg_available - K_egg_export) +
+      (animal_output$K_meat_local_to_consumption - K_meat_export) +
+      (animal_output$K_milk_available - K_dairy_export)
+    
 
 
     N_local_vegetal_products_consumed <- crop_output$N_crop_human_consumption_processed - N_vegetable_export
