@@ -289,8 +289,8 @@ calc_animal <- function(n_slaughter_dairy_cattle, n_slaughter_female_cattle,
   #########
   
   N_egg_available <- n_chicken * egg_per_chicken * `egg-weight` / 100 * N_content_egg / 1000
-  P_egg_available <- n_chicken * egg_per_chicken * `egg-weight` / 100 * N_content_egg / 1000000
-  K_egg_available <- n_chicken * egg_per_chicken * `egg-weight` / 100 * N_content_egg / 1000000
+  P_egg_available <- n_chicken * egg_per_chicken * `egg-weight` / 100 * P_content_egg / 1000000
+  K_egg_available <- n_chicken * egg_per_chicken * `egg-weight` / 100 * K_content_egg / 1000000
   
   
   
@@ -372,7 +372,22 @@ calc_animal <- function(n_slaughter_dairy_cattle, n_slaughter_female_cattle,
   manure_df$P_manure_remaining <- manure_df$P_total_manure - manure_df$P_housing_loss
   manure_df$K_manure_remaining <- manure_df$K_total_manure - manure_df$K_housing_loss
   
+  #sum up remaining manure
+  N_remaining_manure <- sum(manure_df$N_manure_remaining)
+  P_remaining_manure <- sum(manure_df$P_manure_remaining)
+  K_remaining_manure <- sum(manure_df$K_manure_remaining)
+
+  #calculate manure export for K, assuming it has the same N:K share as in the remaining manure
+  export_manure_K_kg <- export_manure_N_kg * (K_remaining_manure /  N_remaining_manure)
   
+  #subtract manure going to biogas
+  N_manure_biogas <- N_remaining_manure - (N_biogas_input * share_N_biogas_input_animal)
+  P_manure_biogas <- P_remaining_manure - (P_biogas_input * share_P_biogas_input_animal)
+  K_manure_biogas <- K_remaining_manure - (K_biogas_input * share_K_biogas_input_animal)
+  
+  N_manure_crop <- N_remaining_manure - N_manure_biogas - export_manure_N_kg
+  P_manure_crop <- P_remaining_manure - P_manure_biogas - export_manure_P_kg
+  K_manure_crop <- K_remaining_manure - K_manure_biogas - export_manure_K_kg
 
   #add conversion factor to K and set to zero
   #set housing loss rate K and P to zero
@@ -419,9 +434,21 @@ calc_animal <- function(n_slaughter_dairy_cattle, n_slaughter_female_cattle,
               P_housing_loss = sum(manure_df$P_housing_loss),
               K_housing_loss = sum(manure_df$K_housing_loss),
               
+
               N_remaining_manure = sum(manure_df$N_manure_remaining),
               P_remaining_manure = sum(manure_df$P_manure_remaining),
               K_remaining_manure = sum(manure_df$K_manure_remaining),
+              
+              N_manure_biogas = N_manure_biogas,
+              P_manure_biogas = P_manure_biogas,
+              K_manure_biogas = K_manure_biogas,
+              
+              N_manure_crop = N_manure_crop,
+              P_manure_crop = P_manure_crop,
+              K_manure_crop = K_manure_crop,
+              
+              export_manure_K_kg = export_manure_K_kg,
+              
               
               slaughter_rate_dairy_cow = slaughter_rate_dairy_cow,
               slaughter_rate_heifer = slaughter_rate_heifer,
