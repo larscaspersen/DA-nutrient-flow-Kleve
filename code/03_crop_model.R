@@ -436,10 +436,28 @@ crop_function <- function(arable_land,
   P_crop_animal_feeding_unprocessed <- sum(crop_df$P_crop_animal_feeding_unprocessed)
   K_crop_animal_feeding_unprocessed <- sum(crop_df$K_crop_animal_feeding_unprocessed)
   
+  #------------#
+  ## BIOGAS ####
+  #------------#
+  
+  #maize going to biogas
   N_crop_biogas <- sum(crop_df$N_crop_biogas)
   P_crop_biogas <- sum(crop_df$P_crop_biogas)
   K_crop_biogas <- sum(crop_df$K_crop_biogas)
   
+  #non-maize going to biogas is total biogas - manure - maize
+  nonmaize_to_biogas_N <- N_biogas_input - N_crop_biogas - (N_biogas_input * share_N_biogas_input_animal)
+  nonmaize_to_biogas_P <- P_biogas_input - P_crop_biogas - (P_biogas_input * share_P_biogas_input_animal)
+  nonmaize_to_biogas_K <- K_biogas_input - K_crop_biogas - (K_biogas_input * share_K_biogas_input_animal)
+  
+  #add nonmaize to N_crop_biogas, subtract it from processed food
+  N_crop_biogas <- N_crop_biogas + nonmaize_to_biogas_N
+  P_crop_biogas <- P_crop_biogas + nonmaize_to_biogas_P
+  K_crop_biogas <- K_crop_biogas + nonmaize_to_biogas_K
+  
+  N_crop_human_consumption_processed <- N_crop_human_consumption_processed - nonmaize_to_biogas_N
+  P_crop_human_consumption_processed <- P_crop_human_consumption_processed - nonmaize_to_biogas_P
+  K_crop_human_consumption_processed <- K_crop_human_consumption_processed - nonmaize_to_biogas_K
   
   
   ################
