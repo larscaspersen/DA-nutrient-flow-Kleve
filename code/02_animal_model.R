@@ -381,13 +381,13 @@ calc_animal <- function(n_slaughter_dairy_cattle, n_slaughter_female_cattle,
   export_manure_K_kg <- export_manure_N_kg * (K_remaining_manure /  N_remaining_manure)
   
   #subtract manure going to biogas
-  N_manure_biogas <- N_remaining_manure - (N_biogas_input * share_N_biogas_input_animal)
-  P_manure_biogas <- P_remaining_manure - (P_biogas_input * share_P_biogas_input_animal)
-  K_manure_biogas <- K_remaining_manure - (K_biogas_input * share_K_biogas_input_animal)
+  N_manure_biogas <- N_biogas_input * share_N_biogas_input_animal
+  P_manure_biogas <- P_biogas_input * share_P_biogas_input_animal
+  K_manure_biogas <- K_biogas_input * share_K_biogas_input_animal
   
-  N_manure_crop <- N_remaining_manure - N_manure_biogas - export_manure_N_kg
-  P_manure_crop <- P_remaining_manure - P_manure_biogas - export_manure_P_kg
-  K_manure_crop <- K_remaining_manure - K_manure_biogas - export_manure_K_kg
+  N_manure_crop <- N_remaining_manure - N_manure_biogas - export_manure_N_kg + import_organic_N_kg
+  P_manure_crop <- P_remaining_manure - P_manure_biogas - export_manure_P_kg + import_organic_P_kg
+  K_manure_crop <- K_remaining_manure - K_manure_biogas - export_manure_K_kg + import_organic_K_kg
 
   #add conversion factor to K and set to zero
   #set housing loss rate K and P to zero
