@@ -449,7 +449,6 @@ calc_animal <- function(n_slaughter_dairy_cattle, n_slaughter_female_cattle,
               
               export_manure_K_kg = export_manure_K_kg,
               
-              
               slaughter_rate_dairy_cow = slaughter_rate_dairy_cow,
               slaughter_rate_heifer = slaughter_rate_heifer,
               slaughter_rate_bull = slaughter_rate_bull,
@@ -457,7 +456,8 @@ calc_animal <- function(n_slaughter_dairy_cattle, n_slaughter_female_cattle,
               slaughter_rate_younstock_youngage = slaughter_rate_younstock_youngage,
               slaughter_rate_pig = slaughter_rate_pig,
               slaughter_rate_poultry = slaughter_rate_poultry,
-              slaughter_rate_sheep = slaughter_rate_sheep))
+              slaughter_rate_sheep = slaughter_rate_sheep
+              ))
   
 }
 
