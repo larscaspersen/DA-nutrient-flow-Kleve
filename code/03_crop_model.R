@@ -346,13 +346,13 @@ crop_function <- function(arable_land,
   crop_df$land_absolute <- crop_df$land_share*arable_land
   
   #get absolute yield of crops
-  crop_df$yield_total <- crop_df$yield * crop_df$land_absolute 
+  crop_df$yield_total <- crop_df$yield * crop_df$land_absolute #in dt
   
   #get N of consumable part
   crop_df$N_main <- crop_df$yield_total * crop_df$yield_share * crop_df$N_yield
   crop_df$P_main <- crop_df$yield_total * crop_df$yield_share * crop_df$P_yield
-  #K is expressed as share of DM total yield
-  crop_df$K_main <- crop_df$yield_total * crop_df$yield_share * crop_df$dm * crop_df$K_yield
+  #K is expressed as share of DM total yield; yield total is in dt, so multiply by 100 in the end
+  crop_df$K_main <- crop_df$yield_total * crop_df$yield_share * crop_df$dm * crop_df$K_yield * 100
   
   
   #distributute main N by animal and human consumption and by with or without processing ----
@@ -385,7 +385,7 @@ crop_function <- function(arable_land,
   ######
   
   #(actually stream from crop to waste)
-  
+  #this mostly includes maize, but rest is filled up with human food
   crop_df$N_crop_biogas <- crop_df$N_main * crop_df$share_to_biogas
   crop_df$P_crop_biogas <- crop_df$P_main * crop_df$share_to_biogas
   crop_df$K_crop_biogas <- crop_df$K_main * crop_df$share_to_biogas
@@ -589,7 +589,7 @@ crop_function <- function(arable_land,
   #this is only coupled to the LF, but it should be affected by the amount of available animal N otherwise
   imported_inorganic_N <- import_inorganic_N_kg_LF * (area_grassland + arable_land)
   imported_inorganic_P <- import_inorganic_P2O5_kg_LF * (area_grassland + arable_land) * convert_phosphorous_pentoxide_to_p
-  imported_inorganic_K <- import_inorganic_K2O_t * convert_potassium_oxide_to_k
+  imported_inorganic_K <- import_inorganic_K2O_t * convert_potassium_oxide_to_k * 1000
 
     
   
@@ -793,41 +793,6 @@ crop_function <- function(arable_land,
               N_grassland = N_grassland,
               P_grassland = P_grassland,
               K_grassland = K_grassland,
-              
-              share_beans = new_share_beans, 
-              share_corn = new_share_corn,
-              share_fodder_peas = new_share_fodder_peas, 
-              share_mais_silage = new_share_mais_silage,
-              share_oat = new_share_oat, 
-              share_oilseed_rape = new_share_oilseed_rape,
-              share_potato = new_share_potato, 
-              share_rye = new_share_rye, 
-              share_sugar_beet = new_share_sugar_beet, 
-              share_summer_barley = new_share_summer_barley,
-              share_summer_wheat = new_share_summer_wheat, 
-              share_triticale = new_share_triticale,
-              share_winter_barley = new_share_winter_barley, 
-              share_winter_wheat = new_share_winter_wheat,
-              land_apple_ha = horti_df$corrected_area_ha[1],  
-              land_arugula_ha = horti_df$corrected_area_ha[2],
-              land_asparagus_ha = horti_df$corrected_area_ha[3], 
-              land_berries_ha = horti_df$corrected_area_ha[4],
-              land_cabbage_ha = horti_df$corrected_area_ha[5],
-              land_carrot_ha = horti_df$corrected_area_ha[6],
-              land_celery_ha = horti_df$corrected_area_ha[7],
-              land_green_bean_ha = horti_df$corrected_area_ha[8],
-              land_lambs_lettuce_ha = horti_df$corrected_area_ha[9],
-              land_lettuce_ha = horti_df$corrected_area_ha[10],
-              land_onion_ha = horti_df$corrected_area_ha[11],
-              land_parsley_ha = horti_df$corrected_area_ha[12],
-              land_pumpkin_ha = horti_df$corrected_area_ha[13],
-              land_radishes_ha = horti_df$corrected_area_ha[14],
-              land_rhubarb_ha = horti_df$corrected_area_ha[15],
-              land_spinash_ha = horti_df$corrected_area_ha[16],
-              land_stone_fruit_ha = horti_df$corrected_area_ha[17],
-              land_strawberry_ha = horti_df$corrected_area_ha[18],
-              land_sweet_corn_ha = horti_df$corrected_area_ha[19],
-              land_veggie_peas_ha = horti_df$corrected_area_ha[20],
               
               total_N_horticulture = horti_N_kg,
               total_P_horticulture = horti_P_kg,
