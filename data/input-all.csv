@@ -595,8 +595,8 @@ calculated from total export - animal derived export,export_other_organic_K_kg,k
 ,P_content_sparkling_wine,g P / 100 gram product,0,0,0,const,consumption,yes,unchanged
 ,K_content_dried_fruit,g K / 100 gram product,0,0,0,const,consumption,yes,unchanged
 ,K_content_margarine,g K / 100 gram product,0,0,0,const,consumption,yes,unchanged
-digestate N content,digestate_P_content,kg N per t fresh matter,0,0,0,const,waste,,
-digestate N content,digestate_K_content,kg N per t fresh matter,0,0,0,const,waste,,
+digestate N content,digestate_P_content,kg P2O5 per t fresh matter,3.15,3.5,3.85,const,waste,,
+digestate N content,digestate_K_content,kg K2O per t fresh matter,3.78,4.2,4.62,const,waste,,
 share of produced crops allocated to biogas in a local feed scenario,scenario_allocate_crop_biogas,share,0.05,,0.2,tnorm_0_1,crop,,survey stakeholders
 share of produced crops allocated to animal feed in a local feed scenario,scenario_allocate_crop_feed,share,0.75,,0.8,tnorm_0_1,crop,,survey stakeholders
 share of produced crops allocated to human food in a local feed scenario,scenario_allocate_crop_food,share,0.05,,0.21,tnorm_0_1,crop,,survey stakeholders
