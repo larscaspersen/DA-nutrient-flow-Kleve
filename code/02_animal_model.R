@@ -84,7 +84,9 @@ calc_animal <- function(n_slaughter_dairy_cattle, n_slaughter_female_cattle,
                         convert_phosphorous_pentoxide_to_p,
                         convert_potassium_oxide_to_k,
                         P_housing_losses,
-                        K_housing_losses){
+                        K_housing_losses,
+                        P_reduction_manure = 0,
+                        K_reduction_manure = 0){
   
   #slaughtering -----
   
@@ -356,8 +358,7 @@ calc_animal <- function(n_slaughter_dairy_cattle, n_slaughter_female_cattle,
   manure_df$P_total_manure <- (manure_df$N_total_manure * manure_df$N_to_PtwoO5) * convert_phosphorous_pentoxide_to_p
   manure_df$K_total_manure <- (manure_df$N_total_manure * manure_df$N_to_KOtwo) * convert_potassium_oxide_to_k
   
-  
-  
+
   #housing losses
   manure_df$N_housing_loss <- manure_df$N_total_manure * manure_df$on_slurry * manure_df$housing_loss_rate_liquid +
                                 manure_df$N_total_manure * (1- manure_df$on_slurry) * manure_df$housing_loss_rate_solid
@@ -372,10 +373,17 @@ calc_animal <- function(n_slaughter_dairy_cattle, n_slaughter_female_cattle,
   manure_df$P_manure_remaining <- manure_df$P_total_manure - manure_df$P_housing_loss
   manure_df$K_manure_remaining <- manure_df$K_total_manure - manure_df$K_housing_loss
   
+  
   #sum up remaining manure
+  
+  #in case of local feeding and if N is not actually the limiting nutrient: subtract the
+  #actually reducing amount of P, K from the total manure because we assume that 
+  #less excess feeding translates to less nutrients excreted
   N_remaining_manure <- sum(manure_df$N_manure_remaining)
-  P_remaining_manure <- sum(manure_df$P_manure_remaining)
-  K_remaining_manure <- sum(manure_df$K_manure_remaining)
+  P_remaining_manure <- sum(manure_df$P_manure_remaining) - P_reduction_manure
+  K_remaining_manure <- sum(manure_df$K_manure_remaining) - K_reduction_manure
+  
+
 
   #calculate manure export for K, assuming it has the same N:K share as in the remaining manure
   export_manure_K_kg <- export_manure_N_kg * (K_remaining_manure /  N_remaining_manure)
