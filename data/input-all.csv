@@ -1,11 +1,11 @@
 ﻿description,variable,unit,lower,median,upper,distribution,subsystem,,version
 total waste water,waste_water,m3,24621300,27357000,30092700,posnorm,waste,,unchanged
 direct discharge of wastewater to ground and surface water,wastewater_direct_discharge,m3,11570400,12856000,14141600,posnorm,consumption,,unchanged
-taken from Nährstoffreport,import_organic_N_kg,kg import / FM dt,5698800," 6,332,000.00 ",6965200,posnorm,crop,no,2020
+taken from Nährstoffreport,import_organic_N_kg,kg import / FM dt,5698800,"6,332,000.00",6965200,posnorm,crop,no,2020
 taken from Nährstoffreport,export_manure_N_kg,kg export / FM dt,7043400,7826000,8608600,posnorm,crop,,2020
 ,N_biogas_input,kg N,2560662,2845180,3129698,posnorm,animal,,2020
 calculated from total export - animal derived export,export_other_organic_N_kg,kg export / FM dt,1958832.9,2176481,2394129.1,posnorm,crop,,2020
-taken from Nährstoffreport,import_organic_P_kg,kg P import,1241121.6," 1,379,024.00 ",1516926.4,posnorm,crop,no,2020
+taken from Nährstoffreport,import_organic_P_kg,kg P import,1241121.6,"1,379,024.00",1516926.4,posnorm,crop,no,2020
 ,K_biogas_input,kg K,1162311,1162311,1162311,const,animal,,2020
 "taken from Nährstoffreport 2020, p.130, converted to P",export_manure_P_kg,kg export,1582430.04,1758255.6,1934081.16,posnorm,crop,,2020
 amount of waste water remaining in channel,wastewater_remain_canal,m3,990900,1101000,1211100,posnorm,consumption,,unchanged
@@ -597,17 +597,6 @@ green_bean,N_content_green_bean_gr_100gr,g N / 100 gram product,0,0,0,const,crop
 ,K_content_margarine,g K / 100 gram product,0,0,0,const,consumption,yes,unchanged
 digestate N content,digestate_P_content,kg P2O5 per t fresh matter,3.15,3.5,3.85,posnorm,waste,,
 digestate N content,digestate_K_content,kg K2O per t fresh matter,3.78,4.2,4.62,posnorm,waste,,
-share of produced crops allocated to biogas in a local feed scenario,scenario_allocate_crop_biogas,share,0.05,,0.2,tnorm_0_1,crop,,survey stakeholders
-share of produced crops allocated to animal feed in a local feed scenario,scenario_allocate_crop_feed,share,0.75,,0.8,tnorm_0_1,crop,,survey stakeholders
-share of produced crops allocated to human food in a local feed scenario,scenario_allocate_crop_food,share,0.05,,0.21,tnorm_0_1,crop,,survey stakeholders
-overall reduction of livestock units in local feed scenario,scenario_overall_livestock_reduction,share,0.1,,0.5,tnorm_0_1,animal,,survey stakeholders
-share of cattle livestock units in local feed scenario,scenario_share_cattle,share,0.57,,0.71,tnorm_0_1,animal,,survey stakeholders
-share of pig livestock units in local feed scenario,scenario_share_pig,share,0.18,,0.28,tnorm_0_1,animal,,survey stakeholders
-share of poultry livestock units in local feed scenario,scenario_share_poultry,share,0.01,,0.15,tnorm_0_1,animal,,survey stakeholders
-share of other animals livestock units in local feed scenario,scenario_share_others,share,0.04,,0.08,tnorm_0_1,animal,,survey stakeholders
-allocation of animal manure to export in a local feed scenario,scenario_allocate_manure_export,,0.001,,0.43,tnorm_0_1,animal,,survey stakeholders
-allocation of animal manure to biogas in a local feed scenario,scenario_allocate_manure_biogas,,0.05,,0.4,tnorm_0_1,animal,,survey stakeholders
-allocation of animal manure to crop in a local feed scenario,scenario_allocate_manure_crop,,0.26,,0.95,tnorm_0_1,animal,,survey stakeholders
 amount of K2O for one N manure; taken from https://ag.umass.edu/crops-dairy-livestock-equine/fact-sheets/plant-nutrients-from-manure,manure_N_to_KtwoO_dairy,share,0.803571429,0.892857143,0.982142857,posnorm,animal,,
 amount of K2O for one N manure; taken from https://ag.umass.edu/crops-dairy-livestock-equine/fact-sheets/plant-nutrients-from-manure,manure_N_to_KtwoO_calf,share,0.9,1,1.1,posnorm,animal,,
 amount of K2O for one N manure; taken from https://ag.umass.edu/crops-dairy-livestock-equine/fact-sheets/plant-nutrients-from-manure,manure_N_to_KtwoO_bull,share,0.514285714,0.571428571,0.628571429,posnorm,animal,,
@@ -616,3 +605,25 @@ amount of K2O for one N manure; taken from https://ag.umass.edu/crops-dairy-live
 amount of K2O for one N manure; taken from https://ag.umass.edu/crops-dairy-livestock-equine/fact-sheets/plant-nutrients-from-manure,manure_N_to_KtwoO_sheep,share,0.782608696,0.869565217,0.956521739,posnorm,animal,,
 amount of K2O for one N manure; taken from https://ag.umass.edu/crops-dairy-livestock-equine/fact-sheets/plant-nutrients-from-manure,manure_N_to_KtwoO_chicken,share,0.638888889,,0.970588235,posnorm,animal,,
 amount of K2O for one N manure; taken from https://ag.umass.edu/crops-dairy-livestock-equine/fact-sheets/plant-nutrients-from-manure,manure_N_to_KtwoO_turkey,share,0.675,,0.722222222,posnorm,animal,,
+share of produced crops allocated to biogas in a local feed scenario,scenario_allocate_crop_biogas_a,share,0.05,,0.2,tnorm_0_1,crop,,survey stakeholders
+share of produced crops allocated to animal feed in a local feed scenario,scenario_allocate_crop_feed_a,share,0.75,,0.8,tnorm_0_1,crop,,survey stakeholders
+share of produced crops allocated to human food in a local feed scenario,scenario_allocate_crop_food_a,share,0.05,,0.21,tnorm_0_1,crop,,survey stakeholders
+overall reduction of livestock units in local feed scenario,scenario_overall_livestock_reduction_a,share,0.1,,0.5,tnorm_0_1,animal,,survey stakeholders
+share of cattle livestock units in local feed scenario,scenario_share_cattle_a,share,0.57,,0.71,tnorm_0_1,animal,,survey stakeholders
+share of pig livestock units in local feed scenario,scenario_share_pig_a,share,0.18,,0.28,tnorm_0_1,animal,,survey stakeholders
+share of poultry livestock units in local feed scenario,scenario_share_poultry_a,share,0.01,,0.15,tnorm_0_1,animal,,survey stakeholders
+share of other animals livestock units in local feed scenario,scenario_share_others_a,share,0.04,,0.08,tnorm_0_1,animal,,survey stakeholders
+allocation of animal manure to export in a local feed scenario,scenario_allocate_manure_export_a,,0.001,,0.43,tnorm_0_1,animal,,survey stakeholders
+allocation of animal manure to biogas in a local feed scenario,scenario_allocate_manure_biogas_a,,0.05,,0.4,tnorm_0_1,animal,,survey stakeholders
+allocation of animal manure to crop in a local feed scenario,scenario_allocate_manure_crop_a,,0.26,,0.95,tnorm_0_1,animal,,survey stakeholders
+share of produced crops allocated to biogas in a local feed scenario,scenario_allocate_crop_biogas_b,share,0.055,,0.205,tnorm_0_1,crop,,survey stakeholders V2
+share of produced crops allocated to animal feed in a local feed scenario,scenario_allocate_crop_feed_b,share,0.755,,0.805,tnorm_0_1,crop,,survey stakeholders V3
+share of produced crops allocated to human food in a local feed scenario,scenario_allocate_crop_food_b,share,0.055,,0.215,tnorm_0_1,crop,,survey stakeholders V4
+overall reduction of livestock units in local feed scenario,scenario_overall_livestock_reduction_b,share,0.105,,0.505,tnorm_0_1,animal,,survey stakeholders V5
+share of cattle livestock units in local feed scenario,scenario_share_cattle_b,share,0.575,,0.715,tnorm_0_1,animal,,survey stakeholders V6
+share of pig livestock units in local feed scenario,scenario_share_pig_b,share,0.185,,0.285,tnorm_0_1,animal,,survey stakeholders V7
+share of poultry livestock units in local feed scenario,scenario_share_poultry_b,share,0.015,,0.155,tnorm_0_1,animal,,survey stakeholders V8
+share of other animals livestock units in local feed scenario,scenario_share_others_b,share,0.045,,0.085,tnorm_0_1,animal,,survey stakeholders V9
+allocation of animal manure to export in a local feed scenario,scenario_allocate_manure_export_b,,0.006,,0.435,tnorm_0_1,animal,,survey stakeholders V10
+allocation of animal manure to biogas in a local feed scenario,scenario_allocate_manure_biogas_b,,0.055,,0.405,tnorm_0_1,animal,,survey stakeholders V11
+allocation of animal manure to crop in a local feed scenario,scenario_allocate_manure_crop_b,,0.265,,0.955,tnorm_0_1,animal,,survey stakeholders V12
