@@ -273,8 +273,8 @@ calc_animal <- function(n_slaughter_dairy_cattle, n_slaughter_female_cattle,
   #total amount of N in milk
   N_milk_produced <- n_dairy_cow * milk_per_cow * N_content_milk / 100
   #for P and K content is in mg
-  P_milk_produced <- n_dairy_cow * milk_per_cow * P_content_milk / 100000
-  K_milk_produced <- n_dairy_cow * milk_per_cow * K_content_milk / 100000 
+  P_milk_produced <- n_dairy_cow * milk_per_cow * P_content_milk / 100
+  K_milk_produced <- n_dairy_cow * milk_per_cow * K_content_milk / 100 
   
   
   N_milk_available <- N_milk_produced * (share_milk_direct_sale +
@@ -291,8 +291,8 @@ calc_animal <- function(n_slaughter_dairy_cattle, n_slaughter_female_cattle,
   #########
   
   N_egg_available <- n_chicken * egg_per_chicken * `egg-weight` / 100 * N_content_egg / 1000
-  P_egg_available <- n_chicken * egg_per_chicken * `egg-weight` / 100 * P_content_egg / 1000000
-  K_egg_available <- n_chicken * egg_per_chicken * `egg-weight` / 100 * K_content_egg / 1000000
+  P_egg_available <- n_chicken * egg_per_chicken * `egg-weight` / 100 * P_content_egg / 1000
+  K_egg_available <- n_chicken * egg_per_chicken * `egg-weight` / 100 * K_content_egg / 1000
   
   
   
@@ -386,6 +386,8 @@ calc_animal <- function(n_slaughter_dairy_cattle, n_slaughter_female_cattle,
 
 
   #calculate manure export for K, assuming it has the same N:K share as in the remaining manure
+  export_manure_N_kg <- export_manure_N_kg
+  export_manure_P_kg <- export_manure_P_kg
   export_manure_K_kg <- export_manure_N_kg * (K_remaining_manure /  N_remaining_manure)
   
   #subtract manure going to biogas
@@ -455,6 +457,8 @@ calc_animal <- function(n_slaughter_dairy_cattle, n_slaughter_female_cattle,
               P_manure_crop = P_manure_crop,
               K_manure_crop = K_manure_crop,
               
+              export_manure_N_kg = export_manure_N_kg,
+              export_manure_P_kg = export_manure_P_kg,
               export_manure_K_kg = export_manure_K_kg,
               
               slaughter_rate_dairy_cow = slaughter_rate_dairy_cow,
