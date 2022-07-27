@@ -84,7 +84,9 @@ calc_animal <- function(n_slaughter_dairy_cattle, n_slaughter_female_cattle,
                         convert_phosphorous_pentoxide_to_p,
                         convert_potassium_oxide_to_k,
                         P_housing_losses,
-                        K_housing_losses){
+                        K_housing_losses,
+                        P_reduction_manure = 0,
+                        K_reduction_manure = 0){
   
   #slaughtering -----
   
@@ -271,8 +273,8 @@ calc_animal <- function(n_slaughter_dairy_cattle, n_slaughter_female_cattle,
   #total amount of N in milk
   N_milk_produced <- n_dairy_cow * milk_per_cow * N_content_milk / 100
   #for P and K content is in mg
-  P_milk_produced <- n_dairy_cow * milk_per_cow * P_content_milk / 100000
-  K_milk_produced <- n_dairy_cow * milk_per_cow * K_content_milk / 100000 
+  P_milk_produced <- n_dairy_cow * milk_per_cow * P_content_milk / 100
+  K_milk_produced <- n_dairy_cow * milk_per_cow * K_content_milk / 100 
   
   
   N_milk_available <- N_milk_produced * (share_milk_direct_sale +
@@ -289,8 +291,8 @@ calc_animal <- function(n_slaughter_dairy_cattle, n_slaughter_female_cattle,
   #########
   
   N_egg_available <- n_chicken * egg_per_chicken * `egg-weight` / 100 * N_content_egg / 1000
-  P_egg_available <- n_chicken * egg_per_chicken * `egg-weight` / 100 * N_content_egg / 1000000
-  K_egg_available <- n_chicken * egg_per_chicken * `egg-weight` / 100 * N_content_egg / 1000000
+  P_egg_available <- n_chicken * egg_per_chicken * `egg-weight` / 100 * P_content_egg / 1000
+  K_egg_available <- n_chicken * egg_per_chicken * `egg-weight` / 100 * K_content_egg / 1000
   
   
   
@@ -321,7 +323,14 @@ calc_animal <- function(n_slaughter_dairy_cattle, n_slaughter_female_cattle,
                                           manure_N_to_PtwoOfive_hen,
                                           manure_N_to_PtwoOfive_other_poultry,
                                           manure_N_to_PtwoOfive_sheep),
-                          N_to_KOtwo = manure_N_to_KOtwo,
+                          N_to_KOtwo = c(manure_N_to_KtwoO_dairy,
+                                         manure_N_to_KtwoO_bull,
+                                         manure_N_to_KtwoO_calf,
+                                         manure_N_to_KtwoO_calf,
+                                         manure_N_to_KtwoO_pig,
+                                         manure_N_to_KtwoO_chicken,
+                                         manure_N_to_KtwoO_turkey,
+                                         manure_N_to_KtwoO_sheep),
                           on_slurry = c( rep(cattle_on_slurry, 4), pig_on_slurry,
                                          rep(1, 3)),
                           housing_loss_rate_liquid = c( rep(cattle_housingloss_rate_liquid, 4),
@@ -349,8 +358,7 @@ calc_animal <- function(n_slaughter_dairy_cattle, n_slaughter_female_cattle,
   manure_df$P_total_manure <- (manure_df$N_total_manure * manure_df$N_to_PtwoO5) * convert_phosphorous_pentoxide_to_p
   manure_df$K_total_manure <- (manure_df$N_total_manure * manure_df$N_to_KOtwo) * convert_potassium_oxide_to_k
   
-  
-  
+
   #housing losses
   manure_df$N_housing_loss <- manure_df$N_total_manure * manure_df$on_slurry * manure_df$housing_loss_rate_liquid +
                                 manure_df$N_total_manure * (1- manure_df$on_slurry) * manure_df$housing_loss_rate_solid
@@ -366,6 +374,30 @@ calc_animal <- function(n_slaughter_dairy_cattle, n_slaughter_female_cattle,
   manure_df$K_manure_remaining <- manure_df$K_total_manure - manure_df$K_housing_loss
   
   
+  #sum up remaining manure
+  
+  #in case of local feeding and if N is not actually the limiting nutrient: subtract the
+  #actually reducing amount of P, K from the total manure because we assume that 
+  #less excess feeding translates to less nutrients excreted
+  N_remaining_manure <- sum(manure_df$N_manure_remaining)
+  P_remaining_manure <- sum(manure_df$P_manure_remaining) - P_reduction_manure
+  K_remaining_manure <- sum(manure_df$K_manure_remaining) - K_reduction_manure
+  
+
+
+  #calculate manure export for K, assuming it has the same N:K share as in the remaining manure
+  export_manure_N_kg <- export_manure_N_kg
+  export_manure_P_kg <- export_manure_P_kg
+  export_manure_K_kg <- export_manure_N_kg * (K_remaining_manure /  N_remaining_manure)
+  
+  #subtract manure going to biogas
+  N_manure_biogas <- N_biogas_input * share_N_biogas_input_animal
+  P_manure_biogas <- P_biogas_input * share_P_biogas_input_animal
+  K_manure_biogas <- K_biogas_input * share_K_biogas_input_animal
+  
+  N_manure_crop <- N_remaining_manure - N_manure_biogas - export_manure_N_kg + import_organic_N_kg
+  P_manure_crop <- P_remaining_manure - P_manure_biogas - export_manure_P_kg + import_organic_P_kg
+  K_manure_crop <- K_remaining_manure - K_manure_biogas - export_manure_K_kg + import_organic_K_kg
 
   #add conversion factor to K and set to zero
   #set housing loss rate K and P to zero
@@ -412,9 +444,22 @@ calc_animal <- function(n_slaughter_dairy_cattle, n_slaughter_female_cattle,
               P_housing_loss = sum(manure_df$P_housing_loss),
               K_housing_loss = sum(manure_df$K_housing_loss),
               
+
               N_remaining_manure = sum(manure_df$N_manure_remaining),
               P_remaining_manure = sum(manure_df$P_manure_remaining),
               K_remaining_manure = sum(manure_df$K_manure_remaining),
+              
+              N_manure_biogas = N_manure_biogas,
+              P_manure_biogas = P_manure_biogas,
+              K_manure_biogas = K_manure_biogas,
+              
+              N_manure_crop = N_manure_crop,
+              P_manure_crop = P_manure_crop,
+              K_manure_crop = K_manure_crop,
+              
+              export_manure_N_kg = export_manure_N_kg,
+              export_manure_P_kg = export_manure_P_kg,
+              export_manure_K_kg = export_manure_K_kg,
               
               slaughter_rate_dairy_cow = slaughter_rate_dairy_cow,
               slaughter_rate_heifer = slaughter_rate_heifer,
@@ -423,7 +468,8 @@ calc_animal <- function(n_slaughter_dairy_cattle, n_slaughter_female_cattle,
               slaughter_rate_younstock_youngage = slaughter_rate_younstock_youngage,
               slaughter_rate_pig = slaughter_rate_pig,
               slaughter_rate_poultry = slaughter_rate_poultry,
-              slaughter_rate_sheep = slaughter_rate_sheep))
+              slaughter_rate_sheep = slaughter_rate_sheep
+              ))
   
 }
 

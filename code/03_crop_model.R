@@ -340,18 +340,18 @@ crop_function <- function(arable_land,
                                                  triticale_to_consumption, winter_barley_to_consumption,
                                                  winter_wheat_to_consumption),
                         share_to_biogas = c( rep(0,3), mais_silage_to_biogas, rep(0,10) ),
-                        through_processing = c( rep(1, 3), 0, rep(1, 2), 0.5, rep(1, 7) ) )
+                        through_processing = c( rep(1, 3), 0, rep(1, 10) ) )
   
   #calculate absolute amount of ha per crop
   crop_df$land_absolute <- crop_df$land_share*arable_land
   
   #get absolute yield of crops
-  crop_df$yield_total <- crop_df$yield * crop_df$land_absolute 
+  crop_df$yield_total <- crop_df$yield * crop_df$land_absolute #in dt
   
   #get N of consumable part
-  crop_df$N_main <- crop_df$yield_total * crop_df$yield_share * crop_df$N_yield
-  crop_df$P_main <- crop_df$yield_total * crop_df$yield_share * crop_df$P_yield
-  #K is expressed as share of DM total yield
+  crop_df$N_main <- crop_df$yield_total * crop_df$yield_share * crop_df$N_yield #yield is in kg N/dt FM total yield
+  crop_df$P_main <- crop_df$yield_total * crop_df$yield_share * crop_df$P_yield #yield is in kg P/dt FM total yield
+  #K is expressed as share of DM total yield; yield total is in dt, so multiply by 100 in the end
   crop_df$K_main <- crop_df$yield_total * crop_df$yield_share * crop_df$dm * crop_df$K_yield * 100
   
   
@@ -362,11 +362,7 @@ crop_function <- function(arable_land,
   crop_df$P_crop_human_consumption_processed <- crop_df$P_main * crop_df$share_to_consumption * crop_df$through_processing
   crop_df$K_crop_human_consumption_processed <- crop_df$K_main * crop_df$share_to_consumption * crop_df$through_processing
   
-  #human consumption without processing
-  crop_df$N_crop_human_consumption_unprocessed <- crop_df$N_main * crop_df$share_to_consumption * (1 - crop_df$through_processing)
-  crop_df$P_crop_human_consumption_unprocessed <- crop_df$P_main * crop_df$share_to_consumption * (1 - crop_df$through_processing)
-  crop_df$K_crop_human_consumption_unprocessed <- crop_df$K_main * crop_df$share_to_consumption * (1 - crop_df$through_processing)
-  
+
   #to animal consumption with processing
   crop_df$N_crop_animal_feeding_processed <- crop_df$N_main * crop_df$share_to_animal * crop_df$through_processing
   crop_df$P_crop_animal_feeding_processed <- crop_df$P_main * crop_df$share_to_animal * crop_df$through_processing
@@ -385,7 +381,7 @@ crop_function <- function(arable_land,
   ######
   
   #(actually stream from crop to waste)
-  
+  #this mostly includes maize, but rest is filled up with human food
   crop_df$N_crop_biogas <- crop_df$N_main * crop_df$share_to_biogas
   crop_df$P_crop_biogas <- crop_df$P_main * crop_df$share_to_biogas
   crop_df$K_crop_biogas <- crop_df$K_main * crop_df$share_to_biogas
@@ -424,10 +420,6 @@ crop_function <- function(arable_land,
   P_crop_human_consumption_processed <- sum(crop_df$P_crop_human_consumption_processed)
   K_crop_human_consumption_processed <- sum(crop_df$K_crop_human_consumption_processed)
   
-  N_crop_human_consumption_unprocessed <- sum(crop_df$N_crop_human_consumption_unprocessed)
-  P_crop_human_consumption_unprocessed <- sum(crop_df$P_crop_human_consumption_unprocessed)
-  K_crop_human_consumption_unprocessed <- sum(crop_df$K_crop_human_consumption_unprocessed)
-  
   N_crop_animal_feeding_processed <- sum(crop_df$N_crop_animal_feeding_processed)
   P_crop_animal_feeding_processed <- sum(crop_df$P_crop_animal_feeding_processed)
   K_crop_animal_feeding_processed <- sum(crop_df$K_crop_animal_feeding_processed)
@@ -436,10 +428,28 @@ crop_function <- function(arable_land,
   P_crop_animal_feeding_unprocessed <- sum(crop_df$P_crop_animal_feeding_unprocessed)
   K_crop_animal_feeding_unprocessed <- sum(crop_df$K_crop_animal_feeding_unprocessed)
   
+  #------------#
+  ## BIOGAS ####
+  #------------#
+  
+  #maize going to biogas
   N_crop_biogas <- sum(crop_df$N_crop_biogas)
   P_crop_biogas <- sum(crop_df$P_crop_biogas)
   K_crop_biogas <- sum(crop_df$K_crop_biogas)
   
+  #non-maize going to biogas is total biogas - manure - maize
+  nonmaize_to_biogas_N <- N_biogas_input - N_crop_biogas - (N_biogas_input * share_N_biogas_input_animal)
+  nonmaize_to_biogas_P <- P_biogas_input - P_crop_biogas - (P_biogas_input * share_P_biogas_input_animal)
+  nonmaize_to_biogas_K <- K_biogas_input - K_crop_biogas - (K_biogas_input * share_K_biogas_input_animal)
+  
+  #add nonmaize to N_crop_biogas, subtract it from processed food
+  N_crop_biogas <- N_crop_biogas + nonmaize_to_biogas_N
+  P_crop_biogas <- P_crop_biogas + nonmaize_to_biogas_P
+  K_crop_biogas <- K_crop_biogas + nonmaize_to_biogas_K
+  
+  N_crop_human_consumption <- N_crop_human_consumption_processed - nonmaize_to_biogas_N
+  P_crop_human_consumption <- P_crop_human_consumption_processed - nonmaize_to_biogas_P
+  K_crop_human_consumption <- K_crop_human_consumption_processed - nonmaize_to_biogas_K
   
   
   ################
@@ -571,7 +581,7 @@ crop_function <- function(arable_land,
   #this is only coupled to the LF, but it should be affected by the amount of available animal N otherwise
   imported_inorganic_N <- import_inorganic_N_kg_LF * (area_grassland + arable_land)
   imported_inorganic_P <- import_inorganic_P2O5_kg_LF * (area_grassland + arable_land) * convert_phosphorous_pentoxide_to_p
-  imported_inorganic_K <- import_inorganic_K2O_t * convert_potassium_oxide_to_k
+  imported_inorganic_K <- import_inorganic_K2O_t * convert_potassium_oxide_to_k * 1000
 
     
   
@@ -760,9 +770,6 @@ crop_function <- function(arable_land,
               N_crop_human_consumption_processed = N_crop_human_consumption_processed,
               P_crop_human_consumption_processed = P_crop_human_consumption_processed,
               K_crop_human_consumption_processed = K_crop_human_consumption_processed,
-              N_crop_human_consumption_unprocessed = N_crop_human_consumption_unprocessed,
-              P_crop_human_consumption_unprocessed = P_crop_human_consumption_unprocessed,
-              K_crop_human_consumption_unprocessed = K_crop_human_consumption_unprocessed,
               N_crop_animal_feeding_processed = N_crop_animal_feeding_processed,
               P_crop_animal_feeding_processed = P_crop_animal_feeding_processed,
               K_crop_animal_feeding_processed = K_crop_animal_feeding_processed,
@@ -775,41 +782,6 @@ crop_function <- function(arable_land,
               N_grassland = N_grassland,
               P_grassland = P_grassland,
               K_grassland = K_grassland,
-              
-              share_beans = new_share_beans, 
-              share_corn = new_share_corn,
-              share_fodder_peas = new_share_fodder_peas, 
-              share_mais_silage = new_share_mais_silage,
-              share_oat = new_share_oat, 
-              share_oilseed_rape = new_share_oilseed_rape,
-              share_potato = new_share_potato, 
-              share_rye = new_share_rye, 
-              share_sugar_beet = new_share_sugar_beet, 
-              share_summer_barley = new_share_summer_barley,
-              share_summer_wheat = new_share_summer_wheat, 
-              share_triticale = new_share_triticale,
-              share_winter_barley = new_share_winter_barley, 
-              share_winter_wheat = new_share_winter_wheat,
-              land_apple_ha = horti_df$corrected_area_ha[1],  
-              land_arugula_ha = horti_df$corrected_area_ha[2],
-              land_asparagus_ha = horti_df$corrected_area_ha[3], 
-              land_berries_ha = horti_df$corrected_area_ha[4],
-              land_cabbage_ha = horti_df$corrected_area_ha[5],
-              land_carrot_ha = horti_df$corrected_area_ha[6],
-              land_celery_ha = horti_df$corrected_area_ha[7],
-              land_green_bean_ha = horti_df$corrected_area_ha[8],
-              land_lambs_lettuce_ha = horti_df$corrected_area_ha[9],
-              land_lettuce_ha = horti_df$corrected_area_ha[10],
-              land_onion_ha = horti_df$corrected_area_ha[11],
-              land_parsley_ha = horti_df$corrected_area_ha[12],
-              land_pumpkin_ha = horti_df$corrected_area_ha[13],
-              land_radishes_ha = horti_df$corrected_area_ha[14],
-              land_rhubarb_ha = horti_df$corrected_area_ha[15],
-              land_spinash_ha = horti_df$corrected_area_ha[16],
-              land_stone_fruit_ha = horti_df$corrected_area_ha[17],
-              land_strawberry_ha = horti_df$corrected_area_ha[18],
-              land_sweet_corn_ha = horti_df$corrected_area_ha[19],
-              land_veggie_peas_ha = horti_df$corrected_area_ha[20],
               
               total_N_horticulture = horti_N_kg,
               total_P_horticulture = horti_P_kg,
