@@ -190,8 +190,17 @@ crop_function <- function(arable_land,
                           K_content_strawberry_gr_100gr,
                           K_content_sweet_corn_gr_100gr,
                           K_content_veggie_peas_gr_100gr,
-                          import_inorganic_N_kg_LF, import_inorganic_P2O5_kg_LF, import_inorganic_K2O_t,
-                          convert_phosphorous_pentoxide_to_p, convert_potassium_oxide_to_k){
+                          import_inorganic_N_kg_LF, 
+                          import_inorganic_P2O5_kg_LF, 
+                          import_inorganic_K2O_t,
+                          convert_phosphorous_pentoxide_to_p, 
+                          convert_potassium_oxide_to_k,
+                          N_biogas_input,
+                          P_biogas_input,
+                          K_biogas_input,
+                          share_N_biogas_input_animal,
+                          share_P_biogas_input_animal,
+                          share_K_biogas_input_animal){
   
   #correct land shares ----
   #the land shares of the crops are randomly drawn, but they need to add up to 100%

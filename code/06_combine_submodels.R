@@ -34,7 +34,7 @@ source("code/05_waste_submodel.R")
 
 input <- read.csv("data/input-all.csv")
 
-make_variables(as.estimate(input))
+#make_variables(as.estimate(input))
 
 
 # create function for mc-simulation
@@ -325,8 +325,17 @@ combined_function <- function() {
           K_content_strawberry_gr_100gr,
           K_content_sweet_corn_gr_100gr,
           K_content_veggie_peas_gr_100gr,
-          import_inorganic_N_kg_LF, import_inorganic_P2O5_kg_LF, import_inorganic_K2O_t,
-          convert_phosphorous_pentoxide_to_p, convert_potassium_oxide_to_k
+          import_inorganic_N_kg_LF, 
+          import_inorganic_P2O5_kg_LF, 
+          import_inorganic_K2O_t,
+          convert_phosphorous_pentoxide_to_p, 
+          convert_potassium_oxide_to_k,
+          N_biogas_input,
+          P_biogas_input,
+          K_biogas_input,
+          share_N_biogas_input_animal,
+          share_P_biogas_input_animal,
+          share_K_biogas_input_animal
         )
         
         if(crop_adjustment){
@@ -579,7 +588,13 @@ combined_function <- function() {
           manure_N_to_PtwoOfive_hen,
           manure_N_to_PtwoOfive_other_poultry,
           manure_N_to_PtwoOfive_sheep,
-          manure_N_to_KOtwo,
+          manure_N_to_KtwoO_dairy,
+          manure_N_to_KtwoO_bull,
+          manure_N_to_KtwoO_calf,
+          manure_N_to_KtwoO_pig,
+          manure_N_to_KtwoO_chicken,
+          manure_N_to_KtwoO_turkey,
+          manure_N_to_KtwoO_sheep,
           cattle_on_slurry,
           pig_on_slurry,
           cattle_housingloss_rate_liquid,
@@ -590,7 +605,18 @@ combined_function <- function() {
           convert_phosphorous_pentoxide_to_p,
           convert_potassium_oxide_to_k,
           P_housing_losses,
-          K_housing_losses
+          K_housing_losses,
+          export_manure_N_kg,
+          export_manure_P_kg,
+          N_biogas_input,
+          P_biogas_input,
+          K_biogas_input,
+          share_N_biogas_input_animal,
+          share_P_biogas_input_animal,
+          share_K_biogas_input_animal,
+          import_organic_N_kg,
+          import_organic_P_kg,
+          import_organic_K_kg
         )
         
         #-----------------#
@@ -815,7 +841,13 @@ combined_function <- function() {
               manure_N_to_PtwoOfive_hen = manure_N_to_PtwoOfive_hen,
               manure_N_to_PtwoOfive_other_poultry = manure_N_to_PtwoOfive_other_poultry,
               manure_N_to_PtwoOfive_sheep = manure_N_to_PtwoOfive_sheep,
-              manure_N_to_KOtwo = manure_N_to_KOtwo,
+              manure_N_to_KtwoO_dairy = manure_N_to_KtwoO_dairy,
+              manure_N_to_KtwoO_bull = manure_N_to_KtwoO_bull,
+              manure_N_to_KtwoO_calf = manure_N_to_KtwoO_calf,
+              manure_N_to_KtwoO_pig = manure_N_to_KtwoO_pig,
+              manure_N_to_KtwoO_chicken = manure_N_to_KtwoO_chicken,
+              manure_N_to_KtwoO_turkey = manure_N_to_KtwoO_turkey,
+              manure_N_to_KtwoO_sheep = manure_N_to_KtwoO_sheep,
               cattle_on_slurry = cattle_on_slurry,
               pig_on_slurry = pig_on_slurry,
               cattle_housingloss_rate_liquid = cattle_housingloss_rate_liquid,
@@ -827,6 +859,17 @@ combined_function <- function() {
               convert_potassium_oxide_to_k = convert_potassium_oxide_to_k,
               P_housing_losses = P_housing_losses,
               K_housing_losses = K_housing_losses,
+              export_manure_N_kg = export_manure_N_kg,
+              export_manure_P_kg = export_manure_P_kg,
+              N_biogas_input = N_biogas_input,
+              P_biogas_input = P_biogas_input,
+              K_biogas_input = K_biogas_input,
+              share_N_biogas_input_animal = share_N_biogas_input_animal,
+              share_P_biogas_input_animal = share_P_biogas_input_animal,
+              share_K_biogas_input_animal = share_K_biogas_input_animal,
+              import_organic_N_kg = import_organic_N_kg,
+              import_organic_P_kg = import_organic_P_kg,
+              import_organic_K_kg = import_organic_K_kg,
               P_reduction_manure = P_reduction_manure,
               K_reduction_manure = K_reduction_manure
             )
