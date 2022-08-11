@@ -33,6 +33,8 @@ source("code/04_consumption_model.R")
 source("code/05_waste_submodel.R")
 
 input <- read.csv("data/input-all.csv")
+#remove median values
+input$median <- NA
 
 # make_variables(as.estimate(input))
 
@@ -104,14 +106,15 @@ combined_function <- function() {
   #---------------------------#
   # Scenario Loop ####
   #---------------------------#
-  for (scenario in c("normal", "all_adjustments", "no_herdsize_adjustment", "no_manure_adjustment", "no_crop_adjustment")) {
+  for (scenario in c("normal", "all_adjustments", "no_herdsize_adjustment", "no_crop_adjustment")) {
+    #idea: if herdsize is not adjusted, try to buffer deficiency of feed by crop allocation
+    #      if crop allocation is not adjusted, try to buffer deficiency by more drastic hersize adjustment
 
     # scenario
     # temp
     # scenario <- 'normal'
     # scenario <- 'all_adjustments'
     # scenario <- 'no_herdsize_adjustment'
-    # scenario <- 'no_manure_adjustment'
     # scenario <- 'no_crop_adjustment'
 
     n_stakeholder_answers <- length(all_scenario_allocate_crop_biogas)
@@ -2164,12 +2167,17 @@ nitrogen_mc_simulation <- mcSimulation(
   functionSyntax = "plainNames"
 )
 
-for (n in 1:100) {
-  make_variables(as.estimate(input))
-  combined_function()
-}
+#everything with same digit at the end of the name belongs together
+#eg scenario1, sewageN1, ....
+#the different numbers come from the scenarios, the stakeholders answers and the strict reductions
 
-problem_levers <- read.csv("problem_levers.csv")
+
+#for (n in 1:100) {
+#  make_variables(as.estimate(input))
+#  combined_function()
+#}
+
+#problem_levers <- read.csv("problem_levers.csv")
 
 
 # somehow the resulting dataframe has one column per variable, but each variable twice:
@@ -2243,8 +2251,11 @@ problem_levers <- read.csv("problem_levers.csv")
 # should I use the PLS to analyse the outcomes of the scenario
 # or should I use it to analyse the CHANGE in the variable
 
+nitrogen_mc_simulation$y
+
 # somehow number were characters, so change back to numeric
-nitrogen_mc_simulation$y[, 2:31] <- sapply(nitrogen_mc_simulation$y[, 2:31], as.numeric)
+n_y <- length(nitrogen_mc_simulation$y)
+nitrogen_mc_simulation$y[, 2:n_y] <- sapply(nitrogen_mc_simulation$y[, 2:n_y], as.numeric)
 
 
 nitrogen_mc_simulation$y$total_input_N_change <- nitrogen_mc_simulation$y$total_input_N1 - nitrogen_mc_simulation$y$total_input_N2
