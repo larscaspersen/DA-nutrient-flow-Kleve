@@ -585,6 +585,7 @@ combined_function <- function() {
         # priorize to maintain the stochiometry of the larger stream (feed to animals)
         #lesser streams are biogas and human food, they get the rest
         
+        #regular distribution following what stakeholders said
         #crops to feed
         crop_to_feed_N <- pool_crop_N * scenario_allocate_crop_feed_corrected
         #maintain stochiometry of K and P stream
@@ -623,8 +624,6 @@ combined_function <- function() {
         change_crop_human_N <- crop_food_not_exported_N - combined_output$local_vegetal_products_consumed_N[1]
         change_crop_human_P <- crop_food_not_exported_P - combined_output$local_vegetal_products_consumed_P[1]
         change_crop_human_K <- crop_food_not_exported_K - combined_output$local_vegetal_products_consumed_K[1]
-      
-        
         
         #------------------------------------------#
         # apply changes in crop allocation to streams
@@ -641,6 +640,8 @@ combined_function <- function() {
         crop_output$K_crop_human_consumption_processed <- crop_output$K_crop_human_consumption_processed + change_crop_human_K
       }
       
+      
+      
       #---------------------------------------------------#
       ## Buffer no herdsize changes by crop allocation ####
       #---------------------------------------------------#
@@ -652,6 +653,7 @@ combined_function <- function() {
         #adjust the crop allocation a second time:
         
         #pool of crop to allocate
+        #difference: here we also allow to allocate the crops that were ment for export
         pool_crop_N <- crop_output$N_crop_human_consumption_processed + crop_output$N_crop_biogas +
           crop_output$N_crop_animal_feeding_processed + crop_output$N_crop_animal_feeding_unprocessed
         
@@ -661,10 +663,14 @@ combined_function <- function() {
         pool_crop_K <- crop_output$K_crop_human_consumption_processed + crop_output$K_crop_biogas +
           crop_output$K_crop_animal_feeding_processed + crop_output$K_crop_animal_feeding_unprocessed
         
+        
+        #crop buffering scenario: put as much crops as possible to biogas and food
+        
         #amount that can be allocated to feed
         buffered_crop_feed_N <- min(N_animal_output_produced, pool_crop_N)
         buffered_crop_feed_P <- min(P_animal_output_produced, pool_crop_P)
         buffered_crop_feed_K <- min(K_animal_output_produced, pool_crop_K)
+        #--> if there is nothing left for biogas or export, then give zero
         
         #leftovers allocated to food and biogas to the same share as in the crop allocation rule
         crop_leftover_N <- max(pool_crop_N - N_animal_output_produced,0)
@@ -672,22 +678,19 @@ combined_function <- function() {
         crop_leftover_K <- max(pool_crop_K - K_animal_output_produced,0)
         
         share_crop_food_N <- scenario_allocate_crop_food / (scenario_allocate_crop_biogas_corrected + scenario_allocate_crop_food)
-        share_crop_food_P <- combined_output / (scenario_allocate_crop_biogas_corrected + scenario_allocate_crop_food)
-        share_crop_food_K <- scenario_allocate_crop_food / (scenario_allocate_crop_biogas_corrected + scenario_allocate_crop_food)
+        share_crop_food_P <- combined_output$combined_output$local_vegetal_products_consumed_P[1] / (combined_output$combined_output$local_vegetal_products_consumed_P[1] + combined_output$combined_output$vegetal_biogas_substrate_P[1])
+        share_crop_food_K <- combined_output$combined_output$local_vegetal_products_consumed_K[1] / (combined_output$combined_output$local_vegetal_products_consumed_K[1] + combined_output$combined_output$vegetal_biogas_substrate_K[1])
         
         #allocate the leftover N according to the rate
         buffered_crop_food_N <-  crop_leftover_N * share_crop_food_N
-        #maintain stochiometry of food stream, ideally
-        target_buffered_crop_food_P <- buffered_crop_food_N * (combined_output$local_vegetal_products_consumed_P[1] / combined_output$local_vegetal_products_consumed_N[1])
-        target_buffered_crop_food_K <- buffered_crop_food_N * (combined_output$local_vegetal_products_consumed_K[1] / combined_output$local_vegetal_products_consumed_N[1])
-        
-        buffered_crop_food_P <- min(crop_leftover_P, target_buffered_crop_food_P)
-        buffered_crop_food_K <- min(crop_leftover_K, target_buffered_crop_food_K)
+        buffered_crop_food_P <- max(crop_leftover_P * share_crop_food_P, 0)
+        buffered_crop_food_K <- max(crop_leftover_K * share_crop_food_K, 0)
         
         #the rest goes to biogas
-        buffered_crop_biogas_N <-  max(crop_leftover_N - buffered_crop_food_N, 0)
-        buffered_crop_biogas_P <-  max(crop_leftover_P - buffered_crop_food_P, 0)
-        buffered_crop_biogas_K <-  max(crop_leftover_K - buffered_crop_food_K, 0)
+        buffered_crop_biogas_N <-  crop_leftover_N * (1 - share_crop_food_N)
+        buffered_crop_biogas_P <-  max(crop_leftover_P * (1 - share_crop_food_P), 0)
+        buffered_crop_biogas_K <-  max(crop_leftover_K * (1 - share_crop_food_K), 0)
+  
         
         #----------------------------------#
         #Apply changed streams by buffering
@@ -708,8 +711,6 @@ combined_function <- function() {
         crop_output$P_crop_biogas <- buffered_crop_biogas_P
         crop_output$K_crop_biogas <- buffered_crop_biogas_K
         
-        # maybe I need to adjust the manure content again and if so,
-        # i should also adjust manure import of inorganic fertilizers
       }
 
       #---------------------#
