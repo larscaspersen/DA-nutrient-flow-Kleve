@@ -640,6 +640,77 @@ combined_function <- function() {
         crop_output$P_crop_human_consumption_processed <- crop_output$P_crop_human_consumption_processed + change_crop_human_P
         crop_output$K_crop_human_consumption_processed <- crop_output$K_crop_human_consumption_processed + change_crop_human_K
       }
+      
+      #---------------------------------------------------#
+      ## Buffer no herdsize changes by crop allocation ####
+      #---------------------------------------------------#
+      
+      if(scenario == "buffer_no_herdsize"){
+        #in case if stakeholders are not willing to adjust the herdsize, calculate the degree of change needed
+        #in crop allocation
+        
+        #adjust the crop allocation a second time:
+        
+        #pool of crop to allocate
+        pool_crop_N <- crop_output$N_crop_human_consumption_processed + crop_output$N_crop_biogas +
+          crop_output$N_crop_animal_feeding_processed + crop_output$N_crop_animal_feeding_unprocessed
+        
+        pool_crop_P <-crop_output$P_crop_human_consumption_processed + crop_output$P_crop_biogas +
+          crop_output$P_crop_animal_feeding_processed + crop_output$P_crop_animal_feeding_unprocessed
+        
+        pool_crop_K <- crop_output$K_crop_human_consumption_processed + crop_output$K_crop_biogas +
+          crop_output$K_crop_animal_feeding_processed + crop_output$K_crop_animal_feeding_unprocessed
+        
+        #amount that can be allocated to feed
+        buffered_crop_feed_N <- min(N_animal_output_produced, pool_crop_N)
+        buffered_crop_feed_P <- min(P_animal_output_produced, pool_crop_P)
+        buffered_crop_feed_K <- min(K_animal_output_produced, pool_crop_K)
+        
+        #leftovers allocated to food and biogas to the same share as in the crop allocation rule
+        crop_leftover_N <- max(pool_crop_N - N_animal_output_produced,0)
+        crop_leftover_P <- max(pool_crop_P - P_animal_output_produced,0)
+        crop_leftover_K <- max(pool_crop_K - K_animal_output_produced,0)
+        
+        share_crop_food_N <- scenario_allocate_crop_food / (scenario_allocate_crop_biogas_corrected + scenario_allocate_crop_food)
+        share_crop_food_P <- combined_output / (scenario_allocate_crop_biogas_corrected + scenario_allocate_crop_food)
+        share_crop_food_K <- scenario_allocate_crop_food / (scenario_allocate_crop_biogas_corrected + scenario_allocate_crop_food)
+        
+        #allocate the leftover N according to the rate
+        buffered_crop_food_N <-  crop_leftover_N * share_crop_food_N
+        #maintain stochiometry of food stream, ideally
+        target_buffered_crop_food_P <- buffered_crop_food_N * (combined_output$local_vegetal_products_consumed_P[1] / combined_output$local_vegetal_products_consumed_N[1])
+        target_buffered_crop_food_K <- buffered_crop_food_N * (combined_output$local_vegetal_products_consumed_K[1] / combined_output$local_vegetal_products_consumed_N[1])
+        
+        buffered_crop_food_P <- min(crop_leftover_P, target_buffered_crop_food_P)
+        buffered_crop_food_K <- min(crop_leftover_K, target_buffered_crop_food_K)
+        
+        #the rest goes to biogas
+        buffered_crop_biogas_N <-  max(crop_leftover_N - buffered_crop_food_N, 0)
+        buffered_crop_biogas_P <-  max(crop_leftover_P - buffered_crop_food_P, 0)
+        buffered_crop_biogas_K <-  max(crop_leftover_K - buffered_crop_food_K, 0)
+        
+        #----------------------------------#
+        #Apply changed streams by buffering
+        #----------------------------------#
+        
+        # crop to feed --> channed changes to unprocessed feed because better buffer capacity
+        crop_output$N_crop_animal_feeding_unprocessed <- buffered_crop_feed_N - crop_output$N_crop_animal_feeding_processed
+        crop_output$P_crop_animal_feeding_unprocessed <- buffered_crop_feed_N - crop_output$N_crop_animal_feeding_processed
+        crop_output$K_crop_animal_feeding_unprocessed <- buffered_crop_feed_N - crop_output$N_crop_animal_feeding_processed
+        
+        # crop to local human consumption
+        crop_output$N_crop_human_consumption_processed <- buffered_crop_food_N
+        crop_output$P_crop_human_consumption_processed <- buffered_crop_food_P
+        crop_output$K_crop_human_consumption_processed <- buffered_crop_food_K
+        
+        #crop to biogas
+        crop_output$N_crop_biogas <- buffered_crop_biogas_N
+        crop_output$P_crop_biogas <- buffered_crop_biogas_P
+        crop_output$K_crop_biogas <- buffered_crop_biogas_K
+        
+        # maybe I need to adjust the manure content again and if so,
+        # i should also adjust manure import of inorganic fertilizers
+      }
 
       #---------------------#
       # ANIMAL SUBSYSTEM ####
@@ -1167,79 +1238,6 @@ combined_function <- function() {
         K_feed_import <- 0
       }
       
-      #---------------------------------------------------#
-      ## Buffer no herdsize changes by crop allocation ####
-      #---------------------------------------------------#
-      
-      if(scenario == "buffer_no_herdsize"){
-        #in case if stakeholders are not willing to adjust the herdsize, calculate the degree of change needed
-        #in crop allocation
-        
-        #adjust the crop allocation a second time:
-        
-        #pool of crop to allocate
-        pool_crop_N <- crop_output$N_crop_human_consumption_processed + crop_output$N_crop_biogas +
-          crop_output$N_crop_animal_feeding_processed + crop_output$N_crop_animal_feeding_unprocessed
-        
-        pool_crop_P <-crop_output$P_crop_human_consumption_processed + crop_output$P_crop_biogas +
-          crop_output$P_crop_animal_feeding_processed + crop_output$P_crop_animal_feeding_unprocessed
-        
-        pool_crop_K <- crop_output$K_crop_human_consumption_processed + crop_output$K_crop_biogas +
-          crop_output$K_crop_animal_feeding_processed + crop_output$K_crop_animal_feeding_unprocessed
-        
-        #amount that can be allocated to feed
-        buffered_crop_feed_N <- min(N_animal_output_produced, pool_crop_N)
-        buffered_crop_feed_P <- min(P_animal_output_produced, pool_crop_P)
-        buffered_crop_feed_K <- min(K_animal_output_produced, pool_crop_K)
-        
-        #leftovers allocated to food and biogas to the same share as in the crop allocation rule
-        crop_leftover_N <- max(pool_crop_N - N_animal_output_produced,0)
-        crop_leftover_P <- max(pool_crop_P - P_animal_output_produced,0)
-        crop_leftover_K <- max(pool_crop_K - K_animal_output_produced,0)
-        
-        share_crop_food_N <- scenario_allocate_crop_food / (scenario_allocate_crop_biogas_corrected + scenario_allocate_crop_food)
-        share_crop_food_P <- combined_output / (scenario_allocate_crop_biogas_corrected + scenario_allocate_crop_food)
-        share_crop_food_K <- scenario_allocate_crop_food / (scenario_allocate_crop_biogas_corrected + scenario_allocate_crop_food)
-        
-        #allocate the leftover N according to the rate
-        buffered_crop_food_N <-  crop_leftover_N * share_crop_food_N
-        #maintain stochiometry of food stream, ideally
-        target_buffered_crop_food_P <- buffered_crop_food_N * (combined_output$local_vegetal_products_consumed_P[1] / combined_output$local_vegetal_products_consumed_N[1])
-        target_buffered_crop_food_K <- buffered_crop_food_N * (combined_output$local_vegetal_products_consumed_K[1] / combined_output$local_vegetal_products_consumed_N[1])
-        
-        buffered_crop_food_P <- min(crop_leftover_P, target_buffered_crop_food_P)
-        buffered_crop_food_K <- min(crop_leftover_K, target_buffered_crop_food_K)
-        
-        #the rest goes to biogas
-        buffered_crop_biogas_N <-  max(crop_leftover_N - buffered_crop_food_N, 0)
-        buffered_crop_biogas_P <-  max(crop_leftover_P - buffered_crop_food_P, 0)
-        buffered_crop_biogas_K <-  max(crop_leftover_K - buffered_crop_food_K, 0)
-        
-        #----------------------------------#
-        #Apply changed streams by buffering
-        #----------------------------------#
-        
-        # crop to feed --> channed changes to unprocessed feed because better buffer capacity
-        crop_output$N_crop_animal_feeding_unprocessed <- buffered_crop_feed_N - crop_output$N_crop_animal_feeding_processed
-        crop_output$P_crop_animal_feeding_unprocessed <- buffered_crop_feed_N - crop_output$N_crop_animal_feeding_processed
-        crop_output$K_crop_animal_feeding_unprocessed <- buffered_crop_feed_N - crop_output$N_crop_animal_feeding_processed
-        
-        # crop to local human consumption
-        crop_output$N_crop_human_consumption_processed <- buffered_crop_food_N
-        crop_output$P_crop_human_consumption_processed <- buffered_crop_food_P
-        crop_output$K_crop_human_consumption_processed <- buffered_crop_food_K
-        
-        #crop to biogas
-        crop_output$N_crop_biogas <- buffered_crop_biogas_N
-        crop_output$P_crop_biogas <- buffered_crop_biogas_P
-        crop_output$K_crop_biogas <- buffered_crop_biogas_K
-        
-        # maybe I need to adjust the manure content again and if so,
-        # i should also adjust manure import of inorganic fertilizers
-      }
-
-
-
       if (manure_adjustment) {
         #-------------------------------------------------#
         ## LEVER: Manure allocation ====
@@ -1348,7 +1346,11 @@ combined_function <- function() {
       #                                         no = pool_manure_K - animal_output$K_manure_biogas - animal_output$export_manure_K_kg)
       # }
       
-
+      
+      #-------------------------------------#
+      ##Import inorganics if less manure ####
+      #-------------------------------------#
+      
       # check how much less manure is applied to crops
       #--> the difference is imported as inorganic fertilizer
       if (manure_adjustment | herdsize_adjustment | scenario == 'buffer_no_herdsize') {
@@ -1357,25 +1359,23 @@ combined_function <- function() {
         # get the difference in manure available for crops, this difference needs
         # to be imported in other ways for example by inorganic fertilizer
         # this calculation is also imporant if only the herdsize was changed!
-        N_manure_missing_for_crops <- combined_output$manure_to_crop_N[1] - animal_output$N_manure_crop
-        P_manure_missing_for_crops <- combined_output$manure_to_crop_P[1] - animal_output$P_manure_crop
-        K_manure_missing_for_crops <- combined_output$manure_to_crop_K[1] - animal_output$K_manure_crop
+        change_manure_for_crops_N <- animal_output$N_manure_crop - combined_output$manure_to_crop_N[1] 
+        change_manure_for_crops_P <- animal_output$P_manure_crop - combined_output$manure_to_crop_P[1]
+        change_manure_for_crops_K <- animal_output$K_manure_crop - combined_output$manure_to_crop_K[1]
 
+        #use import of inorganic fertilizer to buffer changes in manure to crops in both directions
+        #if somehow there is more manure now then less inorganic fertilizer is needed
+        #if there is less manure (regular case), then more inorganic fertilizer should be imported
+        
+        #use a fertilizer efficiency factor for the buffering, in general less inorganic fertilizer
+        #is needed for the same amount of manure N
+        crop_output$imported_inorganic_N <- crop_output$imported_inorganic_N - (change_manure_for_crops_N * convert_manure_to_inorganic_N)
+        #if there is less manure, then change is negative and more stuff is added to the imports
+        #if there is more manure, then change is positibe and less inorganic fertilizer needs to be imported
+        crop_output$imported_inorganic_P <- crop_output$imported_inorganic_P - (change_manure_for_crops_P * convert_manure_to_inorganic_P)
+        crop_output$imported_inorganic_K <- crop_output$imported_inorganic_K - (change_manure_for_crops_K * convert_manure_to_inorganic_K)
+        
 
-        # import the reduction in manure available to crops in form of inorganic fertilizer
-        crop_output$imported_inorganic_N <- ifelse((crop_output$imported_inorganic_N + N_manure_missing_for_crops) > 0,
-          (crop_output$imported_inorganic_N + N_manure_missing_for_crops), 0
-        )
-        crop_output$imported_inorganic_P <- ifelse((crop_output$imported_inorganic_P + P_manure_missing_for_crops) > 0,
-          (crop_output$imported_inorganic_P + P_manure_missing_for_crops), 0
-        )
-        crop_output$imported_inorganic_K <- ifelse((crop_output$imported_inorganic_K + K_manure_missing_for_crops) > 0,
-          (crop_output$imported_inorganic_K + K_manure_missing_for_crops), 0
-        )
-
-        # inorganic fertilizers have less nutrient losses when applied than organic ones
-        # have a reduction factor for environmental losses
-        # still missing!!!!!!
       }
 
       

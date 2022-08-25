@@ -604,7 +604,10 @@ amount of K2O for one N manure; taken from https://ag.umass.edu/crops-dairy-live
 amount of K2O for one N manure; taken from https://ag.umass.edu/crops-dairy-livestock-equine/fact-sheets/plant-nutrients-from-manure,manure_N_to_KtwoO_horse,share,0.675,0.75,0.825,posnorm,animal,,
 amount of K2O for one N manure; taken from https://ag.umass.edu/crops-dairy-livestock-equine/fact-sheets/plant-nutrients-from-manure,manure_N_to_KtwoO_sheep,share,0.782608696,0.869565217,0.956521739,posnorm,animal,,
 "amount of K2O for one N manure; taken from: Chastain, Camberato and Skewes: Poultry Manure Production and Nutrient Content",manure_N_to_KtwoO_chicken,share,0.63,,0.97,posnorm,animal,,
-"amount of K2O for one N manure; taken from: Chastain, Camberato and Skewes: Poultry Manure Production and Nutrient Content",manure_N_to_KtwoO_turkey,share,0.51,,0.72,posnorm,animal,,
+"amount of K2O for one N manure; taken from: Chastain, Camberato and Skewes: Poultry Manure Production and Nutrient Content",manure_N_to_KtwoO_turkey,share,0.51,,0.72,posnorm,animal,,still need proper input
+kg of inorganic N needed for the same fertiliztation effect of 1kg manure N,inorganic_to_manure_N,conversion rate,0.85,,0.95,posnorm,crop,,still need proper input
+kg of inorganic P needed for the same fertiliztation effect of 1kg manure N,inorganic_to_manure_P,conversion rate,0.85,,0.95,posnorm,crop,,still need proper input
+kg of inorganic K needed for the same fertiliztation effect of 1kg manure N,inorganic_to_manure_K,conversion rate,0.85,,0.95,posnorm,crop,,
 share of produced crops allocated to biogas in a local feed scenario,scenario_allocate_crop_biogas_a,share,0.05,,0.2,tnorm_0_1,crop,,survey stakeholders
 share of produced crops allocated to animal feed in a local feed scenario,scenario_allocate_crop_feed_a,share,0.75,,0.8,tnorm_0_1,crop,,survey stakeholders
 share of produced crops allocated to human food in a local feed scenario,scenario_allocate_crop_food_a,share,0.05,,0.21,tnorm_0_1,crop,,survey stakeholders
