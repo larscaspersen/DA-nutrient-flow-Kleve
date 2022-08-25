@@ -1271,25 +1271,30 @@ combined_function <- function() {
         # maintain stochiometry of manure to crops and give rest to lesser streams
         #lesser streams are biogas and export
         
+        #crop
+        animal_output$N_manure_crop <- pool_manure_N * scenario_allocate_manure_crop_corrected
+        animal_output$P_manure_crop <- animal_output$N_manure_crop * (combined_output$manure_to_crop_P / combined_output$manure_to_crop_N)
+        animal_output$K_manure_crop <- animal_output$N_manure_crop * (combined_output$manure_to_crop_K / combined_output$manure_to_crop_N)
+        
+        #get the remaining nutrients, calculate the allocation to biogas and exort without crops
+        manure_remain_P <- pool_manure_P - animal_output$P_manure_crop
+        manure_remain_K <- pool_manure_K - animal_output$K_manure_crop
         
         
         #biogas 
         animal_output$N_manure_biogas <- pool_manure_N * scenario_allocate_manure_biogas_corrected
-        #maintain stochiometry
-        animal_output$P_manure_biogas <- animal_output$N_manure_biogas * (combined_output$manure_as_biogas_substrate_P[1] / combined_output$manure_as_biogas_substrate_N[1])
-        animal_output$K_manure_biogas <- animal_output$N_manure_biogas * (combined_output$manure_as_biogas_substrate_K[1] / combined_output$manure_as_biogas_substrate_N[1])
+        animal_output$P_manure_biogas <- manure_remain_P * (combined_output$manure_as_biogas_substrate_P[1]/(combined_output$manure_as_biogas_substrate_P[1] + combined_output$manure_export_P[1]))
+        animal_output$K_manure_biogas <- manure_remain_K * (combined_output$manure_as_biogas_substrate_K[1]/(combined_output$manure_as_biogas_substrate_K[1] + combined_output$manure_export_K[1]))
         
         #export
         animal_output$export_manure_N_kg <- pool_manure_N * scenario_allocate_manure_export_corrected
-        animal_output$export_manure_P_kg <- animal_output$export_manure_N_kg * (combined_output$manure_export_P[1] / combined_output$manure_export_N[1])
-        animal_output$export_manure_K_kg <- animal_output$export_manure_N_kg * (combined_output$manure_export_K[1] / combined_output$manure_export_N[1])
+        animal_output$export_manure_P_kg <- manure_remain_P * (combined_output$manure_export_P[1]/(combined_output$manure_as_biogas_substrate_P[1] + combined_output$manure_export_P[1]))
+        animal_output$export_manure_K_kg <- manure_remain_P * (combined_output$manure_export_K[1]/(combined_output$manure_as_biogas_substrate_K[1] + combined_output$manure_export_K[1]))
         
-        #crop
-        animal_output$N_manure_crop <- pool_manure_N * scenario_allocate_manure_crop_corrected
-        animal_output$P_manure_crop <- pool_manure_P - animal_output$export_manure_P_kg - animal_output$P_manure_biogas
-        animal_output$K_manure_crop <- pool_manure_K - animal_output$export_manure_K_kg - animal_output$K_manure_biogas
         
-
+        #----------#
+        #old but afraid to delet
+        #----------#
 
         # calculate
         # current allocation of manure
@@ -1306,6 +1311,11 @@ combined_function <- function() {
         cf_manure_biogas <- scenario_allocate_manure_biogas_corrected / current_manure_biogas
         cf_manure_crop <- scenario_allocate_manure_crop_corrected / current_manure_crop
         cf_manure_export <- scenario_allocate_manure_export_corrected / current_manure_export
+        
+        #----------#
+        #END: old but afraid to delete
+        #----------#
+        
       }
 
       # in case the herdsize was changed but not the manure allocation
