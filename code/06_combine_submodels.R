@@ -1949,54 +1949,58 @@ combined_function <- function() {
         net_feed_import_K = c(combined_output$net_feed_import_K, adj_length(K_feed_import, n_rep))
       )
 
-      if (any(unname(unlist(combined_output[-1])) < 0)) {
-
-        # which(unlist(combined_output[-1]) < 0)
-        # combined_output$manure_to_crop_K
-        # which.min(unlist(combined_output[-1]))
-
-        # save the levers values to see if there is a problem
-        levers <- data.frame(
-          stakeholder = k,
-          var_name = c(
-            "scenario_allocate_crop_biogas",
-            "scenario_allocate_crop_feed",
-            "scenario_allocate_crop_food",
-            "scenario_allocate_manure_biogas",
-            "scenario_allocate_manure_crop",
-            "scenario_allocate_manure_export",
-            "scenario_share_cattle",
-            "scenario_share_others",
-            "scenario_share_pig",
-            "scenario_share_poultry",
-            "scenario_overall_livestock_reduction"
-          ),
-          value = c(
-            scenario_allocate_crop_biogas,
-            scenario_allocate_crop_feed,
-            scenario_allocate_crop_food,
-            scenario_allocate_manure_biogas,
-            scenario_allocate_manure_crop,
-            scenario_allocate_manure_export,
-            scenario_share_cattle,
-            scenario_share_others,
-            scenario_share_pig,
-            scenario_share_poultry,
-            scenario_overall_livestock_reduction
-          )
-        )
-
-        write.csv(x = levers, file = "problem_levers.csv", row.names = F)
-
-        # identify problem stream
-        problem_stream <- names(unlist(combined_output[-1]))[unlist(combined_output[-1]) < 0]
-
-
-        stop(paste0(
-          "at least one stream is negative. Error found in scenario: ", scenario,
-          "for stream :", problem_stream
-        ))
-      }
+      #apparantly negative streams are now acceptable
+      # if (any(unname(unlist(combined_output[-1])) < 0)) {
+      # 
+      #   # which(unlist(combined_output[-1]) < 0)
+      #   # combined_output$manure_to_crop_K
+      #   # which.min(unlist(combined_output[-1]))
+      # 
+      #   # save the levers values to see if there is a problem
+      #   levers <- data.frame(
+      #     stakeholder = k,
+      #     var_name = c(
+      #       "scenario_allocate_crop_biogas",
+      #       "scenario_allocate_crop_feed",
+      #       "scenario_allocate_crop_food",
+      #       "scenario_allocate_manure_biogas",
+      #       "scenario_allocate_manure_crop",
+      #       "scenario_allocate_manure_export",
+      #       "scenario_share_cattle",
+      #       "scenario_share_others",
+      #       "scenario_share_pig",
+      #       "scenario_share_poultry",
+      #       "scenario_overall_livestock_reduction"
+      #     ),
+      #     value = c(
+      #       scenario_allocate_crop_biogas,
+      #       scenario_allocate_crop_feed,
+      #       scenario_allocate_crop_food,
+      #       scenario_allocate_manure_biogas,
+      #       scenario_allocate_manure_crop,
+      #       scenario_allocate_manure_export,
+      #       scenario_share_cattle,
+      #       scenario_share_others,
+      #       scenario_share_pig,
+      #       scenario_share_poultry,
+      #       scenario_overall_livestock_reduction
+      #     )
+      #   )
+      # 
+      #   write.csv(x = levers, file = "problem_levers.csv", row.names = F)
+      # 
+      #   # identify problem stream
+      #   problem_stream <- names(unlist(combined_output[-1]))[unlist(combined_output[-1]) < 0]
+      # 
+      # 
+      #   stop(paste0(
+      #     "at least one stream is negative. Error found in scenario: ", scenario,
+      #     "for stream :", problem_stream
+      #   ))
+      # }
+      
+      
+      
     } # end of loop for different stakeholders answers
   } # end of the loop for the different scenarios
 
