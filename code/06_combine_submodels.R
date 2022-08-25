@@ -586,44 +586,58 @@ combined_function <- function() {
         pool_crop_K <- crop_food_not_exported_K + crop_output$K_crop_biogas +
           crop_output$K_crop_animal_feeding_processed + crop_output$K_crop_animal_feeding_unprocessed
 
+        # priorize to maintain the stochiometry of the larger stream (feed to animals)
+        #lesser streams are biogas and human food, they get the rest
         
-        #lesser streams are biogas and human food
+        #crops to feed
+        crop_to_feed_N <- pool_crop_N * scenario_allocate_crop_feed_corrected
+        #maintain stochiometry of K and P stream
+        crop_to_feed_P <- change_crop_feed_N * (combined_output$feed_from_processed_crops_P[1] / combined_output$feed_from_processed_crops_N[1])
+        crop_to_feed_K <- change_crop_feed_N * (combined_output$feed_from_processed_crops_K[1] / combined_output$feed_from_processed_crops_N[1])
+        
+        #-----#
+        #biogas and food get the rest, even if that means negative flows of P and K
+        #-----#
+        #distribute the rest using the same ratio of biogas to feed than in the reference scenario
+        share_rest_biogas_P <- combined_output$vegetal_biogas_substrate_P[1] / (local_vegetal_products_consumed_P[1] + combined_output$vegetal_biogas_substrate_P[1])
+        share_rest_biogas_K <- combined_output$vegetal_biogas_substrate_K[1] / (local_vegetal_products_consumed_K[1] + combined_output$vegetal_biogas_substrate_K[1])
         
         #biogas
         crop_output$N_crop_biogas <- pool_crop_N * scenario_allocate_crop_biogas_corrected
         #maintain stochiometry of biogas 
-        crop_output$P_crop_biogas <- crop_output$N_crop_biogas * (combined_output$vegetal_biogas_substrate_P[1] / combined_output$vegetal_biogas_substrate_N[1])
-        crop_output$K_crop_biogas <- crop_output$N_crop_biogas * (combined_output$vegetal_biogas_substrate_K[1] / combined_output$vegetal_biogas_substrate_N[1])
+        crop_output$P_crop_biogas <- (pool_crop_P - crop_to_feed_P) * share_rest_biogas_P
+        crop_output$K_crop_biogas <- (pool_crop_K - crop_to_feed_K) * share_rest_biogas_K
         
         #food
         crop_food_not_exported_N <- pool_crop_N * scenario_allocate_crop_food_corrected
         #maintain stochiometry
-        crop_food_not_exported_P <- crop_food_not_exported_N * (combined_output$local_vegetal_products_consumed_P[1] / combined_output$local_vegetal_products_consumed_N[1])
-        crop_food_not_exported_K <- crop_food_not_exported_N * (combined_output$local_vegetal_products_consumed_K[1] / combined_output$local_vegetal_products_consumed_N[1])
+        crop_food_not_exported_P <- (pool_crop_P - crop_to_feed_P) * (1 - share_rest_biogas_P)
+        crop_food_not_exported_K <- (pool_crop_K - crop_to_feed_K) * (1 - share_rest_biogas_K)
+        
+        
+        #in case of crop to food and crop to feed I need to calculate change in streams
+        #crop to human: there is alos food exported, but allocation of stakeholders only asked about local food
+        #crop to feed: this is composed of two different streams, pump change in processed feed
+        
+        change_crop_feed_N <- crop_to_feed_N - (crop_output$N_crop_animal_feeding_processed + crop_output$N_crop_animal_feeding_unprocessed)
+        change_crop_feed_P <- crop_to_feed_P - (crop_output$P_crop_animal_feeding_processed + crop_output$P_crop_animal_feeding_unprocessed)
+        change_crop_feed_K <- crop_to_feed_K - (crop_output$K_crop_animal_feeding_processed + crop_output$K_crop_animal_feeding_unprocessed)
         
         #calculate change compared to status quo in crop exported
         change_crop_human_N <- crop_food_not_exported_N - combined_output$local_vegetal_products_consumed_N[1]
         change_crop_human_P <- crop_food_not_exported_P - combined_output$local_vegetal_products_consumed_P[1]
         change_crop_human_K <- crop_food_not_exported_K - combined_output$local_vegetal_products_consumed_K[1]
-        
-        #crop to feed, should be the rest
-        #the problem is, that the stream are actually two so I can't put all 
-        #the stuff from the pool only into one stream
-        #--> need to calculate the change in the stream
-        change_crop_feed_N <- (pool_crop_N * scenario_allocate_crop_feed_corrected) - (combined_output$feed_crops_N[1] + combined_output$feed_from_processed_crops_N[1])
-        #calculate change in feed P and K as the difference of leftover P and K to the status quo
-        change_crop_feed_P <- (pool_crop_P - crop_output$P_crop_biogas - crop_food_not_exported_P) - (combined_output$feed_crops_P[1] + combined_output$feed_from_processed_crops_P[1])
-        change_crop_feed_K <- (pool_crop_K - crop_output$K_crop_biogas - crop_food_not_exported_K) - (combined_output$feed_crops_K[1] + combined_output$feed_from_processed_crops_K[1])
+      
         
         
         #------------------------------------------#
         # apply changes in crop allocation to streams
         #------------------------------------------#
 
-        # crop to feed --> channed changes to unprocessed feed because better buffer capacity
-        crop_output$N_crop_animal_feeding_unprocessed <- crop_output$N_crop_animal_feeding_unprocessed + change_crop_feed_N
-        crop_output$P_crop_animal_feeding_unprocessed <- crop_output$P_crop_animal_feeding_unprocessed + change_crop_feed_P
-        crop_output$K_crop_animal_feeding_unprocessed <- crop_output$K_crop_animal_feeding_unprocessed + change_crop_feed_K
+        # crop to feed --> channed changes to processed feed because better buffer capacity
+        crop_output$N_crop_animal_feeding_processed <- crop_output$N_crop_animal_feeding_processed + change_crop_feed_N
+        crop_output$P_crop_animal_feeding_processed <- crop_output$P_crop_animal_feeding_processed + change_crop_feed_P
+        crop_output$K_crop_animal_feeding_processed <- crop_output$K_crop_animal_feeding_processed + change_crop_feed_K
 
         # crop to local human consumption
         crop_output$N_crop_human_consumption_processed <- crop_output$N_crop_human_consumption_processed + change_crop_human_N
@@ -854,7 +868,11 @@ combined_function <- function() {
       N_feed_import <- max(N_animal_output_produced - N_animal_local_input, 0)
       P_feed_import <- max(P_animal_output_produced - P_animal_local_input, 0)
       K_feed_import <- max(K_animal_output_produced - K_animal_local_input, 0)
-
+      
+      #put import import_organic_N to a new variable, because it gets adjusted in scenario
+      import_organic_N_can_change <- import_organic_N_kg 
+      import_organic_P_can_change <- import_organic_P_kg 
+      import_organic_K_can_change <- import_organic_K_kg 
 
       #----------------------#
       ## LEVER: herd size ####
@@ -872,6 +890,12 @@ combined_function <- function() {
 
         # stakeholders came up with different reduction factor
         rf_stakeholder <- 1 - scenario_overall_livestock_reduction
+        
+        #scale down import of organic fertilizer by the same rate as livestock
+        #is reduced
+        import_organic_N_can_change <- import_organic_N_can_change * rf_local_feed_N
+        import_organic_P_can_change <- import_organic_P_can_change * rf_local_feed_P
+        import_organic_K_can_change <- import_organic_K_can_change * rf_local_feed_K
 
 
         #-------------------------------------------------------------#
@@ -1069,9 +1093,9 @@ combined_function <- function() {
             share_N_biogas_input_animal = share_N_biogas_input_animal,
             share_P_biogas_input_animal = share_P_biogas_input_animal,
             share_K_biogas_input_animal = share_K_biogas_input_animal,
-            import_organic_N_kg = import_organic_N_kg,
-            import_organic_P_kg = import_organic_P_kg,
-            import_organic_K_kg = import_organic_K_kg,
+            import_organic_N_kg = import_organic_N_can_change,
+            import_organic_P_kg = import_organic_P_can_change,
+            import_organic_K_kg = import_organic_K_can_change,
             P_reduction_manure = P_reduction_manure,
             K_reduction_manure = K_reduction_manure
           )
@@ -1238,13 +1262,16 @@ combined_function <- function() {
         scenario_allocate_manure_export_corrected <- scenario_allocate_manure_export * correction_factor
 
         # take the manure after housing losses + manure import and calculate the streams directly
-
-        #get total pool
-        pool_manure_N <- animal_output$N_remaining_manure + import_organic_N_kg
-        pool_manure_P <- animal_output$P_remaining_manure + import_organic_P_kg
-        pool_manure_K <- animal_output$K_remaining_manure + import_organic_K_kg
         
+        #get total pool
+        pool_manure_N <- animal_output$N_remaining_manure + import_organic_N_can_change
+        pool_manure_P <- animal_output$P_remaining_manure + import_organic_N_can_change
+        pool_manure_K <- animal_output$K_remaining_manure + import_organic_N_can_change
+        
+        # maintain stochiometry of manure to crops and give rest to lesser streams
         #lesser streams are biogas and export
+        
+        
         
         #biogas 
         animal_output$N_manure_biogas <- pool_manure_N * scenario_allocate_manure_biogas_corrected
@@ -1292,9 +1319,9 @@ combined_function <- function() {
         current_manure_crop <- combined_output$manure_to_crop_N[1] / total_manure
         current_manure_export <- combined_output$manure_export_N[1] / total_manure
         
-        pool_manure_N <- animal_output$N_remaining_manure + import_organic_N_kg
-        pool_manure_P <- animal_output$P_remaining_manure + import_organic_P_kg
-        pool_manure_K <- animal_output$K_remaining_manure + import_organic_K_kg
+        pool_manure_N <- animal_output$N_remaining_manure + import_organic_N_can_change
+        pool_manure_P <- animal_output$P_remaining_manure + import_organic_P_can_change
+        pool_manure_K <- animal_output$K_remaining_manure + import_organic_K_can_change
 
         #allocate total manure the same way as done in manure allocation:
         #at first do lesser streams and then put the rest to export
@@ -1527,7 +1554,7 @@ combined_function <- function() {
 
       N_fertilization_losses_blackbox <- (N_digestate + animal_output$N_manure_crop +
         crop_output$imported_inorganic_N +
-        import_organic_N_kg +
+        import_organic_N_can_change +
         waste_output$N_sewage_to_crop +
         waste_output$N_compost_crop) -
         (crop_output$N_crop_human_consumption_processed +
@@ -1540,7 +1567,7 @@ combined_function <- function() {
       P_fertilization_losses_blackbox <- (P_digestate +
         animal_output$P_manure_crop +
         crop_output$imported_inorganic_P +
-        import_organic_P_kg +
+        import_organic_P_can_change +
         waste_output$P_sewage_to_crop +
         waste_output$P_compost_crop) -
         (crop_output$P_crop_human_consumption_processed +
@@ -1553,7 +1580,7 @@ combined_function <- function() {
       K_fertilization_losses_blackbox <- (K_digestate +
         animal_output$K_manure_crop +
         crop_output$imported_inorganic_K +
-        import_organic_K_kg +
+        import_organic_K_can_change +
         waste_output$K_sewage_to_crop +
         waste_output$K_compost_crop) -
         (crop_output$K_crop_human_consumption_processed +
@@ -1883,9 +1910,9 @@ combined_function <- function() {
         import_inorganic_fertilizer_N = c(combined_output$import_inorganic_fertilizer_N, adj_length(crop_output$imported_inorganic_N, n_rep)),
         import_inorganic_fertilizer_P = c(combined_output$import_inorganic_fertilizer_P, adj_length(crop_output$imported_inorganic_P, n_rep)),
         import_inorganic_fertilizer_K = c(combined_output$import_inorganic_fertilizer_K, adj_length(crop_output$imported_inorganic_K, n_rep)),
-        import_organic_fertilizer_N = c(combined_output$import_organic_fertilizer_N, adj_length(import_organic_N_kg, n_rep)),
-        import_organic_fertilizer_P = c(combined_output$import_organic_fertilizer_P, adj_length(import_organic_P_kg, n_rep)),
-        import_organic_fertilizer_K = c(combined_output$import_organic_fertilizer_K, adj_length(import_organic_K_kg, n_rep)),
+        import_organic_fertilizer_N = c(combined_output$import_organic_fertilizer_N, adj_length(import_organic_N_can_change, n_rep)),
+        import_organic_fertilizer_P = c(combined_output$import_organic_fertilizer_P, adj_length(import_organic_P_can_change, n_rep)),
+        import_organic_fertilizer_K = c(combined_output$import_organic_fertilizer_K, adj_length(import_organic_K_can_change, n_rep)),
         net_food_import_N = c(combined_output$net_food_import_N, adj_length(N_total_food_import, n_rep)),
         net_food_import_P = c(combined_output$net_food_import_P, adj_length(P_total_food_import, n_rep)),
         net_food_import_K = c(combined_output$net_food_import_K, adj_length(K_total_food_import, n_rep)),
