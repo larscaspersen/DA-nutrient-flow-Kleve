@@ -115,10 +115,11 @@ combined_function <- function() {
     # scenario <- 'normal'
     # scenario <- 'all_adjustments'
     # scenario <- 'no_herdsize_adjustment'
+    scenario <- 'back_to_roots'
 
 
     n_stakeholder_answers <- length(all_scenario_allocate_crop_biogas)
-    if (scenario == "normal") {
+    if (scenario %in% c('normal', 'back_to_roots')) {
       n_stakeholder_answers <- 1
     }
     
@@ -687,35 +688,132 @@ combined_function <- function() {
       n_other_poultry <- (LLU_poultry_2020 / LLU_poultry_2016) * n_other_poultry_2016 * cf_poultry_local_feed
       n_pig <- (LLU_pig_2020 / LLU_pig_2016) * n_pig_2016 * cf_pig_local_feed
       n_sheep <- (LLU_others_2020 / LLU_others_2016) * n_sheep_2016 * cf_others_local_feed
+      
+      
+      #----------------------#
+      ##slaughter animals ####
+      #----------------------#
+      
+      #scale the slaughter animals according to the changes in the livestock groups
+      n_slaughter_dairy_cattle_changed <- n_slaughter_dairy_cattle * cf_cattle_local_feed
+      n_slaughter_bulls_changed <- n_slaughter_bulls * cf_cattle_local_feed
+      n_slaughter_female_cattle_changed <- n_slaughter_female_cattle * cf_cattle_local_feed
+      n_slaughter_goat_changed <- n_slaughter_goat * cf_others_local_feed
+      n_slaughter_horse_changed <- n_slaughter_horse * cf_others_local_feed
+      n_slaughter_lamb_changed <- n_slaughter_lamb * cf_others_local_feed
+      n_slaughter_oxes_changed <- n_slaughter_oxes * cf_cattle_local_feed
+      n_slaughter_pig_changed <- n_slaughter_pig * cf_pig_local_feed
+      n_slaughter_poultry_changed <- n_slaughter_poultry * cf_poultry_local_feed
+      n_slaughter_sheep_changed <- n_slaughter_sheep * cf_others_local_feed
+      n_slaughter_younstock_midage_changed <- n_slaughter_younstock_midage * cf_cattle_local_feed
+      n_slaughter_younstock_youngage_changed <- n_slaughter_younstock_youngage * cf_cattle_local_feed
+      
+      #import
+      n_slaughter_import_dairy_cattle_changed <- n_slaughter_import_dairy_cattle * cf_cattle_local_feed
+      n_slaughter_import_bulls_changed <- n_slaughter_import_bulls * cf_cattle_local_feed
+      n_slaughter_import_female_cattle_changed <- n_slaughter_import_female_cattle * cf_cattle_local_feed
+      n_slaughter_import_goat_changed <- n_slaughter_import_goat * cf_others_local_feed
+      n_slaughter_import_horse_changed <- n_slaughter_import_horse * cf_others_local_feed
+      n_slaughter_import_lamb_changed <- n_slaughter_import_lamb * cf_others_local_feed
+      n_slaughter_import_oxes_changed <- n_slaughter_import_oxes * cf_cattle_local_feed
+      n_slaughter_import_pig_changed <- n_slaughter_import_pig * cf_pig_local_feed
+      n_slaughter_import_poultry_changed <- n_slaughter_import_poultry * cf_poultry_local_feed
+      n_slaughter_import_sheep_changed <- n_slaughter_import_sheep * cf_others_local_feed
+      n_slaughter_import_younstock_midage_changed <- n_slaughter_import_younstock_midage * cf_cattle_local_feed
+      n_slaughter_import_younstock_youngage_changed <- n_slaughter_import_younstock_youngage * cf_cattle_local_feed
+      
+      if(scenario != 'normal'){
+        #in case of not-normal scenario, imports are set to zero
+        n_slaughter_import_dairy_cattle_changed <- n_slaughter_import_bulls_changed <- n_slaughter_import_female_cattle_changed <- 0
+        n_slaughter_import_goat_changed <- n_slaughter_import_horse_changed <- n_slaughter_import_lamb_changed <- 0
+        n_slaughter_import_oxes_changed <- n_slaughter_import_pig_changed <- n_slaughter_import_poultry_changed <- 0
+        n_slaughter_import_sheep_changed <- n_slaughter_import_younstock_midage_changed <- n_slaughter_import_younstock_youngage_changed <- 0
+      }
+      
+      #------------------------------------#
+      ## animal numbers as in the 1960s ====
+      #------------------------------------#
+      
+      
+      if(scenario == 'back_to_roots'){
+        
+        n_dairy_cow_1962 <- 19884 + 21395
+        n_other_cattle_1962 <- 47929 + 48610 - n_dairy_cow_1962
+        n_pig_1962 <- 75977 + 56145
+        n_chicken_1962 <- 230627 + 212368
+        n_other_poultry_1962 <- 3746 + 1662 + 5383 + 3812
+        n_sheep_1962 <- 772 + 1044
+        
+        #assign number of animals directly after the statistics of 1962
+        n_dairy_cow <- n_dairy_cow_1962
+        
+        #only gave numbers on total cattle and dairy cattle
+        #--> assume same composition of dairy to rest
+        n_other_cattle_2016 <- n_heifer_2016 + n_bull_2016 + n_calf_2016
+        
+        n_bull <- (n_bull_2016 / n_other_cattle_2016) * n_other_cattle_1962
+        n_heifer <- (n_heifer_2016 / n_other_cattle_2016) * n_other_cattle_1962
+        n_calf <- (n_calf_2016 / n_other_cattle_2016) * n_other_cattle_1962
+        #think this through again
+        
+        n_chicken <- n_chicken_1962
+        n_other_poultry <- n_other_poultry_1962
+        n_pig <- n_pig_1962
+        n_sheep <- n_sheep_1962
+        
+        #I am not sure about chicken and pig, I took total numbers, maybe there is a better choice?
+        #horses are not reflected here, even though they had numbers on them in the 1962 statistics
+        
+        
+        #adjust slaughter numbers as well?
+        n_slaughter_dairy_cattle_changed <- n_dairy_cow * animal_output$slaughter_rate_dairy_cow
+        n_slaughter_female_cattle_changed <- n_heifer * animal_output$slaughter_rate_heifer
+        n_slaughter_bulls_changed <- n_bull * animal_output$slaughter_rate_bull
+        n_slaughter_younstock_midage_changed <- n_calf * animal_output$slaughter_rate_younstock_midage
+        n_slaughter_younstock_youngage_changed <- n_calf * animal_output$slaughter_rate_younstock_youngage
+        n_slaughter_pig_changed <- n_pig * animal_output$slaughter_rate_pig
+        n_slaughter_poultry_changed <- n_chicken * animal_output$slaughter_rate_poultry
+        n_slaughter_sheep_changed <- n_sheep * animal_output$slaughter_rate_sheep
+        
+        # reduce slaughter animals for which we dont have any stock, so there we assume reduction linear to reduction in available feed
+        n_slaughter_goat_changed <- n_slaughter_goat 
+        n_slaughter_horse_changed <- n_slaughter_horse 
+        n_slaughter_lamb_changed <- n_slaughter_lamb 
+        n_slaughter_oxes_changed <- n_slaughter_oxes 
+        
+      }
+      
+ 
+
 
 
       # calculate animal output with changed composition, but with same LLU as
       # in normal scenario
       animal_output <- calc_animal(
-        n_slaughter_dairy_cattle = n_slaughter_dairy_cattle,
-        n_slaughter_female_cattle = n_slaughter_female_cattle,
-        n_slaughter_bulls = n_slaughter_bulls,
-        n_slaughter_oxes =  n_slaughter_oxes,
-        n_slaughter_younstock_youngage = n_slaughter_younstock_youngage,
-        n_slaughter_younstock_midage = n_slaughter_younstock_midage,
-        n_slaughter_pig = n_slaughter_pig,
-        n_slaughter_poultry = n_slaughter_poultry,
-        n_slaughter_lamb = n_slaughter_lamb,
-        n_slaughter_sheep = n_slaughter_sheep,
-        n_slaughter_goat = n_slaughter_goat,
-        n_slaughter_horse = n_slaughter_horse,
-        n_slaughter_import_dairy_cattle = n_slaughter_import_dairy_cattle,
-        n_slaughter_import_female_cattle = n_slaughter_import_female_cattle,
-        n_slaughter_import_bulls = n_slaughter_import_bulls,
-        n_slaughter_import_oxes = n_slaughter_import_oxes,
-        n_slaughter_import_younstock_youngage = n_slaughter_import_younstock_youngage,
-        n_slaughter_import_younstock_midage = n_slaughter_import_younstock_midage,
-        n_slaughter_import_pig = n_slaughter_import_pig,
-        n_slaughter_import_poultry = n_slaughter_import_poultry,
-        n_slaughter_import_lamb = n_slaughter_import_lamb,
-        n_slaughter_import_sheep = n_slaughter_import_sheep,
-        n_slaughter_import_goat = n_slaughter_import_goat,
-        n_slaughter_import_horse = n_slaughter_import_horse,
+        n_slaughter_dairy_cattle = n_slaughter_dairy_cattle_changed,
+        n_slaughter_female_cattle = n_slaughter_female_cattle_changed,
+        n_slaughter_bulls = n_slaughter_bulls_changed,
+        n_slaughter_oxes =  n_slaughter_oxes_changed,
+        n_slaughter_younstock_youngage = n_slaughter_younstock_youngage_changed,
+        n_slaughter_younstock_midage = n_slaughter_younstock_midage_changed,
+        n_slaughter_pig = n_slaughter_pig_changed,
+        n_slaughter_poultry = n_slaughter_poultry_changed,
+        n_slaughter_lamb = n_slaughter_lamb_changed,
+        n_slaughter_sheep = n_slaughter_sheep_changed,
+        n_slaughter_goat = n_slaughter_goat_changed,
+        n_slaughter_horse = n_slaughter_horse_changed,
+        n_slaughter_import_dairy_cattle = n_slaughter_import_dairy_cattle_changed,
+        n_slaughter_import_female_cattle = n_slaughter_import_female_cattle_changed,
+        n_slaughter_import_bulls = n_slaughter_import_bulls_changed,
+        n_slaughter_import_oxes = n_slaughter_import_oxes_changed,
+        n_slaughter_import_younstock_youngage = n_slaughter_import_younstock_youngage_changed,
+        n_slaughter_import_younstock_midage = n_slaughter_import_younstock_midage_changed,
+        n_slaughter_import_pig = n_slaughter_import_pig_changed,
+        n_slaughter_import_poultry = n_slaughter_import_poultry_changed,
+        n_slaughter_import_lamb = n_slaughter_import_lamb_changed,
+        n_slaughter_import_sheep = n_slaughter_import_sheep_changed,
+        n_slaughter_import_goat = n_slaughter_import_goat_changed,
+        n_slaughter_import_horse = n_slaughter_import_horse_changed,
         slaughter_weight_dairy_cattle = slaughter_weight_dairy_cattle,
         slaughter_weight_female_cattle = slaughter_weight_female_cattle, 
         slaughter_weight_bulls =slaughter_weight_bulls, 
@@ -1019,8 +1117,10 @@ combined_function <- function() {
 
         # run the animal subsystem again now with the changed animal stocks
         # and with reduced local slaughter animal number
-
-
+        
+        
+        
+ 
         #--------------------------------------------------#
         ## animal calculation under local feed scenario ####
         #--------------------------------------------------#
@@ -1042,18 +1142,18 @@ combined_function <- function() {
             n_slaughter_sheep = n_slaughter_sheep_reduced[i],
             n_slaughter_goat = n_slaughter_goat_reduced[i],
             n_slaughter_horse = n_slaughter_horse_reduced[i],
-            n_slaughter_import_dairy_cattle = n_slaughter_import_dairy_cattle,
-            n_slaughter_import_female_cattle = n_slaughter_import_female_cattle,
-            n_slaughter_import_bulls = n_slaughter_import_bulls,
-            n_slaughter_import_oxes = n_slaughter_import_oxes,
-            n_slaughter_import_younstock_youngage = n_slaughter_import_younstock_youngage,
-            n_slaughter_import_younstock_midage = n_slaughter_import_younstock_midage,
-            n_slaughter_import_pig = n_slaughter_import_pig,
-            n_slaughter_import_poultry = n_slaughter_import_poultry,
-            n_slaughter_import_lamb = n_slaughter_import_lamb,
-            n_slaughter_import_sheep = n_slaughter_import_sheep,
-            n_slaughter_import_goat = n_slaughter_import_goat,
-            n_slaughter_import_horse = n_slaughter_import_horse,
+            n_slaughter_import_dairy_cattle = n_slaughter_import_dairy_cattle_changed,
+            n_slaughter_import_female_cattle = n_slaughter_import_female_cattle_changed,
+            n_slaughter_import_bulls = n_slaughter_import_bulls_changed,
+            n_slaughter_import_oxes = n_slaughter_import_oxes_changed,
+            n_slaughter_import_younstock_youngage = n_slaughter_import_younstock_youngage_changed,
+            n_slaughter_import_younstock_midage = n_slaughter_import_younstock_midage_changed,
+            n_slaughter_import_pig = n_slaughter_import_pig_changed,
+            n_slaughter_import_poultry = n_slaughter_import_poultry_changed,
+            n_slaughter_import_lamb = n_slaughter_import_lamb_changed,
+            n_slaughter_import_sheep = n_slaughter_import_sheep_changed,
+            n_slaughter_import_goat = n_slaughter_import_goat_changed,
+            n_slaughter_import_horse = n_slaughter_import_horse_changed,
             slaughter_weight_dairy_cattle = slaughter_weight_dairy_cattle,
             slaughter_weight_female_cattle = slaughter_weight_female_cattle,
             slaughter_weight_bulls = slaughter_weight_bulls,
@@ -1231,7 +1331,7 @@ combined_function <- function() {
 
       # in every situation, except the normal (=baseline) scenario, set feedimport to zero
       # set the feed import in case of local feed to zero
-      if (scenario != "normal") {
+      if (scenario %in% c('all_adjustments', 'buffer_no_herdsize')) {
         N_feed_import <- 0
         P_feed_import <- 0
         K_feed_import <- 0
@@ -1494,7 +1594,7 @@ combined_function <- function() {
       
       # check how much less manure is applied to crops
       #--> the difference is imported as inorganic fertilizer
-      if (manure_adjustment | herdsize_adjustment | scenario == 'buffer_no_herdsize') {
+      if (manure_adjustment | herdsize_adjustment | scenario == 'buffer_no_herdsize' | scenario == 'back_to_roots') {
         
         
         # get the difference in manure available for crops, this difference needs
