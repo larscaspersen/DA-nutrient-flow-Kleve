@@ -106,7 +106,7 @@ combined_function <- function() {
   #---------------------------#
   # Scenario Loop ####
   #---------------------------#
-  for (scenario in c("normal", "all_adjustments", "buffer_no_herdsize")) {
+  for (scenario in c("normal", "all_adjustments", "buffer_no_herdsize", "back_to_roots")) {
     #idea: if herdsize is not adjusted, try to buffer deficiency of feed by crop allocation
     #      if crop allocation is not adjusted, try to buffer deficiency by more drastic hersize adjustment
 
@@ -115,7 +115,7 @@ combined_function <- function() {
     # scenario <- 'normal'
     # scenario <- 'all_adjustments'
     # scenario <- 'no_herdsize_adjustment'
-    scenario <- 'back_to_roots'
+    # scenario <- 'back_to_roots'
 
 
     n_stakeholder_answers <- length(all_scenario_allocate_crop_biogas)
@@ -728,21 +728,22 @@ combined_function <- function() {
         n_slaughter_import_goat_changed <- n_slaughter_import_horse_changed <- n_slaughter_import_lamb_changed <- 0
         n_slaughter_import_oxes_changed <- n_slaughter_import_pig_changed <- n_slaughter_import_poultry_changed <- 0
         n_slaughter_import_sheep_changed <- n_slaughter_import_younstock_midage_changed <- n_slaughter_import_younstock_youngage_changed <- 0
+        
       }
       
-      #------------------------------------#
-      ## animal numbers as in the 1960s ====
-      #------------------------------------#
+      #-------------------------------------------#
+      ## LEVER: animal numbers as in the 1960s ====
+      #-------------------------------------------#
       
       
       if(scenario == 'back_to_roots'){
         
-        n_dairy_cow_1962 <- 19884 + 21395
-        n_other_cattle_1962 <- 47929 + 48610 - n_dairy_cow_1962
-        n_pig_1962 <- 75977 + 56145
-        n_chicken_1962 <- 230627 + 212368
-        n_other_poultry_1962 <- 3746 + 1662 + 5383 + 3812
-        n_sheep_1962 <- 772 + 1044
+        # n_dairy_cow_1962 <- 19884 + 21395
+        # n_other_cattle_1962 <- 47929 + 48610 - n_dairy_cow_1962
+        # n_pig_1962 <- 75977 + 56145
+        # n_chicken_1962 <- 230627 + 212368
+        # n_other_poultry_1962 <- 3746 + 1662 + 5383 + 3812
+        # n_sheep_1962 <- 772 + 1044
         
         #assign number of animals directly after the statistics of 1962
         n_dairy_cow <- n_dairy_cow_1962
