@@ -630,3 +630,9 @@ share of other animals livestock units in local feed scenario,scenario_share_oth
 allocation of animal manure to export in a local feed scenario,scenario_allocate_manure_export_b,,0.006,,0.435,tnorm_0_1,animal,,survey stakeholders V2
 allocation of animal manure to biogas in a local feed scenario,scenario_allocate_manure_biogas_b,,0.055,,0.405,tnorm_0_1,animal,,survey stakeholders V2
 allocation of animal manure to crop in a local feed scenario,scenario_allocate_manure_crop_b,,0.265,,0.955,tnorm_0_1,animal,,survey stakeholders V2
+,n_dairy_cow_1962,,37151.1,41279,45406.9,posnorm,animal,,
+,n_other_cattle_1962,,49734,55260,60786,posnorm,animal,,
+,n_pig_1962,,118909.8,132122,145334.2,posnorm,animal,,
+,n_chicken_1962,,398695.5,442995,487294.5,posnorm,animal,,
+,n_other_poultry_1962,,13142.7,14603,16063.3,posnorm,animal,,
+,n_sheep_1962,,1634.4,1816,1997.6,posnorm,animal,,
