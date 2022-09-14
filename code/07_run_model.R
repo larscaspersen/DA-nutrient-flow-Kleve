@@ -4,17 +4,88 @@ source('code/06_combine_submodels.R')
 # decide what to return
 return_flows <- TRUE
 
+n_runs <- 100
+
 # let mc simulation run, just to test if everything works out
 nitrogen_mc_simulation <- mcSimulation(
   estimate = as.estimate(input),
   model_function = combined_function,
-  numberOfModelRuns = 100,
+  numberOfModelRuns = n_runs,
   functionSyntax = "plainNames"
 )
+
 
 #everything with same digit at the end of the name belongs together
 #eg scenario1, sewageN1, ....
 #the different numbers come from the scenarios, the stakeholders answers and the strict reductions
+
+#get number of outcomes
+n_outcomes <- sum(grepl('scenario', colnames(nitrogen_mc_simulation$y)))
+
+#bind items with same characters but different numbers
+flow_names <- unique(gsub('[0-9]+', '', colnames(nitrogen_mc_simulation$y)))
+
+
+#create empty data.frame with the right dimensions
+combined_results <- data.frame(matrix(nrow = n_runs * n_outcomes, ncol = length(flow_names)))
+
+for(i in 1:length(flow_names)){
+  #take variable names
+  target_names <- colnames(nitrogen_mc_simulation$y)[flow_names[i] == gsub('[0-9]+', '', colnames(nitrogen_mc_simulation$y))]
+  #append to data frame
+  combined_results[,i] <- unlist(nitrogen_mc_simulation$y[target_names],use.names = FALSE)
+}
+
+#adjust the column names
+colnames(combined_results) <- flow_names
+
+#split the results the different scenarios? In the end the scenarios are not a result but an input
+result_list <- split(x = combined_results, f = combined_results$scenario)
+#--> list contains model results spliut by the scenarios
+
+#check the distributions
+
+library(tidyverse)
+library(ggridges)
+
+if(return_flows){
+  #visualisation for individual flows
+  
+  #melt combined outputs
+  combined_results_long <- reshape2::melt(combined_results, id.var = 'scenario')
+  
+  for(flow in unique(combined_results_long$variable)){
+    
+    p1 <- combined_results_long %>%
+      filter(variable == flow) %>%
+      ggplot(aes(x=as.numeric(value) ,y = scenario, fill = scenario)) +
+      geom_density_ridges_gradient(scale=2) +
+      xlab(paste0(flow, ' [t per year]'))+
+      ylab('')+
+      theme_bw() +
+      theme(legend.position = "none")
+    
+    fname <- paste0(flow,'.jpg')
+    ggsave(p1,  filename = fname, path = 'figures/flows/',  device = 'jpeg', width = 10, height = 7, units = 'cm')
+  }
+  
+
+    
+  
+  
+} else {
+  #visualization for circularity metrics
+  
+}
+
+
+
+
+combined_results[1] <- c(1,2,3)
+
+
+
+
 
 
 #for (n in 1:100) {

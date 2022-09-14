@@ -106,7 +106,8 @@ combined_function <- function() {
   #---------------------------#
   # Scenario Loop ####
   #---------------------------#
-  for (scenario in c("normal", "all_adjustments", "buffer_no_herdsize", "back_to_roots")) {
+  #for (scenario in c("normal", "all_adjustments", "buffer_no_herdsize", "back_to_roots")) {
+  for (scenario in c("normal", "all_adjustments", "buffer_no_herdsize")) {
     #idea: if herdsize is not adjusted, try to buffer deficiency of feed by crop allocation
     #      if crop allocation is not adjusted, try to buffer deficiency by more drastic hersize adjustment
 
@@ -2112,14 +2113,10 @@ combined_function <- function() {
       #     "for stream :", problem_stream
       #   ))
       # }
-      
-      
-      
     } # end of loop for different stakeholders answers
-  } # end of the loop for the different scenarios
-
-
-
+  } # end of the loop for the different scenarios    
+      
+      
   # parameters to evaluate model output:
   #   one calculation for the two / three different scenarios
   #   that is why outside the loop
@@ -2366,12 +2363,11 @@ combined_function <- function() {
   losses_K <- combined_output$crop_cultivation_losses_K +
     combined_output$animal_housing_and_storage_losses_K +
     combined_output$wastewater_effluent_gaseous_losses_K
-
-
+  
 
   # indicators, summarizing the flows
   model_evaluation <- list(
-    scenario = c(model_evaluation$scenario, scenario),
+    scenario = c(model_evaluation$scenario, combined_output$scenario),
     total_input_N = c(model_evaluation$total_input_N, total_input_N),
     total_input_P = c(model_evaluation$total_input_P, total_input_P),
     total_input_K = c(model_evaluation$total_input_K, total_input_K),
@@ -2388,6 +2384,8 @@ combined_function <- function() {
     losses_P = c(model_evaluation$losses_P, losses_P),
     losses_K = c(model_evaluation$losses_K, losses_K)
   )
+  
+
 
 
   if (return_flows) {
