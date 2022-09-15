@@ -4,7 +4,7 @@ source('code/06_combine_submodels.R')
 # decide what to return
 return_flows <- TRUE
 
-n_runs <- 100
+n_runs <- 1000
 
 # let mc simulation run, just to test if everything works out
 nitrogen_mc_simulation <- mcSimulation(
@@ -43,6 +43,21 @@ colnames(combined_results) <- flow_names
 result_list <- split(x = combined_results, f = combined_results$scenario)
 #--> list contains model results spliut by the scenarios
 
+
+#change the name of the scenarios, drop sh2
+combined_results <- combined_results[!(combined_results$scenario %in% c('all_adjustments_sh_2_stakeholder_reduction', 
+                                                                        'all_adjustments_sh_2_strict_reduction',
+                                                                        'buffer_no_herdsize_sh_2')),]
+
+combined_results$scenario <- as.factor(combined_results$scenario)
+
+levels(combined_results$scenario)
+
+levels(combined_results$scenario) <- list(baseline  = "normal", 
+                                          local_feed = "all_adjustments_sh_1_stakeholder_reduction",
+                                          lf_animal_buffered = 'all_adjustments_sh_1_strict_reduction',
+                                          lf_crop_buffered = 'buffer_no_herdsize_sh_1') 
+
 #check the distributions
 
 library(tidyverse)
@@ -54,7 +69,26 @@ if(return_flows){
   #melt combined outputs
   combined_results_long <- reshape2::melt(combined_results, id.var = 'scenario')
   
+  boring_streams <- c('animal_housing_and_storage_losses_K','animal_housing_and_storage_losses_P',
+                      'compost_to_consumption_N','compost_to_consumption_P','compost_to_consumption_K',
+                      'fresh_compost_crop_N', 'fresh_compost_crop_P','fresh_compost_crop_K',
+                      'fresh_compost_export_N', 'fresh_compost_export_P', 'fresh_compost_export_K',
+                      'fruit_and_vegetable_N','fruit_and_vegetable_P','fruit_and_vegetable_K',
+                      'grassbased_feed_N','grassbased_feed_P','grassbased_feed_K',
+                      'import_OFMSW_N','import_OFMSW_P','import_OFMSW_K',
+                      'ofmsw_N','ofmsw_P','ofmsw_K',
+                      'ofmsw_residual_waste_N','ofmsw_residual_waste_P','ofmsw_residual_waste_K',
+                      'other_organic_fertilizer_export_N','other_organic_fertilizer_export_P','other_organic_fertilizer_export_K',
+                      'sewage_N', 'sewage_P', 'sewage_K',
+                      'sewage_sludge_export_N','sewage_sludge_export_P', 'sewage_sludge_export_K',
+                      'sewage_to_crop_N','sewage_to_crop_P', 'sewage_to_crop_K',
+                      'straw_N', 'straw_P', 'straw_K',
+                      'wastewater_direct_discharge_N', 'wastewater_direct_discharge_P', 'wastewater_direct_discharge_K',
+                      'wastewater_effluent_gaseous_losses_N', 'wastewater_effluent_gaseous_losses_P', 'wastewater_effluent_gaseous_losses_K')
+  
   for(flow in unique(combined_results_long$variable)){
+    
+    
     
     p1 <- combined_results_long %>%
       filter(variable == flow) %>%
@@ -65,8 +99,14 @@ if(return_flows){
       theme_bw() +
       theme(legend.position = "none")
     
+    if(flow %in% boring_streams){
+      pic_path <- 'figures/flows/boring_streams/'
+    } else {
+      pic_path <- 'figures/flows/'
+    }
+    
     fname <- paste0(flow,'.jpg')
-    ggsave(p1,  filename = fname, path = 'figures/flows/',  device = 'jpeg', width = 10, height = 7, units = 'cm')
+    ggsave(p1,  filename = fname, path = pic_path,  device = 'jpeg', width = 10, height = 7, units = 'cm')
   }
   
 
