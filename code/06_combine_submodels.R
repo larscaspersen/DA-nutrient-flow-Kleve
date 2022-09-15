@@ -49,58 +49,47 @@ combined_function <- function() {
 
   # combined the stakeholders answers to a vector
   all_scenario_allocate_crop_biogas <- c(
-    scenario_allocate_crop_biogas_a,
-    scenario_allocate_crop_biogas_b
+    scenario_allocate_crop_biogas_a
   )
 
   all_scenario_allocate_crop_feed <- c(
-    scenario_allocate_crop_feed_a,
-    scenario_allocate_crop_feed_b
+    scenario_allocate_crop_feed_a
   )
 
   all_scenario_allocate_crop_food <- c(
-    scenario_allocate_crop_food_a,
-    scenario_allocate_crop_food_b
+    scenario_allocate_crop_food_a
   )
 
   all_scenario_allocate_manure_biogas <- c(
-    scenario_allocate_manure_biogas_a,
-    scenario_allocate_manure_biogas_b
+    scenario_allocate_manure_biogas_a
   )
 
   all_scenario_allocate_manure_crop <- c(
-    scenario_allocate_manure_crop_a,
-    scenario_allocate_manure_crop_b
+    scenario_allocate_manure_crop_a
   )
 
   all_scenario_allocate_manure_export <- c(
-    scenario_allocate_manure_export_a,
-    scenario_allocate_manure_export_b
+    scenario_allocate_manure_export_a
   )
 
   all_scenario_overall_livestock_reduction <- c(
-    scenario_overall_livestock_reduction_a,
-    scenario_overall_livestock_reduction_b
+    scenario_overall_livestock_reduction_a
   )
 
   all_scenario_share_cattle <- c(
-    scenario_share_cattle_a,
-    scenario_share_cattle_b
+    scenario_share_cattle_a
   )
 
   all_scenario_share_others <- c(
-    scenario_share_others_a,
-    scenario_share_others_b
+    scenario_share_others_a
   )
 
   all_scenario_share_pig <- c(
-    scenario_share_pig_a,
-    scenario_share_pig_b
+    scenario_share_pig_a
   )
 
   all_scenario_share_poultry <- c(
-    scenario_share_poultry_a,
-    scenario_share_poultry_b
+    scenario_share_poultry_a
   )
 
   #---------------------------#
@@ -1001,9 +990,10 @@ combined_function <- function() {
         crop_leftover_P <- pool_crop_P - buffered_crop_feed_P
         crop_leftover_K <- pool_crop_K - buffered_crop_feed_K
         
+        #allocation of crop to biogas and food, when feed is not considered
         share_crop_food_N <- scenario_allocate_crop_food / (scenario_allocate_crop_biogas_corrected + scenario_allocate_crop_food)
-        share_crop_food_P <- combined_output$combined_output$local_vegetal_products_consumed_P[1] / (combined_output$combined_output$local_vegetal_products_consumed_P[1] + combined_output$combined_output$vegetal_biogas_substrate_P[1])
-        share_crop_food_K <- combined_output$combined_output$local_vegetal_products_consumed_K[1] / (combined_output$combined_output$local_vegetal_products_consumed_K[1] + combined_output$combined_output$vegetal_biogas_substrate_K[1])
+        share_crop_food_P <- combined_output$local_vegetal_products_consumed_P[1] / (combined_output$local_vegetal_products_consumed_P[1] + combined_output$vegetal_biogas_substrate_P[1])
+        share_crop_food_K <- combined_output$local_vegetal_products_consumed_K[1] / (combined_output$local_vegetal_products_consumed_K[1] + combined_output$vegetal_biogas_substrate_K[1])
         
         #allocate the leftover N according to the rate
         buffered_crop_food_N <-  crop_leftover_N * share_crop_food_N
@@ -1022,8 +1012,8 @@ combined_function <- function() {
         
         # crop to feed --> channed changes to unprocessed feed because better buffer capacity
         crop_output$N_crop_animal_feeding_unprocessed <- buffered_crop_feed_N - crop_output$N_crop_animal_feeding_processed
-        crop_output$P_crop_animal_feeding_unprocessed <- buffered_crop_feed_N - crop_output$N_crop_animal_feeding_processed
-        crop_output$K_crop_animal_feeding_unprocessed <- buffered_crop_feed_N - crop_output$N_crop_animal_feeding_processed
+        crop_output$P_crop_animal_feeding_unprocessed <- buffered_crop_feed_P - crop_output$P_crop_animal_feeding_processed
+        crop_output$K_crop_animal_feeding_unprocessed <- buffered_crop_feed_K - crop_output$K_crop_animal_feeding_processed
         
         # crop to local human consumption
         crop_output$N_crop_human_consumption_processed <- buffered_crop_food_N
@@ -1689,7 +1679,8 @@ combined_function <- function() {
       # calculate fertilization losses as a difference between crop input (inorganic fertilizer, organic fertilizer,
       # digestate, sewage) minus output (vegetal products, feed, other organic fertilizer exported from field)
 
-      N_fertilization_losses_blackbox <- (N_digestate + animal_output$N_manure_crop +
+      N_fertilization_losses_blackbox <- (N_digestate + 
+        animal_output$N_manure_crop +
         crop_output$imported_inorganic_N +
         import_organic_N_can_change +
         waste_output$N_sewage_to_crop +
