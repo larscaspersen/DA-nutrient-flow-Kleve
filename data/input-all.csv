@@ -6,7 +6,7 @@ taken from Nährstoffreport,export_manure_N_kg,kg export / FM dt,7043400,7826000
 ,N_biogas_input,kg N,2560662,2845180,3129698,posnorm,animal,,2020
 calculated from total export - animal derived export,export_other_organic_N_kg,kg export / FM dt,1958832.9,2176481,2394129.1,posnorm,crop,,2020
 taken from Nährstoffreport,import_organic_P_kg,kg P import,1241121.6,"1,379,024.00",1516926.4,posnorm,crop,no,2020
-,K_biogas_input,kg K,1162311,1162311,1162311,const,animal,,2020
+,K_biogas_input,kg K,1046079.9,1162311,1278542.1,posnorm,animal,,2020
 "taken from Nährstoffreport 2020, p.130, converted to P",export_manure_P_kg,kg export,1582430.04,1758255.6,1934081.16,posnorm,crop,,2020
 amount of waste water remaining in channel,wastewater_remain_canal,m3,990900,1101000,1211100,posnorm,consumption,,unchanged
 ,n_slaughter_poultry,individuals,827415.9,919351,1011286.1,posnorm,animal,no,2020
@@ -574,7 +574,7 @@ green_bean,N_content_green_bean_gr_100gr,g N / 100 gram product,0,0,0,const,crop
 ,K_content_green_bean_gr_100gr,mg K / 100 g product,0,0,0,const,crop,no,unchanged
 ,import_inorganic_P2O5_kg_LF,kg per LF,8.73,9.7,10.67,posnorm,crop,yes,2020
 "ranges calculated from 2017 K:N, K:P and with 2020 reports on N and P",import_organic_K_kg,kg K import,2894881,3373520,3852159,posnorm,crop,,
-"calculated range using the rate of K:N, K:N of 2017 and exports of N, P",export_other_organic_K_kg,kg export / FM dt,1386075,1948699.5,2511324,posnorm,crop,,2020
+"calculated range using the rate of K:N, K:N of 2017 and exports of N, P",export_other_organic_K_kg,kg export / FM dt,1611000,1790000,1969000,posnorm,crop,,2020
 ,n_slaughter_lamb,individuals,0,0,0,const,animal,no,2020
 ,n_slaughter_import_oxes,individuals,0,0,0,const,animal,no,2020
 ,n_slaughter_import_bulls,individuals,0,0,0,const,animal,no,2020
