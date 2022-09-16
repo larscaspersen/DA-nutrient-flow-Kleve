@@ -36,7 +36,7 @@ input <- read.csv("data/input-all.csv")
 #remove median values
 input$median <- NA
 
-make_variables(as.estimate(input))
+#make_variables(as.estimate(input))
 
 
 # create function for mc-simulation
@@ -1970,9 +1970,8 @@ combined_function <- function() {
         net_feed_import_P = c(combined_output$net_feed_import_P, adj_length(P_feed_import, n_rep)),
         net_feed_import_K = c(combined_output$net_feed_import_K, adj_length(K_feed_import, n_rep))
       )
-
-
-  combined_output$crop_cultivation_losses_K
+    } # end of loop for different stakeholders answers
+  } # end of the loop for the different scenarios   
       
       
   # parameters to evaluate model output:
@@ -2449,5 +2448,4 @@ combined_function <- function() {
     #     "for stream :", problem_stream
     #   ))
     # }
-  } # end of loop for different stakeholders answers
-} # end of the loop for the different scenarios    
+ 
