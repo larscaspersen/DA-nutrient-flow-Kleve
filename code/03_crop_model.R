@@ -748,8 +748,8 @@ crop_function <- function(arable_land,
   
   
   #P2O5 and K2O yield of grazing not known, so assumed to be in the same N:P:K as mowing
-  P_yield_grazing <- P_yield_mowing / N_yield_mowing * N_yield_grazing
-  K_yield_grazing <- K_yield_mowing / N_yield_mowing * N_yield_grazing
+  P_yield_grazing <- (P_yield_mowing / N_yield_mowing) * N_yield_grazing
+  K_yield_grazing <- (K_yield_mowing / N_yield_mowing) * N_yield_grazing
   
   N_grazing <- area_grassland * share_grazing * N_yield_grazing
   P_grazing <- area_grassland * share_grazing * P_yield_grazing * convert_phosphorous_pentoxide_to_p
