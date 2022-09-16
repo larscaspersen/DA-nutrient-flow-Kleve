@@ -36,7 +36,7 @@ input <- read.csv("data/input-all.csv")
 #remove median values
 input$median <- NA
 
-#make_variables(as.estimate(input))
+make_variables(as.estimate(input))
 
 
 # create function for mc-simulation
@@ -157,9 +157,8 @@ combined_function <- function() {
       cf_cattle_local_feed <- cf_pig_local_feed <- cf_poultry_local_feed <- cf_others_local_feed <- 1
 
       cf_crop_to_biogas <- cf_crop_to_feed <- cf_crop_to_food <- 1
-      cf_manure_biogas <- cf_manure_crop <- cf_crop_to_food <- 1
 
-      cf_manure_export <- 1
+
       rf_local_feed_K <- rf_local_feed_N <- rf_local_feed_P <- 1
       rf_stakeholder <- 1
 
@@ -598,27 +597,63 @@ combined_function <- function() {
         #-----#
         #biogas and food get the rest, even if that means negative flows of P and K
         #-----#
-        #distribute the rest using the same ratio of biogas to feed than in the reference scenario
-        share_rest_biogas_P <- combined_output$vegetal_biogas_substrate_P[1] / (combined_output$local_vegetal_products_consumed_P[1] + combined_output$vegetal_biogas_substrate_P[1])
-        share_rest_biogas_K <- combined_output$vegetal_biogas_substrate_K[1] / (combined_output$local_vegetal_products_consumed_K[1] + combined_output$vegetal_biogas_substrate_K[1])
         
-        #biogas
+        #approach: at first maintain the stochiometry, then in a second step distribute the "leftovers"
+        #(can also be negative) using the new allocation rule
+        
+        #allocate N for biogas and food
         crop_output$N_crop_biogas <- pool_crop_N * scenario_allocate_crop_biogas_corrected
-        #maintain stochiometry of biogas 
-        crop_output$P_crop_biogas <- (pool_crop_P - crop_to_feed_P) * share_rest_biogas_P
-        crop_output$K_crop_biogas <- (pool_crop_K - crop_to_feed_K) * share_rest_biogas_K
+        crop_food_not_exported_N <- pool_crop_N * scenario_allocate_crop_food_corrected
+        
+        
+        ##maintain stochiometry
+        ideal_crop_biogas_P <- crop_output$N_crop_biogas *  (combined_output$vegetal_biogas_substrate_P[1] / combined_output$vegetal_biogas_substrate_N[1])
+        ideal_crop_biogas_K <- crop_output$N_crop_biogas *  (combined_output$vegetal_biogas_substrate_K[1] / combined_output$vegetal_biogas_substrate_N[1])
+        
+        ideal_crop_food_P <- crop_food_not_exported_N * (combined_output$local_vegetal_products_consumed_P[1] / combined_output$local_vegetal_products_consumed_N[1])
+        ideal_crop_food_K <- crop_food_not_exported_N * (combined_output$local_vegetal_products_consumed_K[1] / combined_output$local_vegetal_products_consumed_N[1])
+        
+        
+        #find out how much P and K is leftover / was allocated too much
+        crop_biogas_extra_P <- (pool_crop_P - crop_to_feed_P - ideal_crop_biogas_P - ideal_crop_food_P) * (scenario_allocate_crop_biogas_corrected / (scenario_allocate_crop_biogas_corrected + scenario_allocate_crop_food_corrected))
+        crop_biogas_extra_K <- (pool_crop_K - crop_to_feed_K - ideal_crop_biogas_K - ideal_crop_food_K) * (scenario_allocate_crop_biogas_corrected / (scenario_allocate_crop_biogas_corrected + scenario_allocate_crop_food_corrected))
+        
+        crop_food_extra_P <- (pool_crop_P - crop_to_feed_P - ideal_crop_biogas_P - ideal_crop_food_P) * (scenario_allocate_crop_food_corrected / (scenario_allocate_crop_biogas_corrected + scenario_allocate_crop_food_corrected))
+        crop_food_extra_K <- (pool_crop_K - crop_to_feed_K - ideal_crop_biogas_K - ideal_crop_food_K) * (scenario_allocate_crop_food_corrected / (scenario_allocate_crop_biogas_corrected + scenario_allocate_crop_food_corrected))
+        
+        
+        #add extra to ideal stochiometry
+        #biogas
+        crop_output$P_crop_biogas <- ideal_crop_biogas_P + crop_biogas_extra_P
+        crop_output$K_crop_biogas <- ideal_crop_biogas_K + crop_biogas_extra_K
         
         #food
-        crop_food_not_exported_N <- pool_crop_N * scenario_allocate_crop_food_corrected
-        #maintain stochiometry
-        crop_food_not_exported_P <- (pool_crop_P - crop_to_feed_P) * (1 - share_rest_biogas_P)
-        crop_food_not_exported_K <- (pool_crop_K - crop_to_feed_K) * (1 - share_rest_biogas_K)
+        crop_food_not_exported_P <- ideal_crop_food_P + crop_food_extra_P + crop_food_exported_P
+        crop_food_not_exported_K <- ideal_crop_food_K + crop_food_extra_K + crop_food_exported_K
         
         
-        #crops produced for human consumption is sum of local and export
-        crop_output$N_crop_human_consumption_processed <- crop_food_not_exported_N + crop_food_exported_N
-        crop_output$P_crop_human_consumption_processed <- crop_food_not_exported_P + crop_food_exported_P
-        crop_output$K_crop_human_consumption_processed <- crop_food_not_exported_K + crop_food_exported_K
+        #old allocation approach
+        # #distribute the rest using the same ratio of biogas to feed than in the reference scenario
+        # share_rest_biogas_P <- combined_output$vegetal_biogas_substrate_P[1] / (combined_output$local_vegetal_products_consumed_P[1] + combined_output$vegetal_biogas_substrate_P[1])
+        # share_rest_biogas_K <- combined_output$vegetal_biogas_substrate_K[1] / (combined_output$local_vegetal_products_consumed_K[1] + combined_output$vegetal_biogas_substrate_K[1])
+        # 
+        # #biogas
+        # crop_output$N_crop_biogas <- pool_crop_N * scenario_allocate_crop_biogas_corrected
+        # #maintain stochiometry of biogas 
+        # crop_output$P_crop_biogas <- (pool_crop_P - crop_to_feed_P) * share_rest_biogas_P
+        # crop_output$K_crop_biogas <- (pool_crop_K - crop_to_feed_K) * share_rest_biogas_K
+        # 
+        # #food
+        # crop_food_not_exported_N <- pool_crop_N * scenario_allocate_crop_food_corrected
+        # #maintain stochiometry
+        # crop_food_not_exported_P <- (pool_crop_P - crop_to_feed_P) * (1 - share_rest_biogas_P)
+        # crop_food_not_exported_K <- (pool_crop_K - crop_to_feed_K) * (1 - share_rest_biogas_K)
+        # 
+        # 
+        # #crops produced for human consumption is sum of local and export
+        # crop_output$N_crop_human_consumption_processed <- crop_food_not_exported_N + crop_food_exported_N
+        # crop_output$P_crop_human_consumption_processed <- crop_food_not_exported_P + crop_food_exported_P
+        # crop_output$K_crop_human_consumption_processed <- crop_food_not_exported_K + crop_food_exported_K
       }
       
       
@@ -1359,179 +1394,60 @@ combined_function <- function() {
         animal_output$P_manure_crop <- animal_output$N_manure_crop * (combined_output$manure_to_crop_P[1] / combined_output$manure_to_crop_N[1])
         animal_output$K_manure_crop <- animal_output$N_manure_crop * (combined_output$manure_to_crop_K[1] / combined_output$manure_to_crop_N[1])
         
-        #get the remaining nutrients, calculate the allocation to biogas and exort without crops
-        manure_remain_P <- pool_manure_P - animal_output$P_manure_crop
-        manure_remain_K <- pool_manure_K - animal_output$K_manure_crop
         
-        
-        #biogas 
+        #allocate N to the lesser streams
         animal_output$N_manure_biogas <- pool_manure_N * scenario_allocate_manure_biogas_corrected
-        animal_output$P_manure_biogas <- manure_remain_P * (combined_output$manure_as_biogas_substrate_P[1]/(combined_output$manure_as_biogas_substrate_P[1] + combined_output$manure_export_P[1]))
-        animal_output$K_manure_biogas <- manure_remain_K * (combined_output$manure_as_biogas_substrate_K[1]/(combined_output$manure_as_biogas_substrate_K[1] + combined_output$manure_export_K[1]))
+        animal_output$export_manure_N_kg <- pool_manure_N * scenario_allocate_manure_export_corrected
+        
+        #at first stage maintain the stochiometry of the lesser streams
+        #biogas
+        ideal_manure_biogas_P <- animal_output$N_manure_biogas * (combined_output$manure_as_biogas_substrate_P[1] / combined_output$manure_as_biogas_substrate_N[1])
+        ideal_manure_biogas_K <- animal_output$N_manure_biogas * (combined_output$manure_as_biogas_substrate_K[1] / combined_output$manure_as_biogas_substrate_N[1])
         
         #export
-        animal_output$export_manure_N_kg <- pool_manure_N * scenario_allocate_manure_export_corrected
-        animal_output$export_manure_P_kg <- manure_remain_P * (combined_output$manure_export_P[1]/(combined_output$manure_as_biogas_substrate_P[1] + combined_output$manure_export_P[1]))
-        animal_output$export_manure_K_kg <- manure_remain_K * (combined_output$manure_export_K[1]/(combined_output$manure_as_biogas_substrate_K[1] + combined_output$manure_export_K[1]))
+        ideal_manure_export_P <- animal_output$export_manure_N_kg * (combined_output$manure_export_P[1] / combined_output$manure_export_N[1])
+        ideal_manure_export_K <- animal_output$export_manure_N_kg * (combined_output$manure_export_K[1] / combined_output$manure_export_N[1])
         
         
-        #----------#
-        #old but afraid to delete
-        #----------#
-
-        # calculate
-        # current allocation of manure
-        total_manure <- combined_output$manure_export_N[1] +
-          combined_output$manure_as_biogas_substrate_N[1] +
-          combined_output$manure_to_crop_N[1]
-
-        current_manure_biogas <- combined_output$manure_as_biogas_substrate_N[1] / total_manure
-        current_manure_crop <- combined_output$manure_to_crop_N[1] / total_manure
-        current_manure_export <- combined_output$manure_export_N[1] / total_manure
-
-        # calculate change factor for streams
-        #--> this is needed for scaling of biogas stream especially
-        cf_manure_biogas <- scenario_allocate_manure_biogas_corrected / current_manure_biogas
-        cf_manure_crop <- scenario_allocate_manure_crop_corrected / current_manure_crop
-        cf_manure_export <- scenario_allocate_manure_export_corrected / current_manure_export
         
-        #----------#
-        #END: old but afraid to delete
-        #----------#
+        #find out how much P and K is leftover / was allocated too much
+        manure_biogas_extra_P <- (pool_manure_P - animal_output$P_manure_crop - ideal_manure_biogas_P - ideal_manure_export_P) * (scenario_allocate_manure_biogas_corrected / (scenario_allocate_manure_biogas_corrected + scenario_allocate_manure_export_corrected))
+        manure_biogas_extra_K <- (pool_manure_K - animal_output$K_manure_crop - ideal_manure_biogas_K - ideal_manure_export_K) * (scenario_allocate_manure_biogas_corrected / (scenario_allocate_manure_biogas_corrected + scenario_allocate_manure_export_corrected))
+        
+        manure_export_extra_P <- (pool_manure_P - animal_output$P_manure_crop - ideal_manure_biogas_P - ideal_manure_export_P) * (scenario_allocate_manure_export_corrected / (scenario_allocate_manure_biogas_corrected + scenario_allocate_manure_export_corrected))
+        manure_export_extra_K <- (pool_manure_K - animal_output$K_manure_crop - ideal_manure_biogas_K - ideal_manure_export_K) * (scenario_allocate_manure_export_corrected / (scenario_allocate_manure_biogas_corrected + scenario_allocate_manure_export_corrected))
+        
+        
+        animal_output$P_manure_biogas <- ideal_manure_biogas_P + manure_biogas_extra_P
+        animal_output$K_manure_biogas <- ideal_manure_biogas_K + manure_biogas_extra_K
+        
+        animal_output$export_manure_P_kg <- ideal_manure_export_P + manure_biogas_extra_P
+        animal_output$export_manure_K_kg <- ideal_manure_export_K + manure_biogas_extra_K
+
+        
+        
+        #old allocation
+        # 
+        # 
+        # #get the remaining nutrients, calculate the allocation to biogas and exort without crops
+        # manure_remain_P <- pool_manure_P - animal_output$P_manure_crop
+        # manure_remain_K <- pool_manure_K - animal_output$K_manure_crop
+        # 
+        # 
+        # #biogas 
+        # animal_output$N_manure_biogas <- pool_manure_N * scenario_allocate_manure_biogas_corrected
+        # animal_output$P_manure_biogas <- manure_remain_P * (combined_output$manure_as_biogas_substrate_P[1]/(combined_output$manure_as_biogas_substrate_P[1] + combined_output$manure_export_P[1]))
+        # animal_output$K_manure_biogas <- manure_remain_K * (combined_output$manure_as_biogas_substrate_K[1]/(combined_output$manure_as_biogas_substrate_K[1] + combined_output$manure_export_K[1]))
+        # 
+        # #export
+        # animal_output$export_manure_N_kg <- pool_manure_N * scenario_allocate_manure_export_corrected
+        # animal_output$export_manure_P_kg <- manure_remain_P * (combined_output$manure_export_P[1]/(combined_output$manure_as_biogas_substrate_P[1] + combined_output$manure_export_P[1]))
+        # animal_output$export_manure_K_kg <- manure_remain_K * (combined_output$manure_export_K[1]/(combined_output$manure_as_biogas_substrate_K[1] + combined_output$manure_export_K[1]))
+        # 
+        # 
         
       }
 
-      # # in case the herdsize was changed but not the manure allocation
-      # # make sure that manure is distributed using the allocation rules of the baseline
-      # if (scenario == "no_manure_adjustment") {
-      #   total_manure <- combined_output$manure_export_N[1] +
-      #     combined_output$manure_as_biogas_substrate_N[1] +
-      #     combined_output$manure_to_crop_N[1] 
-      # 
-      #   current_manure_biogas <- combined_output$manure_as_biogas_substrate_N[1] / total_manure
-      #   current_manure_crop <- combined_output$manure_to_crop_N[1] / total_manure
-      #   current_manure_export <- combined_output$manure_export_N[1] / total_manure
-      #   
-      #   pool_manure_N <- animal_output$N_remaining_manure + import_organic_N_can_change
-      #   pool_manure_P <- animal_output$P_remaining_manure + import_organic_P_can_change
-      #   pool_manure_K <- animal_output$K_remaining_manure + import_organic_K_can_change
-      # 
-      #   #allocate total manure the same way as done in manure allocation:
-      #   #at first do lesser streams and then put the rest to export
-      #   animal_output$N_manure_biogas <- pool_manure_N * current_manure_biogas
-      #   animal_output$P_manure_biogas <- animal_output$N_manure_biogas * (combined_output$manure_as_biogas_substrate_P[1] / combined_output$manure_as_biogas_substrate_N[1])
-      #   animal_output$K_manure_biogas <- animal_output$N_manure_biogas * (combined_output$manure_as_biogas_substrate_K[1] / combined_output$manure_as_biogas_substrate_N[1])
-      #   
-      #   #manure to export
-      #   animal_output$export_manure_N_kg <- pool_manure_N * current_manure_export
-      #   animal_output$export_manure_P_kg <- animal_output$export_manure_N_kg * (combined_output$manure_export_P[1] / combined_output$manure_export_N[1])
-      #   animal_output$export_manure_K_kg <- animal_output$export_manure_N_kg * (combined_output$manure_export_K[1] / combined_output$manure_export_N[1])
-      #   
-      #   #put rest to manure to crop
-      #   animal_output$N_manure_crop <- pool_manure_N * current_manure_crop
-      #   animal_output$P_manure_crop <- ifelse((pool_manure_P - animal_output$P_manure_biogas - animal_output$export_manure_P_kg)< 0,
-      #                                         yes = 0, 
-      #                                         no = pool_manure_P - animal_output$P_manure_biogas - animal_output$export_manure_P_kg)
-      #   animal_output$K_manure_crop <- ifelse((pool_manure_K - animal_output$K_manure_biogas - animal_output$export_manure_K_kg)< 0,
-      #                                         yes = 0, 
-      #                                         no = pool_manure_K - animal_output$K_manure_biogas - animal_output$export_manure_K_kg)
-      # }
-      
-      
-
-
-      
-      # if (scenario != "normal") {
-      # 
-      #   #--------------------------------#
-      #   ## BIOGAS IN scenario ####
-      #   #--------------------------------#
-      #   
-      #   # get ratio of crop to manure in biogas
-      #   ratio_crop_to_manure_biogas_N <- combined_output$vegetal_biogas_substrate_N[1] / combined_output$manure_as_biogas_substrate_N[1]
-      #   ratio_crop_to_manure_biogas_P <- combined_output$vegetal_biogas_substrate_P[1] / combined_output$manure_as_biogas_substrate_P[1]
-      #   ratio_crop_to_manure_biogas_K <- combined_output$vegetal_biogas_substrate_K[1] / combined_output$manure_as_biogas_substrate_K[1]
-      # 
-      #   # because the manure and crop allocation changed, find out which is limiting
-      #   # for biogas: take the limiting factors, scale the non-limiting biomas down
-      #   #--> what happens with the "free" biomass of the non-limiting biomass?
-      #   # manure is used for crops
-      #   # vegetable biomass
-      # 
-      #   # calculate how much crop biogas input would be needed for the amount of allocated manure
-      #   # do all calculations for N and then let P and K follow
-      #   crop_leftover <- crop_output$N_crop_biogas - (ratio_crop_to_manure_biogas_N * animal_output$N_manure_biogas)
-      #   manure_leftover <- animal_output$N_manure_biogas - ((1 / ratio_crop_to_manure_biogas_N) * crop_output$N_crop_biogas)
-      # 
-      # 
-      #   limiting_factor <- which.max(c(crop_leftover, manure_leftover))
-      #   
-      #   #in case of herdsize reduction we have decision criterion 1,2 for manure and 3,4 for crop
-      #   #in case of no herdsize reduction the decision criterio is 1 for manure and 2 for crop
-      #   if(herdsize_adjustment){
-      #     decision_criterion_manure <- c(1,2)
-      #     decision_cirterion_crop <- c(3,4)
-      #   } else {
-      #     decision_criterion_manure <- 1
-      #     decision_cirterion_crop <- 2
-      #   }
-      #   
-      #   if (limiting_factor %in% decision_criterion_manure) {
-      #     # the amount manure is limiting, because there is unused crop biomass
-      # 
-      #     # calculate leftover crop K and P
-      #     crop_leftover_P <- crop_output$P_crop_biogas - (ratio_crop_to_manure_biogas_P * animal_output$P_manure_biogas)
-      #     crop_leftover_K <- crop_output$K_crop_biogas - (ratio_crop_to_manure_biogas_K * animal_output$K_manure_biogas)
-      # 
-      # 
-      #     # take the not used crop from allocated stream
-      #     crop_output$N_crop_biogas <- crop_output$N_crop_biogas - crop_leftover
-      #     crop_output$P_crop_biogas <- crop_output$P_crop_biogas - crop_leftover_P
-      #     crop_output$K_crop_biogas <- crop_output$K_crop_biogas - crop_leftover_K
-      # 
-      #     # put the not used biogas crop biomass to local consumption instead
-      #     crop_output$N_crop_human_consumption_processed <- crop_output$N_crop_human_consumption_processed + crop_leftover
-      #     crop_output$P_crop_human_consumption_processed <- crop_output$P_crop_human_consumption_processed + crop_leftover_P
-      #     crop_output$K_crop_human_consumption_processed <- crop_output$K_crop_human_consumption_processed + crop_leftover_K
-      #   } else if (limiting_factor %in% decision_cirterion_crop) {
-      #     # allocated crop is limiting: that is why there is a positive amount of manure leftover
-      #     #--> take the current amount of crop, put the leftover manure to manure for crops
-      # 
-      #     # calculate leftover manure K and P
-      #     manure_leftover_P <- animal_output$P_manure_biogas - ((1 / ratio_crop_to_manure_biogas_P) * crop_output$P_crop_biogas)
-      #     manure_leftover_K <- animal_output$K_manure_biogas - ((1 / ratio_crop_to_manure_biogas_K) * crop_output$K_crop_biogas)
-      # 
-      #     # take leftover manure from the stream
-      #     animal_output$N_manure_biogas <- animal_output$N_manure_biogas - manure_leftover
-      #     animal_output$P_manure_biogas <- animal_output$P_manure_biogas - manure_leftover_P
-      #     animal_output$K_manure_biogas <- animal_output$K_manure_biogas - manure_leftover_K
-      # 
-      #     # put the not-used manure, intended for biogas to crop instead
-      #     animal_output$N_manure_crop <- animal_output$N_manure_crop + manure_leftover
-      #     animal_output$P_manure_crop <- animal_output$P_manure_crop + manure_leftover_P
-      #     animal_output$K_manure_crop <- animal_output$K_manure_crop + manure_leftover_K
-      # 
-      #     # the additionally available manure for crop reduces the need for inorganic fertilizer import
-      #     crop_output$imported_inorganic_N <- ifelse((crop_output$imported_inorganic_N > manure_leftover),
-      #       (crop_output$imported_inorganic_N - manure_leftover), 0
-      #     )
-      #     crop_output$imported_inorganic_P <- ifelse((crop_output$imported_inorganic_P > manure_leftover_P),
-      #       (crop_output$imported_inorganic_P - manure_leftover_P), 0
-      #     )
-      #     crop_output$imported_inorganic_K <- ifelse((crop_output$imported_inorganic_K > manure_leftover_K),
-      #       (crop_output$imported_inorganic_K - manure_leftover_K), 0
-      #     )
-      #   } else {
-      #     stop("wrong limiting factor for biogas")
-      #   }
-      # 
-      # 
-      #   # get factor how much biogas input is actually scaled down / or even increased?
-      #   # this is needed to scale down the biogas ouput
-      #   rf_biogas_input_N <- (crop_output$N_crop_biogas + animal_output$N_manure_biogas) / (combined_output$vegetal_biogas_substrate_N[1] + combined_output$manure_as_biogas_substrate_N[1])
-      #   rf_biogas_input_P <- (crop_output$P_crop_biogas + animal_output$P_manure_biogas) / (combined_output$vegetal_biogas_substrate_P[1] + combined_output$manure_as_biogas_substrate_P[1])
-      #   rf_biogas_input_K <- (crop_output$K_crop_biogas + animal_output$K_manure_biogas) / (combined_output$vegetal_biogas_substrate_K[1] + combined_output$manure_as_biogas_substrate_K[1])
-      # }
 
 
       #---------------#
@@ -2055,57 +1971,8 @@ combined_function <- function() {
         net_feed_import_K = c(combined_output$net_feed_import_K, adj_length(K_feed_import, n_rep))
       )
 
-      #apparantly negative streams are now acceptable
-      # if (any(unname(unlist(combined_output[-1])) < 0)) {
-      # 
-      #   # which(unlist(combined_output[-1]) < 0)
-      #   # combined_output$manure_to_crop_K
-      #   # which.min(unlist(combined_output[-1]))
-      # 
-      #   # save the levers values to see if there is a problem
-      #   levers <- data.frame(
-      #     stakeholder = k,
-      #     var_name = c(
-      #       "scenario_allocate_crop_biogas",
-      #       "scenario_allocate_crop_feed",
-      #       "scenario_allocate_crop_food",
-      #       "scenario_allocate_manure_biogas",
-      #       "scenario_allocate_manure_crop",
-      #       "scenario_allocate_manure_export",
-      #       "scenario_share_cattle",
-      #       "scenario_share_others",
-      #       "scenario_share_pig",
-      #       "scenario_share_poultry",
-      #       "scenario_overall_livestock_reduction"
-      #     ),
-      #     value = c(
-      #       scenario_allocate_crop_biogas,
-      #       scenario_allocate_crop_feed,
-      #       scenario_allocate_crop_food,
-      #       scenario_allocate_manure_biogas,
-      #       scenario_allocate_manure_crop,
-      #       scenario_allocate_manure_export,
-      #       scenario_share_cattle,
-      #       scenario_share_others,
-      #       scenario_share_pig,
-      #       scenario_share_poultry,
-      #       scenario_overall_livestock_reduction
-      #     )
-      #   )
-      # 
-      #   write.csv(x = levers, file = "problem_levers.csv", row.names = F)
-      # 
-      #   # identify problem stream
-      #   problem_stream <- names(unlist(combined_output[-1]))[unlist(combined_output[-1]) < 0]
-      # 
-      # 
-      #   stop(paste0(
-      #     "at least one stream is negative. Error found in scenario: ", scenario,
-      #     "for stream :", problem_stream
-      #   ))
-      # }
-    } # end of loop for different stakeholders answers
-  } # end of the loop for the different scenarios    
+
+  combined_output$crop_cultivation_losses_K
       
       
   # parameters to evaluate model output:
@@ -2385,3 +2252,202 @@ combined_function <- function() {
     return(model_evaluation)
   }
 }
+
+
+
+
+
+
+
+
+# ____________ ####
+# old code chunks ####
+
+
+
+# # in case the herdsize was changed but not the manure allocation
+# # make sure that manure is distributed using the allocation rules of the baseline
+# if (scenario == "no_manure_adjustment") {
+#   total_manure <- combined_output$manure_export_N[1] +
+#     combined_output$manure_as_biogas_substrate_N[1] +
+#     combined_output$manure_to_crop_N[1] 
+# 
+#   current_manure_biogas <- combined_output$manure_as_biogas_substrate_N[1] / total_manure
+#   current_manure_crop <- combined_output$manure_to_crop_N[1] / total_manure
+#   current_manure_export <- combined_output$manure_export_N[1] / total_manure
+#   
+#   pool_manure_N <- animal_output$N_remaining_manure + import_organic_N_can_change
+#   pool_manure_P <- animal_output$P_remaining_manure + import_organic_P_can_change
+#   pool_manure_K <- animal_output$K_remaining_manure + import_organic_K_can_change
+# 
+#   #allocate total manure the same way as done in manure allocation:
+#   #at first do lesser streams and then put the rest to export
+#   animal_output$N_manure_biogas <- pool_manure_N * current_manure_biogas
+#   animal_output$P_manure_biogas <- animal_output$N_manure_biogas * (combined_output$manure_as_biogas_substrate_P[1] / combined_output$manure_as_biogas_substrate_N[1])
+#   animal_output$K_manure_biogas <- animal_output$N_manure_biogas * (combined_output$manure_as_biogas_substrate_K[1] / combined_output$manure_as_biogas_substrate_N[1])
+#   
+#   #manure to export
+#   animal_output$export_manure_N_kg <- pool_manure_N * current_manure_export
+#   animal_output$export_manure_P_kg <- animal_output$export_manure_N_kg * (combined_output$manure_export_P[1] / combined_output$manure_export_N[1])
+#   animal_output$export_manure_K_kg <- animal_output$export_manure_N_kg * (combined_output$manure_export_K[1] / combined_output$manure_export_N[1])
+#   
+#   #put rest to manure to crop
+#   animal_output$N_manure_crop <- pool_manure_N * current_manure_crop
+#   animal_output$P_manure_crop <- ifelse((pool_manure_P - animal_output$P_manure_biogas - animal_output$export_manure_P_kg)< 0,
+#                                         yes = 0, 
+#                                         no = pool_manure_P - animal_output$P_manure_biogas - animal_output$export_manure_P_kg)
+#   animal_output$K_manure_crop <- ifelse((pool_manure_K - animal_output$K_manure_biogas - animal_output$export_manure_K_kg)< 0,
+#                                         yes = 0, 
+#                                         no = pool_manure_K - animal_output$K_manure_biogas - animal_output$export_manure_K_kg)
+# }
+
+
+
+
+
+# if (scenario != "normal") {
+# 
+#   #--------------------------------#
+#   ## BIOGAS IN scenario 
+#   #--------------------------------#
+#   
+#   # get ratio of crop to manure in biogas
+#   ratio_crop_to_manure_biogas_N <- combined_output$vegetal_biogas_substrate_N[1] / combined_output$manure_as_biogas_substrate_N[1]
+#   ratio_crop_to_manure_biogas_P <- combined_output$vegetal_biogas_substrate_P[1] / combined_output$manure_as_biogas_substrate_P[1]
+#   ratio_crop_to_manure_biogas_K <- combined_output$vegetal_biogas_substrate_K[1] / combined_output$manure_as_biogas_substrate_K[1]
+# 
+#   # because the manure and crop allocation changed, find out which is limiting
+#   # for biogas: take the limiting factors, scale the non-limiting biomas down
+#   #--> what happens with the "free" biomass of the non-limiting biomass?
+#   # manure is used for crops
+#   # vegetable biomass
+# 
+#   # calculate how much crop biogas input would be needed for the amount of allocated manure
+#   # do all calculations for N and then let P and K follow
+#   crop_leftover <- crop_output$N_crop_biogas - (ratio_crop_to_manure_biogas_N * animal_output$N_manure_biogas)
+#   manure_leftover <- animal_output$N_manure_biogas - ((1 / ratio_crop_to_manure_biogas_N) * crop_output$N_crop_biogas)
+# 
+# 
+#   limiting_factor <- which.max(c(crop_leftover, manure_leftover))
+#   
+#   #in case of herdsize reduction we have decision criterion 1,2 for manure and 3,4 for crop
+#   #in case of no herdsize reduction the decision criterio is 1 for manure and 2 for crop
+#   if(herdsize_adjustment){
+#     decision_criterion_manure <- c(1,2)
+#     decision_cirterion_crop <- c(3,4)
+#   } else {
+#     decision_criterion_manure <- 1
+#     decision_cirterion_crop <- 2
+#   }
+#   
+#   if (limiting_factor %in% decision_criterion_manure) {
+#     # the amount manure is limiting, because there is unused crop biomass
+# 
+#     # calculate leftover crop K and P
+#     crop_leftover_P <- crop_output$P_crop_biogas - (ratio_crop_to_manure_biogas_P * animal_output$P_manure_biogas)
+#     crop_leftover_K <- crop_output$K_crop_biogas - (ratio_crop_to_manure_biogas_K * animal_output$K_manure_biogas)
+# 
+# 
+#     # take the not used crop from allocated stream
+#     crop_output$N_crop_biogas <- crop_output$N_crop_biogas - crop_leftover
+#     crop_output$P_crop_biogas <- crop_output$P_crop_biogas - crop_leftover_P
+#     crop_output$K_crop_biogas <- crop_output$K_crop_biogas - crop_leftover_K
+# 
+#     # put the not used biogas crop biomass to local consumption instead
+#     crop_output$N_crop_human_consumption_processed <- crop_output$N_crop_human_consumption_processed + crop_leftover
+#     crop_output$P_crop_human_consumption_processed <- crop_output$P_crop_human_consumption_processed + crop_leftover_P
+#     crop_output$K_crop_human_consumption_processed <- crop_output$K_crop_human_consumption_processed + crop_leftover_K
+#   } else if (limiting_factor %in% decision_cirterion_crop) {
+#     # allocated crop is limiting: that is why there is a positive amount of manure leftover
+#     #--> take the current amount of crop, put the leftover manure to manure for crops
+# 
+#     # calculate leftover manure K and P
+#     manure_leftover_P <- animal_output$P_manure_biogas - ((1 / ratio_crop_to_manure_biogas_P) * crop_output$P_crop_biogas)
+#     manure_leftover_K <- animal_output$K_manure_biogas - ((1 / ratio_crop_to_manure_biogas_K) * crop_output$K_crop_biogas)
+# 
+#     # take leftover manure from the stream
+#     animal_output$N_manure_biogas <- animal_output$N_manure_biogas - manure_leftover
+#     animal_output$P_manure_biogas <- animal_output$P_manure_biogas - manure_leftover_P
+#     animal_output$K_manure_biogas <- animal_output$K_manure_biogas - manure_leftover_K
+# 
+#     # put the not-used manure, intended for biogas to crop instead
+#     animal_output$N_manure_crop <- animal_output$N_manure_crop + manure_leftover
+#     animal_output$P_manure_crop <- animal_output$P_manure_crop + manure_leftover_P
+#     animal_output$K_manure_crop <- animal_output$K_manure_crop + manure_leftover_K
+# 
+#     # the additionally available manure for crop reduces the need for inorganic fertilizer import
+#     crop_output$imported_inorganic_N <- ifelse((crop_output$imported_inorganic_N > manure_leftover),
+#       (crop_output$imported_inorganic_N - manure_leftover), 0
+#     )
+#     crop_output$imported_inorganic_P <- ifelse((crop_output$imported_inorganic_P > manure_leftover_P),
+#       (crop_output$imported_inorganic_P - manure_leftover_P), 0
+#     )
+#     crop_output$imported_inorganic_K <- ifelse((crop_output$imported_inorganic_K > manure_leftover_K),
+#       (crop_output$imported_inorganic_K - manure_leftover_K), 0
+#     )
+#   } else {
+#     stop("wrong limiting factor for biogas")
+#   }
+# 
+# 
+#   # get factor how much biogas input is actually scaled down / or even increased?
+#   # this is needed to scale down the biogas ouput
+#   rf_biogas_input_N <- (crop_output$N_crop_biogas + animal_output$N_manure_biogas) / (combined_output$vegetal_biogas_substrate_N[1] + combined_output$manure_as_biogas_substrate_N[1])
+#   rf_biogas_input_P <- (crop_output$P_crop_biogas + animal_output$P_manure_biogas) / (combined_output$vegetal_biogas_substrate_P[1] + combined_output$manure_as_biogas_substrate_P[1])
+#   rf_biogas_input_K <- (crop_output$K_crop_biogas + animal_output$K_manure_biogas) / (combined_output$vegetal_biogas_substrate_K[1] + combined_output$manure_as_biogas_substrate_K[1])
+# }
+
+    
+    
+    
+    #apparantly negative streams are now acceptable
+    # if (any(unname(unlist(combined_output[-1])) < 0)) {
+    # 
+    #   # which(unlist(combined_output[-1]) < 0)
+    #   # combined_output$manure_to_crop_K
+    #   # which.min(unlist(combined_output[-1]))
+    # 
+    #   # save the levers values to see if there is a problem
+    #   levers <- data.frame(
+    #     stakeholder = k,
+    #     var_name = c(
+    #       "scenario_allocate_crop_biogas",
+    #       "scenario_allocate_crop_feed",
+    #       "scenario_allocate_crop_food",
+    #       "scenario_allocate_manure_biogas",
+    #       "scenario_allocate_manure_crop",
+    #       "scenario_allocate_manure_export",
+    #       "scenario_share_cattle",
+    #       "scenario_share_others",
+    #       "scenario_share_pig",
+    #       "scenario_share_poultry",
+    #       "scenario_overall_livestock_reduction"
+    #     ),
+    #     value = c(
+    #       scenario_allocate_crop_biogas,
+    #       scenario_allocate_crop_feed,
+    #       scenario_allocate_crop_food,
+    #       scenario_allocate_manure_biogas,
+    #       scenario_allocate_manure_crop,
+    #       scenario_allocate_manure_export,
+    #       scenario_share_cattle,
+    #       scenario_share_others,
+    #       scenario_share_pig,
+    #       scenario_share_poultry,
+    #       scenario_overall_livestock_reduction
+    #     )
+    #   )
+    # 
+    #   write.csv(x = levers, file = "problem_levers.csv", row.names = F)
+    # 
+    #   # identify problem stream
+    #   problem_stream <- names(unlist(combined_output[-1]))[unlist(combined_output[-1]) < 0]
+    # 
+    # 
+    #   stop(paste0(
+    #     "at least one stream is negative. Error found in scenario: ", scenario,
+    #     "for stream :", problem_stream
+    #   ))
+    # }
+  } # end of loop for different stakeholders answers
+} # end of the loop for the different scenarios    
