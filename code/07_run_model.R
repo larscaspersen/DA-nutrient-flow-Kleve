@@ -1,10 +1,12 @@
+library(decisionSupport)
+
 #run nutrient flow simulations
 source('code/06_combine_submodels.R')
 
 # decide what to return
-return_flows <- TRUE
+return_flows <- FALSE
 
-n_runs <- 1000
+n_runs <- 10000
 
 # let mc simulation run, just to test if everything works out
 nitrogen_mc_simulation <- mcSimulation(
@@ -39,15 +41,11 @@ for(i in 1:length(flow_names)){
 #adjust the column names
 colnames(combined_results) <- flow_names
 
-#split the results the different scenarios? In the end the scenarios are not a result but an input
-result_list <- split(x = combined_results, f = combined_results$scenario)
-#--> list contains model results spliut by the scenarios
-
 
 #change the name of the scenarios, drop sh2
-combined_results <- combined_results[!(combined_results$scenario %in% c('all_adjustments_sh_2_stakeholder_reduction', 
-                                                                        'all_adjustments_sh_2_strict_reduction',
-                                                                        'buffer_no_herdsize_sh_2')),]
+#combined_results <- combined_results[!(combined_results$scenario %in% c('all_adjustments_sh_2_stakeholder_reduction', 
+#                                                                        'all_adjustments_sh_2_strict_reduction',
+#                                                                        'buffer_no_herdsize_sh_2')),]
 
 combined_results$scenario <- as.factor(combined_results$scenario)
 
@@ -57,6 +55,25 @@ levels(combined_results$scenario) <- list(baseline  = "normal",
                                           local_feed = "all_adjustments_sh_1_stakeholder_reduction",
                                           lf_animal_buffered = 'all_adjustments_sh_1_strict_reduction',
                                           lf_crop_buffered = 'buffer_no_herdsize_sh_1') 
+
+#split the results the different scenarios? In the end the scenarios are not a result but an input
+result_list <- split(x = combined_results, f = combined_results$scenario)
+
+#change columns to numeric
+result_list$baseline[,-1] <- lapply(result_list$baseline[,-1], as.numeric)
+result_list$local_feed[,-1] <- lapply(result_list$local_feed[,-1], as.numeric)
+result_list$lf_animal_buffered[,-1] <- lapply(result_list$lf_animal_buffered[,-1], as.numeric)
+result_list$lf_crop_buffered[,-1] <- lapply(result_list$lf_crop_buffered[,-1], as.numeric)
+
+
+diff_df <- rbind.data.frame(result_list$local_feed[,-1] - result_list$baseline[,-1],
+                   result_list$lf_animal_buffered[-1] - result_list$baseline[,-1],
+                   result_list$lf_crop_buffered[-1] - result_list$baseline[,-1])
+diff_df$scenario <- c(result_list$local_feed$scenario, result_list$lf_animal_buffered$scenario, result_list$lf_crop_buffered$scenario)
+diff_df <- relocate(diff_df, scenario)
+
+
+#--> list contains model results spliut by the scenarios
 
 #check the distributions
 
@@ -116,12 +133,164 @@ if(return_flows){
 } else {
   #visualization for circularity metrics
   
+  #melt combined outputs
+  combined_results_long <- reshape2::melt(combined_results, id.var = 'scenario')
+  
+  diff_df_long <- reshape::melt(diff_df, id.var = 'scenario')
+  
+  for(flow in unique(combined_results_long$variable)){
+    
+    #density plot off all scenarios
+    
+    p1 <- combined_results_long %>%
+      filter(variable == flow) %>%
+      ggplot(aes(x=as.numeric(value) ,y = scenario, fill = scenario)) +
+      geom_density_ridges_gradient(scale=2) +
+      xlab(paste0(flow, ' [t per year]'))+
+      ylab('')+
+      theme_bw() +
+      theme(legend.position = "none")
+    
+    pic_path <- 'figures/circularity_metrics/raw/'
+    
+    fname <- paste0(flow,'.jpg')
+    ggsave(p1,  filename = fname, path = pic_path,  device = 'jpeg', width = 10, height = 7, units = 'cm')
+    
+    
+    #pls analysis
+    
+    for(scenario in levels(combined_results$scenario)){
+      
+      #put only the corresponding scenario values to the simulation output, drop the scenario column
+      nitrogen_mc_simulation$y <- combined_results[combined_results$scenario == scenario, -1]
+
+      #do pls
+      pls_result <- plsr.mcSimulation(
+        object = nitrogen_mc_simulation,
+        resultName = names(nitrogen_mc_simulation$y[flow]), ncomp = 1
+      )
+      
+      pls_plot <- plot_pls(pls_result, input_table = input, threshold = 0.9)
+      
+      pic_path <- 'figures/circularity_metrics/pls_raw/'
+      
+      fname <- paste0(flow,'_', scenario, '_pls.jpg')
+      ggsave(pls_plot,  filename = fname, path = pic_path,  device = 'jpeg', width = 12, height = 10, units = 'cm')
+    }
+
+    
+    
+    
+    
+    
+    #desnity plots of difference to baseline
+    p2 <-  diff_df_long %>%
+      filter(variable == flow) %>%
+      ggplot(aes(x=as.numeric(value) ,y = scenario, fill = scenario)) +
+      geom_density_ridges_gradient(scale=2) +
+      geom_vline(xintercept = 0, linetype = 'dashed')+
+      xlab(paste0(flow, ' [t per year]'))+
+      ylab('')+
+      theme_bw() +
+      theme(legend.position = "none")
+    
+    pic_path <- 'figures/circularity_metrics/difference_to_baseline/'
+    
+    fname <- paste0(flow,'diff_to_baseline.jpg')
+    ggsave(p2,  filename = fname, path = pic_path,  device = 'jpeg', width = 12, height = 10, units = 'cm')
+    
+    
+    #pls analysis
+    
+    for(scenario in unique(diff_df$scenario)){
+      
+      #put only the corresponding scenario values to the simulation output, drop the scenario column
+      nitrogen_mc_simulation$y <- diff_df[diff_df$scenario == scenario, -1]
+      
+      #do pls
+      pls_result <- plsr.mcSimulation(
+        object = nitrogen_mc_simulation,
+        resultName = names(nitrogen_mc_simulation$y[flow]), ncomp = 1
+      )
+      
+      pls_plot <- plot_pls(pls_result, input_table = input, threshold = 0.9)
+      
+      pic_path <- 'figures/circularity_metrics/pls_difference_baseline/'
+      
+      fname <- paste0(flow,'_', scenario, '_difference_baseline_pls.jpg')
+      ggsave(pls_plot,  filename = fname, path = pic_path,  device = 'jpeg', width = 10, height = 10, units = 'cm')
+    }
+  }
+  
+  
+
+  
+
+  
 }
 
+combined_results$run <- rep(1:n_runs, 4)
+
+
+sub_out <- combined_results %>%
+  filter(scenario == 'baseline' & crop_cultivation_losses_K == 0) %>%
+  select(-c(sewage_N, sewage_K, sewage_P, ofmsw_N, ofmsw_P, ofmsw_K, ofmsw_residual_waste_N, ofmsw_residual_waste_P, ofmsw_residual_waste_K,
+            import_OFMSW_K, import_OFMSW_N, import_OFMSW_P, wastewater_direct_discharge_N, wastewater_direct_discharge_P, wastewater_direct_discharge_K, 
+            wastewater_effluent_gaseous_losses_K, wastewater_effluent_gaseous_losses_N, wastewater_effluent_gaseous_losses_P, compost_to_consumption_N, 
+            compost_to_consumption_P, compost_to_consumption_K, sewage_sludge_export_N, sewage_sludge_export_P, sewage_sludge_export_K, 
+            fresh_compost_export_N, fresh_compost_export_P, fresh_compost_export_K, fresh_compost_export_K, fresh_compost_export_P, fresh_compost_export_N,
+            sewage_to_crop_N, sewage_to_crop_P, sewage_to_crop_K, fresh_compost_crop_N, fresh_compost_crop_P, fresh_compost_crop_K, 
+            export_meat_K, export_meat_N, export_meat_P, export_egg_K, export_egg_N, export_egg_P, animal_housing_and_storage_losses_P, animal_housing_and_storage_losses_K))
+
+sub_in <- nitrogen_mc_simulation$x[sub_out$run,]
+
+#compare input values to all input values
+
+#candidates:
+#-export_other_organic_K
+#-import_inorganic_K2O_t
+#-K_yield_mowing
+#-mais_silage_to_biogas
+#-K_yield_mais_silage
+#-import_organic_K_kg
+df1 <- select(sub_in, export_manure_N_kg, export_other_organic_K_kg,  K_yield_mowing,  import_organic_K_kg,
+              export_manure_N_kg, N_excretion_dairy, n_dairy_cow_2016)
+df1$sample <- 'cultivation_losses_zero'
+
+df2 <- select(nitrogen_mc_simulation$x, export_manure_N_kg, export_other_organic_K_kg, K_yield_mowing,  import_organic_K_kg,
+              export_manure_N_kg, N_excretion_dairy, n_dairy_cow_2016)
+df2$sample <- 'all'
+
+rbind(df1, df2) %>%
+  reshape2::melt(id.var = 'sample') %>%
+  ggplot(aes(x = sample, y = value)) + 
+  geom_boxplot() +
+  facet_wrap(~variable, scales = 'free_y')
+
+
+#check why I have so many cases of zero cultivation losses in K 
+
+#remove the scenario
+#use only the baseline data
+combined_results_sub <- combined_results[combined_results$scenario == 'baseline', ]
+#drop scenario
+combined_results_sub <- combined_results_sub[,-1]
+nitrogen_mc_simulation$y <- combined_results_sub
 
 
 
-combined_results[1] <- c(1,2,3)
+# PLS----
+# what variable should be used for it?
+
+pls_result <- plsr.mcSimulation(
+  object = nitrogen_mc_simulation,
+  resultName = names(nitrogen_mc_simulation$y["crop_cultivation_losses_K"]), ncomp = 1
+)
+
+plot_pls(pls_result, input_table = input, threshold = 0.9)
+
+
+
 
 
 
