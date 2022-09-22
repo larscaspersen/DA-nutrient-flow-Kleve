@@ -141,7 +141,7 @@ combined_function <- function() {
       if (scenario == "all_adjustments") {
         herdsize_adjustment <- crop_adjustment <- manure_adjustment <- herd_composition <- TRUE
       } else if (scenario == "buffer_no_herdsize") {
-        crop_adjustment <- manure_adjustment <- herd_composition <- TRUE
+        herdsize_adjustment <- crop_adjustment <- manure_adjustment <- herd_composition <- TRUE
       } 
 
 
