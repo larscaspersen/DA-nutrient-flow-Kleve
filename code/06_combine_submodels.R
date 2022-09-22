@@ -32,7 +32,7 @@ source("code/03_crop_model.R")
 source("code/04_consumption_model.R")
 source("code/05_waste_submodel.R")
 
-input <- read.csv("data/input-all.csv")
+input <- read.csv("data/input_all_uncertainty_classes.csv")
 #remove median values
 input$median <- NA
 
