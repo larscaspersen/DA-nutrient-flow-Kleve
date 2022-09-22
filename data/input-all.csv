@@ -1,4 +1,4 @@
-﻿description,variable,unit,lower,median,upper,distribution,subsystem,,version
+﻿description,variable,unit,lower,median,upper,distribution,subsystem,ranges_from_excel,version
 total waste water,waste_water,m3,24621300,27357000,30092700,posnorm,waste,,unchanged
 direct discharge of wastewater to ground and surface water,wastewater_direct_discharge,m3,11570400,12856000,14141600,posnorm,consumption,,unchanged
 taken from Nährstoffreport,import_organic_N_kg,kg import / FM dt,5698800,"6,332,000.00",6965200,posnorm,crop,no,2020
