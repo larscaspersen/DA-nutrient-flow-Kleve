@@ -24,4 +24,19 @@ input$upper <- ifelse(input$ranges_from_excel == 'yes', yes = as.numeric(input$u
                                                              no = ifelse(input$uncertainty.level == "4", yes =  as.numeric(input$median) * (1+0.2),
                                                                          no = ifelse(input$uncertainty.level == "5", yes =  as.numeric(input$median) * (1+0.25), no =NA)))))))
 
+library(tidyverse)
+
+input %>% 
+  filter(distribution == 'tnorm_0_1') %>%
+  filter(lower <= 0)
+
+
+input %>% 
+  filter(distribution == 'tnorm_0_1') %>%
+  filter(upper >= 1)
+
+#--> make sure that in this case the upper value is set to 1 instead
+input$upper <- ifelse(input$distribution == 'tnorm_0_1' & input$upper >= 1, yes = 1, no = input$upper)
+input$lower <- ifelse(input$distribution == 'tnorm_0_1' & input$lower <= 0, yes = 0, no = input$lower)
+
 write.csv(input, file = 'data/input_all_uncertainty_classes.csv', row.names = F)

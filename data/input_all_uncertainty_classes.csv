@@ -290,7 +290,7 @@
 "",1,"veggie_peas","N_content_veggie_peas_gr_100gr","g N / 100 gram product",1.0395,1.05,1.0605,"posnorm","crop","no","unchanged"
 "",1,"","N_content_legumes","g N / 100 gram product",1.0395,1.05,1.0605,"posnorm","consumption","","unchanged"
 "",1,"","N_content_condensed_milk","g N / 100 gram product",1.0098,1.02,1.0302,"posnorm","consumption","","unchanged"
-"Nährstoffbericht 2017, Table 3, p.27",4,"share of cattle kept on liquid manure catchment systems","cattle_on_slurry","share",0.744,0.93,1.116,"tnorm_0_1","animal","",""
+"Nährstoffbericht 2017, Table 3, p.27",4,"share of cattle kept on liquid manure catchment systems","cattle_on_slurry","share",0.744,0.93,1,"tnorm_0_1","animal","",""
 "",1,"total share of arable land","share_crop_land","share of total agricultural area",0.877,0.877,0.877,"const","crop","no","2020"
 "",1,"","convert_potassium_oxide_to_k","conversion factor",0.8301,0.8301,0.8301,"const","","","unchanged"
 "",1,"Oilseed rape","dm_oilseed_rape","",0.9009,0.91,0.9191,"tnorm_0_1","crop","no","unchanged"
