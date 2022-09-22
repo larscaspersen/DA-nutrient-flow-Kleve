@@ -26,11 +26,12 @@ input$upper <- ifelse(input$ranges_from_excel == 'yes', yes = as.numeric(input$u
 
 library(tidyverse)
 
+#check for cases below 0
 input %>% 
   filter(distribution == 'tnorm_0_1') %>%
   filter(lower <= 0)
 
-
+#check for cases above 1
 input %>% 
   filter(distribution == 'tnorm_0_1') %>%
   filter(upper >= 1)
