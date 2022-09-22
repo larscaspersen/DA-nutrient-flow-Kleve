@@ -37,7 +37,7 @@ input %>%
   filter(upper >= 1)
 
 #--> make sure that in this case the upper value is set to 1 instead
-input$upper <- ifelse(input$distribution == 'tnorm_0_1' & input$upper >= 1, yes = 1, no = input$upper)
-input$lower <- ifelse(input$distribution == 'tnorm_0_1' & input$lower <= 0, yes = 0, no = input$lower)
+input$upper <- ifelse(input$distribution == 'tnorm_0_1' & input$upper >= 1, yes = 0.99, no = input$upper)
+input$lower <- ifelse(input$distribution == 'tnorm_0_1' & input$lower <= 0, yes = 0.01, no = input$lower)
 
 write.csv(input, file = 'data/input_all_uncertainty_classes.csv', row.names = F)
