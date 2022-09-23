@@ -104,7 +104,7 @@ combined_function <- function() {
     # temp
     # scenario <- 'normal'
     # scenario <- 'all_adjustments'
-    # scenario <- 'no_herdsize_adjustment'
+    # scenario <- 'buffer_no_herdsize'
     # scenario <- 'back_to_roots'
 
 
@@ -985,82 +985,7 @@ combined_function <- function() {
       import_organic_K_can_change <- import_organic_K_kg 
       
       
-      #---------------------------------------------------#
-      ## Buffer no herdsize changes by crop allocation ####
-      #---------------------------------------------------#
-      
-      if(scenario == "buffer_no_herdsize"){
-        #in case if stakeholders are not willing to adjust the herdsize, calculate the degree of change needed
-        #in crop allocation
-        
-        #adjust the crop allocation a second time:
-        
-        #pool of crop to allocate
-        #difference: here we also allow to allocate the crops that were ment for export
-        #and we need to factor in the grass and straw already supplied to animals
-        pool_crop_N <- crop_output$N_crop_human_consumption_processed + crop_output$N_crop_biogas +
-          crop_output$N_crop_animal_feeding_processed + crop_output$N_crop_animal_feeding_unprocessed
-        
-        pool_crop_P <-crop_output$P_crop_human_consumption_processed + crop_output$P_crop_biogas +
-          crop_output$P_crop_animal_feeding_processed + crop_output$P_crop_animal_feeding_unprocessed
-        
-        pool_crop_K <- crop_output$K_crop_human_consumption_processed + crop_output$K_crop_biogas +
-          crop_output$K_crop_animal_feeding_processed + crop_output$K_crop_animal_feeding_unprocessed
-        
-        #needed feed after grass and straw
-        N_feed_after_gras <- N_animal_output_produced - crop_output$N_straw - crop_output$N_grassland
-        P_feed_after_gras <- P_animal_output_produced - crop_output$P_straw - crop_output$P_grassland
-        K_feed_after_gras <- K_animal_output_produced - crop_output$K_straw - crop_output$K_grassland
-        
-        #crop buffering scenario: put as much crops as possible to biogas and food
-        
-        #amount that can be allocated to feed
-        buffered_crop_feed_N <- min(N_feed_after_gras, pool_crop_N)
-        buffered_crop_feed_P <- min(P_feed_after_gras, pool_crop_P)
-        buffered_crop_feed_K <- min(K_feed_after_gras, pool_crop_K)
-        #--> if there is nothing left for biogas or export, then give zero
-        
-        #leftovers allocated to food and biogas to the same share as in the crop allocation rule
-        crop_leftover_N <- pool_crop_N - buffered_crop_feed_N
-        crop_leftover_P <- pool_crop_P - buffered_crop_feed_P
-        crop_leftover_K <- pool_crop_K - buffered_crop_feed_K
-        
-        #allocation of crop to biogas and food, when feed is not considered
-        share_crop_food_N <- scenario_allocate_crop_food / (scenario_allocate_crop_biogas_corrected + scenario_allocate_crop_food)
-        share_crop_food_P <- combined_output$local_vegetal_products_consumed_P[1] / (combined_output$local_vegetal_products_consumed_P[1] + combined_output$vegetal_biogas_substrate_P[1])
-        share_crop_food_K <- combined_output$local_vegetal_products_consumed_K[1] / (combined_output$local_vegetal_products_consumed_K[1] + combined_output$vegetal_biogas_substrate_K[1])
-        
-        #allocate the leftover N according to the rate
-        buffered_crop_food_N <-  crop_leftover_N * share_crop_food_N
-        buffered_crop_food_P <- max(crop_leftover_P * share_crop_food_P, 0)
-        buffered_crop_food_K <- max(crop_leftover_K * share_crop_food_K, 0)
-        
-        #the rest goes to biogas
-        buffered_crop_biogas_N <-  crop_leftover_N * (1 - share_crop_food_N)
-        buffered_crop_biogas_P <-  max(crop_leftover_P * (1 - share_crop_food_P), 0)
-        buffered_crop_biogas_K <-  max(crop_leftover_K * (1 - share_crop_food_K), 0)
-        
-        
-        #----------------------------------#
-        #Apply changed streams by buffering
-        #----------------------------------#
-        
-        # crop to feed --> channed changes to unprocessed feed because better buffer capacity
-        crop_output$N_crop_animal_feeding_unprocessed <- buffered_crop_feed_N - crop_output$N_crop_animal_feeding_processed
-        crop_output$P_crop_animal_feeding_unprocessed <- buffered_crop_feed_P - crop_output$P_crop_animal_feeding_processed
-        crop_output$K_crop_animal_feeding_unprocessed <- buffered_crop_feed_K - crop_output$K_crop_animal_feeding_processed
-        
-        # crop to local human consumption
-        crop_output$N_crop_human_consumption_processed <- buffered_crop_food_N
-        crop_output$P_crop_human_consumption_processed <- buffered_crop_food_P
-        crop_output$K_crop_human_consumption_processed <- buffered_crop_food_K
-        
-        #crop to biogas
-        crop_output$N_crop_biogas <- buffered_crop_biogas_N
-        crop_output$P_crop_biogas <- buffered_crop_biogas_P
-        crop_output$K_crop_biogas <- buffered_crop_biogas_K
-        
-      }
+
 
       #----------------------#
       ## LEVER: herd size ####
@@ -1083,9 +1008,14 @@ combined_function <- function() {
         #is reduced
 
 
-        # idead: compare the strict local feed-stuff oriented reduction with
-        # stakeholder proposed reduction of herd-size
-        rf_local_feed <- c(rf_local_feed, rf_stakeholder)
+        #in case of all adjustments calculate stakeholder proposed reduction and feed-informed animal reduction
+        if(scenario == 'all_adjustments'){
+          rf_local_feed <- c(rf_local_feed, rf_stakeholder)
+        } else if(scenario == 'buffer_no_herdsize'){
+          #in case of crop allocation buffering the stakeholder animal reduction, only work with stakeholder proposed reduction factor
+          rf_local_feed <- rf_stakeholder
+        }
+        
         
         import_organic_N_can_change <- import_organic_N_can_change * rf_local_feed
         import_organic_P_can_change <- import_organic_P_can_change * rf_local_feed
@@ -1353,6 +1283,87 @@ combined_function <- function() {
           animal_output$K_housing_loss +
           animal_output$K_to_slaughter
       } # end animal output with changed herdsize / composition 
+      
+      
+      
+      #------------------------------------------------#
+      ## Buffer herdsize changes by crop allocation ####
+      #------------------------------------------------#
+      
+      if(scenario == "buffer_no_herdsize"){
+        #in case if stakeholders are not willing to adjust the herdsize, calculate the degree of change needed
+        #in crop allocation
+        
+        #adjust the crop allocation a second time:
+        
+        #pool of crop to allocate
+        #difference: here we also allow to allocate the crops that were ment for export
+        #and we need to factor in the grass and straw already supplied to animals
+        pool_crop_N <- crop_output$N_crop_human_consumption_processed + crop_output$N_crop_biogas +
+          crop_output$N_crop_animal_feeding_processed + crop_output$N_crop_animal_feeding_unprocessed
+        
+        pool_crop_P <-crop_output$P_crop_human_consumption_processed + crop_output$P_crop_biogas +
+          crop_output$P_crop_animal_feeding_processed + crop_output$P_crop_animal_feeding_unprocessed
+        
+        pool_crop_K <- crop_output$K_crop_human_consumption_processed + crop_output$K_crop_biogas +
+          crop_output$K_crop_animal_feeding_processed + crop_output$K_crop_animal_feeding_unprocessed
+        
+        #needed feed after grass and straw
+        N_feed_after_gras <- N_animal_output_produced - crop_output$N_straw - crop_output$N_grassland
+        P_feed_after_gras <- P_animal_output_produced - crop_output$P_straw - crop_output$P_grassland
+        K_feed_after_gras <- K_animal_output_produced - crop_output$K_straw - crop_output$K_grassland
+        
+        #crop buffering scenario: put as much crops as possible to biogas and food
+        
+        #amount that can be allocated to feed
+        buffered_crop_feed_N <- min(N_feed_after_gras, pool_crop_N)
+        buffered_crop_feed_P <- min(P_feed_after_gras, pool_crop_P)
+        buffered_crop_feed_K <- min(K_feed_after_gras, pool_crop_K)
+        #--> if there is nothing left for biogas or export, then give zero
+        
+        #leftovers allocated to food and biogas to the same share as in the crop allocation rule
+        crop_leftover_N <- pool_crop_N - buffered_crop_feed_N
+        crop_leftover_P <- pool_crop_P - buffered_crop_feed_P
+        crop_leftover_K <- pool_crop_K - buffered_crop_feed_K
+        
+        #allocation of crop to biogas and food, when feed is not considered
+        share_crop_food_N <- scenario_allocate_crop_food / (scenario_allocate_crop_biogas_corrected + scenario_allocate_crop_food)
+        share_crop_food_P <- combined_output$local_vegetal_products_consumed_P[1] / (combined_output$local_vegetal_products_consumed_P[1] + combined_output$vegetal_biogas_substrate_P[1])
+        share_crop_food_K <- combined_output$local_vegetal_products_consumed_K[1] / (combined_output$local_vegetal_products_consumed_K[1] + combined_output$vegetal_biogas_substrate_K[1])
+        
+        #allocate the leftover N according to the rate
+        buffered_crop_food_N <-  crop_leftover_N * share_crop_food_N
+        buffered_crop_food_P <- max(crop_leftover_P * share_crop_food_P, 0)
+        buffered_crop_food_K <- max(crop_leftover_K * share_crop_food_K, 0)
+        
+        #the rest goes to biogas
+        buffered_crop_biogas_N <-  crop_leftover_N * (1 - share_crop_food_N)
+        buffered_crop_biogas_P <-  max(crop_leftover_P * (1 - share_crop_food_P), 0)
+        buffered_crop_biogas_K <-  max(crop_leftover_K * (1 - share_crop_food_K), 0)
+        
+        
+        #----------------------------------#
+        #Apply changed streams by buffering
+        #----------------------------------#
+        
+        # crop to feed --> channed changes to unprocessed feed because better buffer capacity
+        crop_output$N_crop_animal_feeding_unprocessed <- buffered_crop_feed_N - crop_output$N_crop_animal_feeding_processed
+        crop_output$P_crop_animal_feeding_unprocessed <- buffered_crop_feed_P - crop_output$P_crop_animal_feeding_processed
+        crop_output$K_crop_animal_feeding_unprocessed <- buffered_crop_feed_K - crop_output$K_crop_animal_feeding_processed
+        
+        # crop to local human consumption
+        crop_output$N_crop_human_consumption_processed <- buffered_crop_food_N
+        crop_output$P_crop_human_consumption_processed <- buffered_crop_food_P
+        crop_output$K_crop_human_consumption_processed <- buffered_crop_food_K
+        
+        #crop to biogas
+        crop_output$N_crop_biogas <- buffered_crop_biogas_N
+        crop_output$P_crop_biogas <- buffered_crop_biogas_P
+        crop_output$K_crop_biogas <- buffered_crop_biogas_K
+        
+      }
+      
+      
 
       # case crop and feed allocation but no herddjustment
 
