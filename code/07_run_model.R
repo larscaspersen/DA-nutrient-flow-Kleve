@@ -51,24 +51,24 @@ combined_results$scenario <- as.factor(combined_results$scenario)
 
 levels(combined_results$scenario)
 
-levels(combined_results$scenario) <- list(baseline  = "normal", 
-                                          local_feed = "all_adjustments_sh_1_stakeholder_reduction",
-                                          lf_animal_buffered = 'all_adjustments_sh_1_strict_reduction',
-                                          lf_crop_buffered = 'buffer_no_herdsize_sh_1') 
+levels(combined_results$scenario) <- list(reference_year  = "normal", 
+                                          interventions = "all_adjustments_sh_1_stakeholder_reduction",
+                                          interventions_animal_adjusted = 'all_adjustments_sh_1_strict_reduction',
+                                          interventions_crop_adjusted = 'buffer_no_herdsize_sh_1') 
 
 #split the results the different scenarios? In the end the scenarios are not a result but an input
 result_list <- split(x = combined_results, f = combined_results$scenario)
 
 #change columns to numeric
-result_list$baseline[,-1] <- lapply(result_list$baseline[,-1], as.numeric)
-result_list$local_feed[,-1] <- lapply(result_list$local_feed[,-1], as.numeric)
-result_list$lf_animal_buffered[,-1] <- lapply(result_list$lf_animal_buffered[,-1], as.numeric)
-result_list$lf_crop_buffered[,-1] <- lapply(result_list$lf_crop_buffered[,-1], as.numeric)
+result_list$reference_year[,-1] <- lapply(result_list$reference_year[,-1], as.numeric)
+result_list$interventions[,-1] <- lapply(result_list$interventions[,-1], as.numeric)
+result_list$interventions_animal_adjusted[,-1] <- lapply(result_list$interventions_animal_adjusted[,-1], as.numeric)
+result_list$interventions_crop_adjusted[,-1] <- lapply(result_list$interventions_crop_adjusted[,-1], as.numeric)
 
 
-diff_df <- rbind.data.frame(result_list$local_feed[,-1] - result_list$baseline[,-1],
-                   result_list$lf_animal_buffered[-1] - result_list$baseline[,-1],
-                   result_list$lf_crop_buffered[-1] - result_list$baseline[,-1])
+diff_df <- rbind.data.frame(result_list$interventions[-1] - result_list$reference_year[-1],
+                   result_list$interventions_animal_adjusted[-1] - result_list$reference_year[-1],
+                   result_list$interventions_crop_adjusted[-1] - result_list$reference_year[-1])
 diff_df$scenario <- c(result_list$local_feed$scenario, result_list$lf_animal_buffered$scenario, result_list$lf_crop_buffered$scenario)
 diff_df <- relocate(diff_df, scenario)
 
