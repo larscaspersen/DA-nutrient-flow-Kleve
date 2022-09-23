@@ -4,7 +4,7 @@ library(decisionSupport)
 source('code/06_combine_submodels.R')
 
 # decide what to return
-return_flows <- FALSE
+return_flows <- TRUE
 
 n_runs <- 10000
 
@@ -69,8 +69,8 @@ result_list$interventions_crop_adjusted[,-1] <- lapply(result_list$interventions
 diff_df <- rbind.data.frame(result_list$interventions[-1] - result_list$reference_year[-1],
                    result_list$interventions_animal_adjusted[-1] - result_list$reference_year[-1],
                    result_list$interventions_crop_adjusted[-1] - result_list$reference_year[-1])
-diff_df$scenario <- c(result_list$local_feed$scenario, result_list$lf_animal_buffered$scenario, result_list$lf_crop_buffered$scenario)
-diff_df <- relocate(diff_df, scenario)
+diff_df$scenario <- c(result_list$interventions$scenario, result_list$interventions_animal_adjusted$scenario, result_list$interventions_crop_adjusted$scenario)
+diff_df <- dplyr::relocate(diff_df, scenario)
 
 
 #--> list contains model results spliut by the scenarios
@@ -85,6 +85,8 @@ if(return_flows){
   
   #melt combined outputs
   combined_results_long <- reshape2::melt(combined_results, id.var = 'scenario')
+  
+  diff_df_long <- reshape::melt(diff_df, id.var = 'scenario')
   
   boring_streams <- c('animal_housing_and_storage_losses_K','animal_housing_and_storage_losses_P',
                       'compost_to_consumption_N','compost_to_consumption_P','compost_to_consumption_K',
@@ -104,9 +106,8 @@ if(return_flows){
                       'wastewater_effluent_gaseous_losses_N', 'wastewater_effluent_gaseous_losses_P', 'wastewater_effluent_gaseous_losses_K')
   
   for(flow in unique(combined_results_long$variable)){
-    
-    
-    
+      
+    #density for all flows
     p1 <- combined_results_long %>%
       filter(variable == flow) %>%
       ggplot(aes(x=as.numeric(value) ,y = scenario, fill = scenario)) +
@@ -117,13 +118,104 @@ if(return_flows){
       theme(legend.position = "none")
     
     if(flow %in% boring_streams){
-      pic_path <- 'figures/flows/boring_streams/'
+      pic_path <- 'figures/flows/distributions/boring_streams/'
     } else {
-      pic_path <- 'figures/flows/'
+      pic_path <- 'figures/flows/distributions'
     }
     
     fname <- paste0(flow,'.jpg')
     ggsave(p1,  filename = fname, path = pic_path,  device = 'jpeg', width = 10, height = 7, units = 'cm')
+    
+    
+    #density of difference to baseline
+    p2 <- diff_df_long %>%
+      filter(variable == flow) %>%
+      ggplot(aes(x=as.numeric(value) ,y = scenario, fill = scenario)) +
+      geom_density_ridges_gradient(scale=2) +
+      xlab(paste0(flow, ' [t per year]'))+
+      ylab('')+
+      theme_bw() +
+      theme(legend.position = "none")
+    
+    if(flow %in% boring_streams){
+      pic_path <- 'figures/flows/distribution_difference_baseline/boring_streams/'
+    } else {
+      pic_path <- 'figures/flows/distribution_difference_baseline/'
+    }
+    
+    fname <- paste0(flow,'.jpg')
+    ggsave(p2,  filename = fname, path = pic_path,  device = 'jpeg', width = 10, height = 7, units = 'cm')
+    
+    
+    
+    
+    # #pls analysis
+    # for(scenario in levels(combined_results$scenario)){
+    #   
+    #   if(flow %in% boring_streams){
+    #     break()
+    #   }
+    #   
+    #   #put only the corresponding scenario values to the simulation output, drop the scenario column
+    #   nitrogen_mc_simulation$y <- combined_results[combined_results$scenario == scenario, -1]
+    #   
+    #   #do pls
+    #   pls_result <- plsr.mcSimulation(
+    #     object = nitrogen_mc_simulation,
+    #     resultName = names(nitrogen_mc_simulation$y[flow]), ncomp = 1
+    #   )
+    #   
+    #   if(all(is.na(pls_result$coefficients)) == TRUE){
+    #     next()
+    #   }
+    #   
+    #   pls_plot <- plot_pls(pls_result, input_table = input, threshold = 0.9)
+    #   
+    #   if(flow %in% boring_streams){
+    #   
+    #     pic_path <- 'figures/flows/pls/boring_streams/'
+    #   } else {
+    #     pic_path <- 'figures/flows/pls/'
+    #   }
+    #   
+    #   fname <- paste0(flow,'_', scenario, '_pls.jpg')
+    #   ggsave(pls_plot,  filename = fname, path = pic_path,  device = 'jpeg', width = 12, height = 10, units = 'cm')
+    # }
+    
+    
+    # for(scenario in unique(diff_df$scenario)){
+    #   
+    #   if(flow %in% boring_streams){
+    #     break()
+    #   }
+    #   
+    #   if(sum(diff_df[diff_df$scenario == scenario, flow]) == 0){
+    #    next() 
+    #   }
+    #   
+    #   #put only the corresponding scenario values to the simulation output, drop the scenario column
+    #   nitrogen_mc_simulation$y <- diff_df[diff_df$scenario == scenario, -1]
+    #   
+    #   #do pls
+    #   pls_result <- plsr.mcSimulation(
+    #     object = nitrogen_mc_simulation,
+    #     resultName = names(nitrogen_mc_simulation$y[flow]), ncomp = 1
+    #   )
+    #   
+    #   pls_plot <- plot_pls(pls_result, input_table = input, threshold = 0.9)
+    #   
+    #   if(flow %in% boring_streams){
+    #     
+    #     pic_path <- 'figures/flows/pls_difference_baseline/boring_streams/'
+    #   } else {
+    #     pic_path <- 'figures/flows/pls_difference_baseline/'
+    #   }
+    #   
+    #   fname <- paste0(flow,'_', scenario, '_difference_baseline_pls.jpg')
+    #   ggsave(pls_plot,  filename = fname, path = pic_path,  device = 'jpeg', width = 10, height = 10, units = 'cm')
+    # }
+    
+
   }
   
 
@@ -218,320 +310,419 @@ if(return_flows){
       pic_path <- 'figures/circularity_metrics/pls_difference_baseline/'
       
       fname <- paste0(flow,'_', scenario, '_difference_baseline_pls.jpg')
-      ggsave(pls_plot,  filename = fname, path = pic_path,  device = 'jpeg', width = 10, height = 10, units = 'cm')
+      try(ggsave(pls_plot,  filename = fname, path = pic_path,  device = 'jpeg', width = 10, height = 10, units = 'cm'))
     }
   }
   
-  
-
-  
-
-  
+ 
+   
 }
 
-combined_results$run <- rep(1:n_runs, 4)
-
-
-sub_out <- combined_results %>%
-  filter(scenario == 'baseline' & crop_cultivation_losses_K == 0) %>%
-  select(-c(sewage_N, sewage_K, sewage_P, ofmsw_N, ofmsw_P, ofmsw_K, ofmsw_residual_waste_N, ofmsw_residual_waste_P, ofmsw_residual_waste_K,
-            import_OFMSW_K, import_OFMSW_N, import_OFMSW_P, wastewater_direct_discharge_N, wastewater_direct_discharge_P, wastewater_direct_discharge_K, 
-            wastewater_effluent_gaseous_losses_K, wastewater_effluent_gaseous_losses_N, wastewater_effluent_gaseous_losses_P, compost_to_consumption_N, 
-            compost_to_consumption_P, compost_to_consumption_K, sewage_sludge_export_N, sewage_sludge_export_P, sewage_sludge_export_K, 
-            fresh_compost_export_N, fresh_compost_export_P, fresh_compost_export_K, fresh_compost_export_K, fresh_compost_export_P, fresh_compost_export_N,
-            sewage_to_crop_N, sewage_to_crop_P, sewage_to_crop_K, fresh_compost_crop_N, fresh_compost_crop_P, fresh_compost_crop_K, 
-            export_meat_K, export_meat_N, export_meat_P, export_egg_K, export_egg_N, export_egg_P, animal_housing_and_storage_losses_P, animal_housing_and_storage_losses_K))
-
-sub_in <- nitrogen_mc_simulation$x[sub_out$run,]
-
-#compare input values to all input values
-
-#candidates:
-#-export_other_organic_K
-#-import_inorganic_K2O_t
-#-K_yield_mowing
-#-mais_silage_to_biogas
-#-K_yield_mais_silage
-#-import_organic_K_kg
-df1 <- select(sub_in, export_manure_N_kg, export_other_organic_K_kg,  K_yield_mowing,  import_organic_K_kg,
-              export_manure_N_kg, N_excretion_dairy, n_dairy_cow_2016)
-df1$sample <- 'cultivation_losses_zero'
-
-df2 <- select(nitrogen_mc_simulation$x, export_manure_N_kg, export_other_organic_K_kg, K_yield_mowing,  import_organic_K_kg,
-              export_manure_N_kg, N_excretion_dairy, n_dairy_cow_2016)
-df2$sample <- 'all'
-
-rbind(df1, df2) %>%
-  reshape2::melt(id.var = 'sample') %>%
-  ggplot(aes(x = sample, y = value)) + 
-  geom_boxplot() +
-  facet_wrap(~variable, scales = 'free_y')
-
-
-#check why I have so many cases of zero cultivation losses in K 
-
-#remove the scenario
-#use only the baseline data
-combined_results_sub <- combined_results[combined_results$scenario == 'baseline', ]
-#drop scenario
-combined_results_sub <- combined_results_sub[,-1]
-nitrogen_mc_simulation$y <- combined_results_sub
 
 
 
-# PLS----
-# what variable should be used for it?
-
-pls_result <- plsr.mcSimulation(
-  object = nitrogen_mc_simulation,
-  resultName = names(nitrogen_mc_simulation$y["crop_cultivation_losses_K"]), ncomp = 1
-)
-
-plot_pls(pls_result, input_table = input, threshold = 0.9)
+#calculate change relative to the reference year
+rel_change_df <- rbind.data.frame((result_list$interventions[-1] - result_list$reference_year[-1]) / result_list$reference_year[-1],
+                            (result_list$interventions_animal_adjusted[-1] - result_list$reference_year[-1]) / result_list$reference_year[-1],
+                            (result_list$interventions_crop_adjusted[-1] - result_list$reference_year[-1]) / result_list$reference_year[-1])
+rel_change_df$scenario <- c(result_list$interventions$scenario, result_list$interventions_animal_adjusted$scenario, result_list$interventions_crop_adjusted$scenario)
+rel_change_df <- dplyr::relocate(rel_change_df, scenario)
 
 
+#summarise results similar to eduardos banana paper
+#--> calculate median and iqr
+
+rel_change_df_long <- reshape2::melt(rel_change_df, id.vars = 'scenario')
+
+summarised_df <- rel_change_df_long %>%
+  group_by(scenario, variable) %>%
+  summarise(median = median(value, na.rm = T),
+            iqr = IQR(value, na.rm = T)) %>%
+  filter(iqr != 0)
+
+#split by nutrients; 
+summarised_df <- tidyr::separate(data = summarised_df, col = variable, sep = -1, convert = TRUE, into = c('variable', 'nutrient'))
+
+#remove streams with boring outcomes
+
+#split value into two columns, one for increase, one for decrease?
+summarised_df$increase <- ifelse(summarised_df$median >= 1,yes = summarised_df$median, no = NA)
+summarised_df$decrease <- ifelse(summarised_df$median < 1,yes = summarised_df$median, no = NA)
+
+#iqr for some parameters complete out of range, set to 2
+summarised_df$iqr_adusted <- ifelse(summarised_df$iqr > 2, yes = 2, no = summarised_df$iqr)
+#also have 2 as a limit for median, otherwise the scale is completely off
+summarised_df$median_adjusted <- ifelse(summarised_df$median > 2, yes = 2.0, no = summarised_df$median)
+
+
+
+install.packages("ggnewscale")
+library(ggnewscale)
+RColorBrewer::brewer.pal()
+
+p1 <- summarised_df %>%
+  filter(nutrient == 'N', median_adjusted >= 0) %>%
+  ggplot(aes(x = scenario, y = variable)) +
+  geom_tile(aes(fill = median_adjusted), colour="white", size=2) +
+  scale_fill_gradient2("Increase", limits = c(0, 2), 
+                       mid = "grey95", high = "#0571b0") +
+  
+  new_scale("fill") +
+  geom_tile(aes(fill = median_adjusted), data = summarised_df[summarised_df$nutrient == 'N' & summarised_df$median_adjusted < 0,],
+            colour="white", size=2) +
+  scale_fill_gradient2("Decrease", limits = c(-1, -0), 
+                       low = "#ca0020", mid = "grey95") +
+  geom_point(aes(size = iqr_adusted), data = summarised_df, col = 'grey50') + 
+  scale_size(range = c(.1, 7), name="IQR") +
+  theme_bw()
+
+ggsave(p1, filename = 'flow_changes.jpg', path = 'figures/', device = 'jpeg', height = 20, width = 15, units = 'cm')
+
+
+p2 <- summarised_df %>%
+  filter(nutrient == 'P', median_adjusted >= 0) %>%
+  ggplot(aes(x = scenario, y = variable)) +
+  geom_tile(aes(fill = median_adjusted), colour="white", size=2) +
+  scale_fill_gradient2("Increase", limits = c(0, 2), 
+                       mid = "grey95", high = "#0571b0") +
+  
+  new_scale("fill") +
+  geom_tile(aes(fill = median_adjusted), data = summarised_df[summarised_df$nutrient == 'N' & summarised_df$median_adjusted < 0,],
+            colour="white", size=2) +
+  scale_fill_gradient2("Decrease", limits = c(-1, 0), 
+                       low = "#ca0020", mid = "grey95") +
+  geom_point(aes(size = iqr_adusted), data = summarised_df, col = 'grey50') + 
+  scale_size(range = c(.1, 7), name="IQR") +
+  theme_bw()
+
+ggsave(p2, filename = 'flow_changes_P.jpg', path = 'figures/', device = 'jpeg', height = 20, width = 15, units = 'cm')
+
+
+p3 <- summarised_df %>%
+  filter(nutrient == 'K', median_adjusted >= 0) %>%
+  ggplot(aes(x = scenario, y = variable)) +
+  geom_tile(aes(fill = median_adjusted), colour="white", size=2) +
+  scale_fill_gradient2("Increase", limits = c(0, 2), 
+                       mid = "grey95", high = "#0571b0") +
+  
+  new_scale("fill") +
+  geom_tile(aes(fill = median_adjusted), data = summarised_df[summarised_df$nutrient == 'N' & summarised_df$median_adjusted < 0,],
+            colour="white", size=2) +
+  scale_fill_gradient2("Decrease", limits = c(-1, 0), 
+                       low = "#ca0020", mid = "grey95") +
+  geom_point(aes(size = iqr_adusted), data = summarised_df, col = 'grey50') + 
+  scale_size(range = c(.1, 7), name="IQR") +
+  theme_bw()
+
+ggsave(p3, filename = 'flow_changes_K.jpg', path = 'figures/', device = 'jpeg', height = 20, width = 15, units = 'cm')
 
 
 
 
-
-
-
-#for (n in 1:100) {
-#  make_variables(as.estimate(input))
-#  combined_function()
-#}
-
-#problem_levers <- read.csv("problem_levers.csv")
-
-
-# somehow the resulting dataframe has one column per variable, but each variable twice:
-# once for normal scenario and once for animal reduction scenario
-#
-#--> I extract the values and combine them to a new object
-#--> this probably causes problems for pls analysis, because now it is not linked to the inputs anymore
-#
-# if(return_flows){
-#   result_df <- data.frame(scenario = c(nitrogen_mc_simulation$y$scenario1, nitrogen_mc_simulation$y$scenario2),
-#                           sewage_N = as.numeric(c(nitrogen_mc_simulation$y$sewage_N1, nitrogen_mc_simulation$y$sewage_N2)),
-#                           ofmsw_residual_waste_N = as.numeric(c(nitrogen_mc_simulation$y$ofmsw_residual_waste_N1, nitrogen_mc_simulation$y$ofmsw_residual_waste_N2)),
-#                           ofmsw_N = as.numeric(c(nitrogen_mc_simulation$y$ofmsw_N1, nitrogen_mc_simulation$y$ofmsw_N2)),
-#                           wastewater_direct_discharge_N = as.numeric(c(nitrogen_mc_simulation$y$wastewater_direct_discharge_N1, nitrogen_mc_simulation$y$wastewater_direct_discharge_N2)),
-#                           compost_to_consumption_N = as.numeric(c(nitrogen_mc_simulation$y$compost_to_consumption_N1, nitrogen_mc_simulation$y$compost_to_consumption_N2)),
-#                           digestate_N = as.numeric(c(nitrogen_mc_simulation$y$digestate_N1, nitrogen_mc_simulation$y$digestate_N2)),
-#                           sewage_sludge_export_N = as.numeric(c(nitrogen_mc_simulation$y$sewage_sludge_export_N1, nitrogen_mc_simulation$y$sewage_sludge_export_N2)),
-#                           wastewater_effluent_gaseous_losses_N = as.numeric(c(nitrogen_mc_simulation$y$wastewater_effluent_gaseous_losses_N1, nitrogen_mc_simulation$y$wastewater_effluent_gaseous_losses_N2)),
-#                           fresh_compost_export_N = as.numeric(c(nitrogen_mc_simulation$y$fresh_compost_export_N1, nitrogen_mc_simulation$y$fresh_compost_crop_N2)),
-#                           fresh_compost_crop_N = as.numeric(c(nitrogen_mc_simulation$y$fresh_compost_crop_N1, nitrogen_mc_simulation$y$fresh_compost_crop_N2)),
-#                           sewage_to_crop_N = as.numeric(c(nitrogen_mc_simulation$y$sewage_to_crop_N1, nitrogen_mc_simulation$y$sewage_N2)),
-#                           vegetal_biogas_substrate_N = as.numeric(c(nitrogen_mc_simulation$y$vegetal_biogas_substrate_N1, nitrogen_mc_simulation$y$vegetal_biogas_substrate_N2)),
-#                           crop_cultivation_losses_N = as.numeric(c(nitrogen_mc_simulation$y$crop_cultivation_losses_N1, nitrogen_mc_simulation$y$crop_cultivation_losses_N2)),
-#                           other_organic_fertilizer_export_N = as.numeric(c(nitrogen_mc_simulation$y$other_organic_fertilizer_export_N1, nitrogen_mc_simulation$y$other_organic_fertilizer_export_N2)),
-#                           straw_N = as.numeric(c(nitrogen_mc_simulation$y$straw_N1, nitrogen_mc_simulation$y$straw_N2)),
-#                           feed_crops_N = as.numeric(c(nitrogen_mc_simulation$y$feed_crops_N1, nitrogen_mc_simulation$y$feed_crops_N2)),
-#                           grassbased_feed_N = as.numeric(c(nitrogen_mc_simulation$y$grassbased_feed_N1, nitrogen_mc_simulation$y$grassbased_feed_N2)),
-#                           fruit_and_vegetable_N = as.numeric(c(nitrogen_mc_simulation$y$fruit_and_vegetable_N1, nitrogen_mc_simulation$y$fruit_and_vegetable_N2)),
-#                           manure_as_biogas_substrate_N = as.numeric(c(nitrogen_mc_simulation$y$manure_as_biogas_substrate_N1, nitrogen_mc_simulation$y$manure_as_biogas_substrate_N2)),
-#                           manure_to_crop_N = as.numeric(c(nitrogen_mc_simulation$y$manure_to_crop_N1, nitrogen_mc_simulation$y$manure_to_crop_N2)),
-#                           manure_export_N = as.numeric(c(nitrogen_mc_simulation$y$manure_export_N1, nitrogen_mc_simulation$y$manure_export_N2)),
-#                           animal_housing_and_storage_losses_N = as.numeric(c(nitrogen_mc_simulation$y$animal_housing_and_storage_losses_N1, nitrogen_mc_simulation$y$animal_housing_and_storage_losses_N2)),
-#                           slaughter_animal_N = as.numeric(c(nitrogen_mc_simulation$y$slaughter_animal_N1, nitrogen_mc_simulation$y$slaughter_animal_N2)),
-#                           egg_and_dairy_N = as.numeric(c(nitrogen_mc_simulation$y$egg_and_dairy_N1, nitrogen_mc_simulation$y$egg_and_dairy_N2)),
-#                           local_vegetal_products_consumed_N = as.numeric(c(nitrogen_mc_simulation$y$local_vegetal_products_consumed_N1, nitrogen_mc_simulation$y$local_vegetal_products_consumed_N2)),
-#                           imported_animal_products_N = as.numeric(c(nitrogen_mc_simulation$y$imported_animal_products_N1, nitrogen_mc_simulation$y$imported_animal_products_N2)),
-#                           imported_vegetal_products_N = as.numeric(c(nitrogen_mc_simulation$y$imported_vegetal_products_N1, nitrogen_mc_simulation$y$imported_vegetal_products_N2)),
-#                           feed_from_processed_crops_N = as.numeric(c(nitrogen_mc_simulation$y$feed_from_processed_crops_N1, nitrogen_mc_simulation$y$feed_from_processed_crops_N2)),
-#                           import_processed_feed_N = as.numeric(c(nitrogen_mc_simulation$y$import_processed_feed_N1, nitrogen_mc_simulation$y$import_processed_feed_N2)),
-#                           local_animal_products_consumed_N = as.numeric(c(nitrogen_mc_simulation$y$local_animal_products_consumed_N1, nitrogen_mc_simulation$y$local_animal_products_consumed_N2)),
-#                           export_meat_N = as.numeric(c(nitrogen_mc_simulation$y$export_meat_N1, nitrogen_mc_simulation$y$export_meat_N2)),
-#                           import_meat_N = as.numeric(c(nitrogen_mc_simulation$y$import_meat_N1, nitrogen_mc_simulation$y$import_meat_N2)),
-#                           export_egg_N = as.numeric(c(nitrogen_mc_simulation$y$export_egg_N1, nitrogen_mc_simulation$y$export_egg_N2)),
-#                           slaughter_waste_N = as.numeric(c(nitrogen_mc_simulation$y$slaughter_waste_N1, nitrogen_mc_simulation$y$slaughter_waste_N2)),
-#                           import_OFMSW_N = as.numeric(c(nitrogen_mc_simulation$y$import_OFMSW_N1, nitrogen_mc_simulation$y$import_OFMSW_N2)),
-#                           import_inorganic_fertilizer_N = as.numeric(c(nitrogen_mc_simulation$y$import_inorganic_fertilizer_N1, nitrogen_mc_simulation$y$import_inorganic_fertilizer_N2)),
-#                           import_organic_fertilizer_N = as.numeric(c(nitrogen_mc_simulation$y$import_organic_fertilizer_N1, nitrogen_mc_simulation$y$import_organic_fertilizer_N2)),
-#                           net_food_import_N = as.numeric(c(nitrogen_mc_simulation$y$net_food_import_N1, nitrogen_mc_simulation$y$net_food_import_N2)),
-#                           net_feed_import_N = as.numeric(c(nitrogen_mc_simulation$y$net_feed_import_N1, nitrogen_mc_simulation$y$net_feed_import_N2))
+# 
+# combined_results$run <- rep(1:n_runs, 4)
+# 
+# 
+# sub_out <- combined_results %>%
+#   filter(scenario == 'baseline' & crop_cultivation_losses_K == 0) %>%
+#   select(-c(sewage_N, sewage_K, sewage_P, ofmsw_N, ofmsw_P, ofmsw_K, ofmsw_residual_waste_N, ofmsw_residual_waste_P, ofmsw_residual_waste_K,
+#             import_OFMSW_K, import_OFMSW_N, import_OFMSW_P, wastewater_direct_discharge_N, wastewater_direct_discharge_P, wastewater_direct_discharge_K, 
+#             wastewater_effluent_gaseous_losses_K, wastewater_effluent_gaseous_losses_N, wastewater_effluent_gaseous_losses_P, compost_to_consumption_N, 
+#             compost_to_consumption_P, compost_to_consumption_K, sewage_sludge_export_N, sewage_sludge_export_P, sewage_sludge_export_K, 
+#             fresh_compost_export_N, fresh_compost_export_P, fresh_compost_export_K, fresh_compost_export_K, fresh_compost_export_P, fresh_compost_export_N,
+#             sewage_to_crop_N, sewage_to_crop_P, sewage_to_crop_K, fresh_compost_crop_N, fresh_compost_crop_P, fresh_compost_crop_K, 
+#             export_meat_K, export_meat_N, export_meat_P, export_egg_K, export_egg_N, export_egg_P, animal_housing_and_storage_losses_P, animal_housing_and_storage_losses_K))
+# 
+# sub_in <- nitrogen_mc_simulation$x[sub_out$run,]
+# 
+# #compare input values to all input values
+# 
+# #candidates:
+# #-export_other_organic_K
+# #-import_inorganic_K2O_t
+# #-K_yield_mowing
+# #-mais_silage_to_biogas
+# #-K_yield_mais_silage
+# #-import_organic_K_kg
+# df1 <- select(sub_in, export_manure_N_kg, export_other_organic_K_kg,  K_yield_mowing,  import_organic_K_kg,
+#               export_manure_N_kg, N_excretion_dairy, n_dairy_cow_2016)
+# df1$sample <- 'cultivation_losses_zero'
+# 
+# df2 <- select(nitrogen_mc_simulation$x, export_manure_N_kg, export_other_organic_K_kg, K_yield_mowing,  import_organic_K_kg,
+#               export_manure_N_kg, N_excretion_dairy, n_dairy_cow_2016)
+# df2$sample <- 'all'
+# 
+# rbind(df1, df2) %>%
+#   reshape2::melt(id.var = 'sample') %>%
+#   ggplot(aes(x = sample, y = value)) + 
+#   geom_boxplot() +
+#   facet_wrap(~variable, scales = 'free_y')
+# 
+# 
+# #check why I have so many cases of zero cultivation losses in K 
+# 
+# #remove the scenario
+# #use only the baseline data
+# combined_results_sub <- combined_results[combined_results$scenario == 'baseline', ]
+# #drop scenario
+# combined_results_sub <- combined_results_sub[,-1]
+# nitrogen_mc_simulation$y <- combined_results_sub
+# 
+# 
+# 
+# # PLS----
+# # what variable should be used for it?
+# 
+# pls_result <- plsr.mcSimulation(
+#   object = nitrogen_mc_simulation,
+#   resultName = names(nitrogen_mc_simulation$y["crop_cultivation_losses_K"]), ncomp = 1
+# )
+# 
+# plot_pls(pls_result, input_table = input, threshold = 0.9)
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# #for (n in 1:100) {
+# #  make_variables(as.estimate(input))
+# #  combined_function()
+# #}
+# 
+# #problem_levers <- read.csv("problem_levers.csv")
+# 
+# 
+# # somehow the resulting dataframe has one column per variable, but each variable twice:
+# # once for normal scenario and once for animal reduction scenario
+# #
+# #--> I extract the values and combine them to a new object
+# #--> this probably causes problems for pls analysis, because now it is not linked to the inputs anymore
+# #
+# # if(return_flows){
+# #   result_df <- data.frame(scenario = c(nitrogen_mc_simulation$y$scenario1, nitrogen_mc_simulation$y$scenario2),
+# #                           sewage_N = as.numeric(c(nitrogen_mc_simulation$y$sewage_N1, nitrogen_mc_simulation$y$sewage_N2)),
+# #                           ofmsw_residual_waste_N = as.numeric(c(nitrogen_mc_simulation$y$ofmsw_residual_waste_N1, nitrogen_mc_simulation$y$ofmsw_residual_waste_N2)),
+# #                           ofmsw_N = as.numeric(c(nitrogen_mc_simulation$y$ofmsw_N1, nitrogen_mc_simulation$y$ofmsw_N2)),
+# #                           wastewater_direct_discharge_N = as.numeric(c(nitrogen_mc_simulation$y$wastewater_direct_discharge_N1, nitrogen_mc_simulation$y$wastewater_direct_discharge_N2)),
+# #                           compost_to_consumption_N = as.numeric(c(nitrogen_mc_simulation$y$compost_to_consumption_N1, nitrogen_mc_simulation$y$compost_to_consumption_N2)),
+# #                           digestate_N = as.numeric(c(nitrogen_mc_simulation$y$digestate_N1, nitrogen_mc_simulation$y$digestate_N2)),
+# #                           sewage_sludge_export_N = as.numeric(c(nitrogen_mc_simulation$y$sewage_sludge_export_N1, nitrogen_mc_simulation$y$sewage_sludge_export_N2)),
+# #                           wastewater_effluent_gaseous_losses_N = as.numeric(c(nitrogen_mc_simulation$y$wastewater_effluent_gaseous_losses_N1, nitrogen_mc_simulation$y$wastewater_effluent_gaseous_losses_N2)),
+# #                           fresh_compost_export_N = as.numeric(c(nitrogen_mc_simulation$y$fresh_compost_export_N1, nitrogen_mc_simulation$y$fresh_compost_crop_N2)),
+# #                           fresh_compost_crop_N = as.numeric(c(nitrogen_mc_simulation$y$fresh_compost_crop_N1, nitrogen_mc_simulation$y$fresh_compost_crop_N2)),
+# #                           sewage_to_crop_N = as.numeric(c(nitrogen_mc_simulation$y$sewage_to_crop_N1, nitrogen_mc_simulation$y$sewage_N2)),
+# #                           vegetal_biogas_substrate_N = as.numeric(c(nitrogen_mc_simulation$y$vegetal_biogas_substrate_N1, nitrogen_mc_simulation$y$vegetal_biogas_substrate_N2)),
+# #                           crop_cultivation_losses_N = as.numeric(c(nitrogen_mc_simulation$y$crop_cultivation_losses_N1, nitrogen_mc_simulation$y$crop_cultivation_losses_N2)),
+# #                           other_organic_fertilizer_export_N = as.numeric(c(nitrogen_mc_simulation$y$other_organic_fertilizer_export_N1, nitrogen_mc_simulation$y$other_organic_fertilizer_export_N2)),
+# #                           straw_N = as.numeric(c(nitrogen_mc_simulation$y$straw_N1, nitrogen_mc_simulation$y$straw_N2)),
+# #                           feed_crops_N = as.numeric(c(nitrogen_mc_simulation$y$feed_crops_N1, nitrogen_mc_simulation$y$feed_crops_N2)),
+# #                           grassbased_feed_N = as.numeric(c(nitrogen_mc_simulation$y$grassbased_feed_N1, nitrogen_mc_simulation$y$grassbased_feed_N2)),
+# #                           fruit_and_vegetable_N = as.numeric(c(nitrogen_mc_simulation$y$fruit_and_vegetable_N1, nitrogen_mc_simulation$y$fruit_and_vegetable_N2)),
+# #                           manure_as_biogas_substrate_N = as.numeric(c(nitrogen_mc_simulation$y$manure_as_biogas_substrate_N1, nitrogen_mc_simulation$y$manure_as_biogas_substrate_N2)),
+# #                           manure_to_crop_N = as.numeric(c(nitrogen_mc_simulation$y$manure_to_crop_N1, nitrogen_mc_simulation$y$manure_to_crop_N2)),
+# #                           manure_export_N = as.numeric(c(nitrogen_mc_simulation$y$manure_export_N1, nitrogen_mc_simulation$y$manure_export_N2)),
+# #                           animal_housing_and_storage_losses_N = as.numeric(c(nitrogen_mc_simulation$y$animal_housing_and_storage_losses_N1, nitrogen_mc_simulation$y$animal_housing_and_storage_losses_N2)),
+# #                           slaughter_animal_N = as.numeric(c(nitrogen_mc_simulation$y$slaughter_animal_N1, nitrogen_mc_simulation$y$slaughter_animal_N2)),
+# #                           egg_and_dairy_N = as.numeric(c(nitrogen_mc_simulation$y$egg_and_dairy_N1, nitrogen_mc_simulation$y$egg_and_dairy_N2)),
+# #                           local_vegetal_products_consumed_N = as.numeric(c(nitrogen_mc_simulation$y$local_vegetal_products_consumed_N1, nitrogen_mc_simulation$y$local_vegetal_products_consumed_N2)),
+# #                           imported_animal_products_N = as.numeric(c(nitrogen_mc_simulation$y$imported_animal_products_N1, nitrogen_mc_simulation$y$imported_animal_products_N2)),
+# #                           imported_vegetal_products_N = as.numeric(c(nitrogen_mc_simulation$y$imported_vegetal_products_N1, nitrogen_mc_simulation$y$imported_vegetal_products_N2)),
+# #                           feed_from_processed_crops_N = as.numeric(c(nitrogen_mc_simulation$y$feed_from_processed_crops_N1, nitrogen_mc_simulation$y$feed_from_processed_crops_N2)),
+# #                           import_processed_feed_N = as.numeric(c(nitrogen_mc_simulation$y$import_processed_feed_N1, nitrogen_mc_simulation$y$import_processed_feed_N2)),
+# #                           local_animal_products_consumed_N = as.numeric(c(nitrogen_mc_simulation$y$local_animal_products_consumed_N1, nitrogen_mc_simulation$y$local_animal_products_consumed_N2)),
+# #                           export_meat_N = as.numeric(c(nitrogen_mc_simulation$y$export_meat_N1, nitrogen_mc_simulation$y$export_meat_N2)),
+# #                           import_meat_N = as.numeric(c(nitrogen_mc_simulation$y$import_meat_N1, nitrogen_mc_simulation$y$import_meat_N2)),
+# #                           export_egg_N = as.numeric(c(nitrogen_mc_simulation$y$export_egg_N1, nitrogen_mc_simulation$y$export_egg_N2)),
+# #                           slaughter_waste_N = as.numeric(c(nitrogen_mc_simulation$y$slaughter_waste_N1, nitrogen_mc_simulation$y$slaughter_waste_N2)),
+# #                           import_OFMSW_N = as.numeric(c(nitrogen_mc_simulation$y$import_OFMSW_N1, nitrogen_mc_simulation$y$import_OFMSW_N2)),
+# #                           import_inorganic_fertilizer_N = as.numeric(c(nitrogen_mc_simulation$y$import_inorganic_fertilizer_N1, nitrogen_mc_simulation$y$import_inorganic_fertilizer_N2)),
+# #                           import_organic_fertilizer_N = as.numeric(c(nitrogen_mc_simulation$y$import_organic_fertilizer_N1, nitrogen_mc_simulation$y$import_organic_fertilizer_N2)),
+# #                           net_food_import_N = as.numeric(c(nitrogen_mc_simulation$y$net_food_import_N1, nitrogen_mc_simulation$y$net_food_import_N2)),
+# #                           net_feed_import_N = as.numeric(c(nitrogen_mc_simulation$y$net_feed_import_N1, nitrogen_mc_simulation$y$net_feed_import_N2))
+# #   )
+# # } else {
+# #   result_df <- data.frame(scenario = c(nitrogen_mc_simulation$y$scenario1, nitrogen_mc_simulation$y$scenario2),
+# #                            self_supplied = c(nitrogen_mc_simulation$y$self_supplied1, nitrogen_mc_simulation$y$self_supplied2),
+# #                            external_input = c(nitrogen_mc_simulation$y$external_input1, nitrogen_mc_simulation$y$external_input2),
+# #                            system_output = c(nitrogen_mc_simulation$y$system_output1, nitrogen_mc_simulation$y$system_output2),
+# #                            system_losses =  c(nitrogen_mc_simulation$y$system_losses1, nitrogen_mc_simulation$y$system_losses2),
+# #                            SSE = c(nitrogen_mc_simulation$y$SSE1, nitrogen_mc_simulation$y$SSE2),
+# #                            supplied_by_outside = c(nitrogen_mc_simulation$y$supplied_by_outside1, nitrogen_mc_simulation$y$supplied_by_outside2),
+# #                            N_manure_to_crop = c(nitrogen_mc_simulation$y$N_manure_to_crop1, nitrogen_mc_simulation$y$N_manure_to_crop2))
+# # }
+# 
+# # nitrogen_mc_simulation$y <- result_df
+# 
+# # nitrogen_mc_simulation$x <- rbind(nitrogen_mc_simulation$x, nitrogen_mc_simulation$x)
+# 
+# # add scenario as input variable
+# # nitrogen_mc_simulation$x$scenario <- as.factor(nitrogen_mc_simulation$y$scenario)
+# #--> looks like PLS cant handle factors, so split it?
+# 
+# 
+# # should I use the PLS to analyse the outcomes of the scenario
+# # or should I use it to analyse the CHANGE in the variable
+# 
+# nitrogen_mc_simulation$y
+# 
+# # somehow number were characters, so change back to numeric
+# n_y <- length(nitrogen_mc_simulation$y)
+# nitrogen_mc_simulation$y[, 2:n_y] <- sapply(nitrogen_mc_simulation$y[, 2:n_y], as.numeric)
+# 
+# 
+# nitrogen_mc_simulation$y$total_input_N_change <- nitrogen_mc_simulation$y$total_input_N1 - nitrogen_mc_simulation$y$total_input_N2
+# nitrogen_mc_simulation$y$total_input_P_change <- nitrogen_mc_simulation$y$total_input_P1 - nitrogen_mc_simulation$y$total_input_P2
+# nitrogen_mc_simulation$y$total_input_K_change <- nitrogen_mc_simulation$y$total_input_K1 - nitrogen_mc_simulation$y$total_input_K2
+# 
+# nitrogen_mc_simulation$y$use_efficiency_N_change <- nitrogen_mc_simulation$y$use_efficiency_N1 - nitrogen_mc_simulation$y$use_efficiency_N2
+# nitrogen_mc_simulation$y$use_efficiency_P_change <- nitrogen_mc_simulation$y$use_efficiency_P1 - nitrogen_mc_simulation$y$use_efficiency_P2
+# nitrogen_mc_simulation$y$use_efficiency_K_change <- nitrogen_mc_simulation$y$use_efficiency_K1 - nitrogen_mc_simulation$y$use_efficiency_K2
+# 
+# nitrogen_mc_simulation$y$share_reuse_to_total_input_N_change <- nitrogen_mc_simulation$y$share_reuse_to_total_input_N1 - nitrogen_mc_simulation$y$share_reuse_to_total_input_N2
+# nitrogen_mc_simulation$y$share_reuse_to_total_input_P_change <- nitrogen_mc_simulation$y$share_reuse_to_total_input_P1 - nitrogen_mc_simulation$y$share_reuse_to_total_input_P2
+# nitrogen_mc_simulation$y$share_reuse_to_total_input_K_change <- nitrogen_mc_simulation$y$share_reuse_to_total_input_K1 - nitrogen_mc_simulation$y$share_reuse_to_total_input_K2
+# 
+# nitrogen_mc_simulation$y$recycling_rate_N_change <- nitrogen_mc_simulation$y$recycling_rate_N1 - nitrogen_mc_simulation$y$recycling_rate_N2
+# nitrogen_mc_simulation$y$recycling_rate_P_change <- nitrogen_mc_simulation$y$recycling_rate_P1 - nitrogen_mc_simulation$y$recycling_rate_P2
+# nitrogen_mc_simulation$y$recycling_rate_K_change <- nitrogen_mc_simulation$y$recycling_rate_K1 - nitrogen_mc_simulation$y$recycling_rate_K2
+# 
+# nitrogen_mc_simulation$y$losses_N_change <- nitrogen_mc_simulation$y$losses_N1 - nitrogen_mc_simulation$y$losses_N2
+# nitrogen_mc_simulation$y$losses_P_change <- nitrogen_mc_simulation$y$losses_P1 - nitrogen_mc_simulation$y$losses_P2
+# nitrogen_mc_simulation$y$losses_K_change <- nitrogen_mc_simulation$y$losses_K1 - nitrogen_mc_simulation$y$losses_K2
+# 
+# 
+# # PLS----
+# # what variable should be used for it?
+# 
+# pls_result <- plsr.mcSimulation(
+#   object = nitrogen_mc_simulation,
+#   resultName = names(nitrogen_mc_simulation$y["total_input_N_change"]), ncomp = 1
+# )
+# VIP <- function(object) {
+#   if (object$method != "oscorespls") {
+#     stop("Only implemented for orthogonal scores algorithm.  Refit with 'method = \"oscorespls\"'")
+#   }
+#   if (nrow(object$Yloadings) > 1) {
+#     stop("Only implemented for single-response models")
+#   }
+#   SS <- c(object$Yloadings)^2 * colSums(object$scores^2)
+#   Wnorm2 <- colSums(object$loading.weights^2)
+#   SSW <- sweep(
+#     object$loading.weights^2, 2, SS / Wnorm2,
+#     "*"
 #   )
-# } else {
-#   result_df <- data.frame(scenario = c(nitrogen_mc_simulation$y$scenario1, nitrogen_mc_simulation$y$scenario2),
-#                            self_supplied = c(nitrogen_mc_simulation$y$self_supplied1, nitrogen_mc_simulation$y$self_supplied2),
-#                            external_input = c(nitrogen_mc_simulation$y$external_input1, nitrogen_mc_simulation$y$external_input2),
-#                            system_output = c(nitrogen_mc_simulation$y$system_output1, nitrogen_mc_simulation$y$system_output2),
-#                            system_losses =  c(nitrogen_mc_simulation$y$system_losses1, nitrogen_mc_simulation$y$system_losses2),
-#                            SSE = c(nitrogen_mc_simulation$y$SSE1, nitrogen_mc_simulation$y$SSE2),
-#                            supplied_by_outside = c(nitrogen_mc_simulation$y$supplied_by_outside1, nitrogen_mc_simulation$y$supplied_by_outside2),
-#                            N_manure_to_crop = c(nitrogen_mc_simulation$y$N_manure_to_crop1, nitrogen_mc_simulation$y$N_manure_to_crop2))
+#   sqrt(nrow(SSW) * apply(SSW, 1, cumsum) / cumsum(SS))
 # }
-
-# nitrogen_mc_simulation$y <- result_df
-
-# nitrogen_mc_simulation$x <- rbind(nitrogen_mc_simulation$x, nitrogen_mc_simulation$x)
-
-# add scenario as input variable
-# nitrogen_mc_simulation$x$scenario <- as.factor(nitrogen_mc_simulation$y$scenario)
-#--> looks like PLS cant handle factors, so split it?
-
-
-# should I use the PLS to analyse the outcomes of the scenario
-# or should I use it to analyse the CHANGE in the variable
-
-nitrogen_mc_simulation$y
-
-# somehow number were characters, so change back to numeric
-n_y <- length(nitrogen_mc_simulation$y)
-nitrogen_mc_simulation$y[, 2:n_y] <- sapply(nitrogen_mc_simulation$y[, 2:n_y], as.numeric)
-
-
-nitrogen_mc_simulation$y$total_input_N_change <- nitrogen_mc_simulation$y$total_input_N1 - nitrogen_mc_simulation$y$total_input_N2
-nitrogen_mc_simulation$y$total_input_P_change <- nitrogen_mc_simulation$y$total_input_P1 - nitrogen_mc_simulation$y$total_input_P2
-nitrogen_mc_simulation$y$total_input_K_change <- nitrogen_mc_simulation$y$total_input_K1 - nitrogen_mc_simulation$y$total_input_K2
-
-nitrogen_mc_simulation$y$use_efficiency_N_change <- nitrogen_mc_simulation$y$use_efficiency_N1 - nitrogen_mc_simulation$y$use_efficiency_N2
-nitrogen_mc_simulation$y$use_efficiency_P_change <- nitrogen_mc_simulation$y$use_efficiency_P1 - nitrogen_mc_simulation$y$use_efficiency_P2
-nitrogen_mc_simulation$y$use_efficiency_K_change <- nitrogen_mc_simulation$y$use_efficiency_K1 - nitrogen_mc_simulation$y$use_efficiency_K2
-
-nitrogen_mc_simulation$y$share_reuse_to_total_input_N_change <- nitrogen_mc_simulation$y$share_reuse_to_total_input_N1 - nitrogen_mc_simulation$y$share_reuse_to_total_input_N2
-nitrogen_mc_simulation$y$share_reuse_to_total_input_P_change <- nitrogen_mc_simulation$y$share_reuse_to_total_input_P1 - nitrogen_mc_simulation$y$share_reuse_to_total_input_P2
-nitrogen_mc_simulation$y$share_reuse_to_total_input_K_change <- nitrogen_mc_simulation$y$share_reuse_to_total_input_K1 - nitrogen_mc_simulation$y$share_reuse_to_total_input_K2
-
-nitrogen_mc_simulation$y$recycling_rate_N_change <- nitrogen_mc_simulation$y$recycling_rate_N1 - nitrogen_mc_simulation$y$recycling_rate_N2
-nitrogen_mc_simulation$y$recycling_rate_P_change <- nitrogen_mc_simulation$y$recycling_rate_P1 - nitrogen_mc_simulation$y$recycling_rate_P2
-nitrogen_mc_simulation$y$recycling_rate_K_change <- nitrogen_mc_simulation$y$recycling_rate_K1 - nitrogen_mc_simulation$y$recycling_rate_K2
-
-nitrogen_mc_simulation$y$losses_N_change <- nitrogen_mc_simulation$y$losses_N1 - nitrogen_mc_simulation$y$losses_N2
-nitrogen_mc_simulation$y$losses_P_change <- nitrogen_mc_simulation$y$losses_P1 - nitrogen_mc_simulation$y$losses_P2
-nitrogen_mc_simulation$y$losses_K_change <- nitrogen_mc_simulation$y$losses_K1 - nitrogen_mc_simulation$y$losses_K2
-
-
-# PLS----
-# what variable should be used for it?
-
-pls_result <- plsr.mcSimulation(
-  object = nitrogen_mc_simulation,
-  resultName = names(nitrogen_mc_simulation$y["total_input_N_change"]), ncomp = 1
-)
-VIP <- function(object) {
-  if (object$method != "oscorespls") {
-    stop("Only implemented for orthogonal scores algorithm.  Refit with 'method = \"oscorespls\"'")
-  }
-  if (nrow(object$Yloadings) > 1) {
-    stop("Only implemented for single-response models")
-  }
-  SS <- c(object$Yloadings)^2 * colSums(object$scores^2)
-  Wnorm2 <- colSums(object$loading.weights^2)
-  SSW <- sweep(
-    object$loading.weights^2, 2, SS / Wnorm2,
-    "*"
-  )
-  sqrt(nrow(SSW) * apply(SSW, 1, cumsum) / cumsum(SS))
-}
-
-library(tidyverse)
-
-# function to return ordered and filtered vip scores
-
-get_clean_VIP <- function(object, vip_threshold = 0.8) {
-  # calculate VIP
-  scores <- VIP(object)
-  
-  # filter scores by threshold
-  scores <- scores[scores >= vip_threshold]
-  
-  # order by decreasing vip score
-  scores <- scores[order(scores, decreasing = T)]
-  
-  # create dataframe which will be returned
-  scores_df <- data.frame(variable = names(scores), vip = scores)
-  
-  # reset rownames()
-  rownames(scores_df) <- NULL
-  
-  
-  return(scores_df)
-}
-
-# loop over all variables I want to make a pls analysis with
-pls_names <- c(
-  "total_input_N_change", "total_input_P_change", "total_input_K_change",
-  "use_efficiency_N_change", "use_efficiency_P_change", "use_efficiency_K_change",
-  "share_reuse_to_total_input_N_change", "share_reuse_to_total_input_P_change", "share_reuse_to_total_input_K_change",
-  "recycling_rate_N_change", "recycling_rate_P_change", "recycling_rate_K_change",
-  "losses_N_change", "losses_P_change", "losses_K_change"
-)
-
-pls_list <- list()
-for (var in pls_names) {
-  # make pls analysis
-  pls_result <- plsr.mcSimulation(
-    object = nitrogen_mc_simulation,
-    resultName = names(nitrogen_mc_simulation$y[var]), ncomp = 1
-  )
-  # get clean vip score, filtered and ordered
-  vip <- get_clean_VIP(pls_result)
-  
-  # add from which flow it is calculated
-  vip$indicator <- var
-  
-  vip$vip <- round(vip$vip, digits = 2)
-  
-  # save to list
-  pls_list[[var]] <- vip
-}
-
-library(openxlsx)
-
-
-# change some names because they are too long
-names(pls_list)[7:9] <- c(
-  "share_reuse_N_change", "share_reuse_P_change",
-  "share_reuse_K_change"
-)
-
-# export each data frame to separate sheets in same Excel file
-openxlsx::write.xlsx(pls_list, file = "data/vip/vip_per_indicator_ver2.xlsx")
-
-
-
-
-
-
-
-# EVPI----
-# all the flows are positive and that is why the evpi doesnt yield a sensible result
-# I need the difference of the two to find something meaningful
-boxplot(as.numeric(nitrogen_mc_simulation$y$total_input_N1) - as.numeric(nitrogen_mc_simulation$y$total_input_N2))
-
-
-# here we subset the outputs from the mcSimulation function (y) by selecting the correct variables
-# this should be done by the user (be sure to run the multi_EVPI only on the variables that the user wants)
-mcSimulation_table <- data.frame(nitrogen_mc_simulation$x, nitrogen_mc_simulation$y[2])
-
-# its always positive
-#--> its always a good "decision"
-mcSimulation_table$total_input_N1 <- as.numeric(mcSimulation_table$total_input_N1)
-
-
-
-mcSimulation_table
-
-evpi <- multi_EVPI(mc = mcSimulation_table, first_out_var = "total_input_N1")
-
-
-
-plot_evpi(evpi, decision_vars = "NPV_decision_do")
-
-
-
-
-
-
-# summarise the flows for bernou
-library(tidyverse)
-
-sum_result <- psych::describeBy(result_df, result_df$scenario, mat = TRUE)
-
-write.csv(sum_result, file = "summary_model_flow.csv")
+# 
+# library(tidyverse)
+# 
+# # function to return ordered and filtered vip scores
+# 
+# get_clean_VIP <- function(object, vip_threshold = 0.8) {
+#   # calculate VIP
+#   scores <- VIP(object)
+#   
+#   # filter scores by threshold
+#   scores <- scores[scores >= vip_threshold]
+#   
+#   # order by decreasing vip score
+#   scores <- scores[order(scores, decreasing = T)]
+#   
+#   # create dataframe which will be returned
+#   scores_df <- data.frame(variable = names(scores), vip = scores)
+#   
+#   # reset rownames()
+#   rownames(scores_df) <- NULL
+#   
+#   
+#   return(scores_df)
+# }
+# 
+# # loop over all variables I want to make a pls analysis with
+# pls_names <- c(
+#   "total_input_N_change", "total_input_P_change", "total_input_K_change",
+#   "use_efficiency_N_change", "use_efficiency_P_change", "use_efficiency_K_change",
+#   "share_reuse_to_total_input_N_change", "share_reuse_to_total_input_P_change", "share_reuse_to_total_input_K_change",
+#   "recycling_rate_N_change", "recycling_rate_P_change", "recycling_rate_K_change",
+#   "losses_N_change", "losses_P_change", "losses_K_change"
+# )
+# 
+# pls_list <- list()
+# for (var in pls_names) {
+#   # make pls analysis
+#   pls_result <- plsr.mcSimulation(
+#     object = nitrogen_mc_simulation,
+#     resultName = names(nitrogen_mc_simulation$y[var]), ncomp = 1
+#   )
+#   # get clean vip score, filtered and ordered
+#   vip <- get_clean_VIP(pls_result)
+#   
+#   # add from which flow it is calculated
+#   vip$indicator <- var
+#   
+#   vip$vip <- round(vip$vip, digits = 2)
+#   
+#   # save to list
+#   pls_list[[var]] <- vip
+# }
+# 
+# library(openxlsx)
+# 
+# 
+# # change some names because they are too long
+# names(pls_list)[7:9] <- c(
+#   "share_reuse_N_change", "share_reuse_P_change",
+#   "share_reuse_K_change"
+# )
+# 
+# # export each data frame to separate sheets in same Excel file
+# openxlsx::write.xlsx(pls_list, file = "data/vip/vip_per_indicator_ver2.xlsx")
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# # EVPI----
+# # all the flows are positive and that is why the evpi doesnt yield a sensible result
+# # I need the difference of the two to find something meaningful
+# boxplot(as.numeric(nitrogen_mc_simulation$y$total_input_N1) - as.numeric(nitrogen_mc_simulation$y$total_input_N2))
+# 
+# 
+# # here we subset the outputs from the mcSimulation function (y) by selecting the correct variables
+# # this should be done by the user (be sure to run the multi_EVPI only on the variables that the user wants)
+# mcSimulation_table <- data.frame(nitrogen_mc_simulation$x, nitrogen_mc_simulation$y[2])
+# 
+# # its always positive
+# #--> its always a good "decision"
+# mcSimulation_table$total_input_N1 <- as.numeric(mcSimulation_table$total_input_N1)
+# 
+# 
+# 
+# mcSimulation_table
+# 
+# evpi <- multi_EVPI(mc = mcSimulation_table, first_out_var = "total_input_N1")
+# 
+# 
+# 
+# plot_evpi(evpi, decision_vars = "NPV_decision_do")
+# 
+# 
+# 
+# 
+# 
+# 
+# # summarise the flows for bernou
+# library(tidyverse)
+# 
+# sum_result <- psych::describeBy(result_df, result_df$scenario, mat = TRUE)
+# 
+# write.csv(sum_result, file = "summary_model_flow.csv")
 
 #
 # #summarise the flows by min, 10% percentile, median, mean, sd, 90% percentile, max
