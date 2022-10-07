@@ -602,17 +602,17 @@ I guess these scenario specific variables can all be categorized under level 5 u
 ,5,kg of inorganic N needed for the same fertiliztation effect of 1kg manure N,convert_manure_to_inorganic_N,conversion rate,0.2475,0.33,0.4125,posnorm,crop,,table from bernou
 ,5,kg of inorganic P needed for the same fertiliztation effect of 1kg manure N,convert_manure_to_inorganic_P,conversion rate,0.1875,0.25,0.3125,posnorm,crop,,table from bernou
 ,5,kg of inorganic K needed for the same fertiliztation effect of 1kg manure N,convert_manure_to_inorganic_K,conversion rate,0.1875,0.25,0.3125,posnorm,crop,,still need proper input
-,5,share of produced crops allocated to biogas in a local feed scenario,scenario_allocate_crop_biogas_a,share,0.09375,0.125,0.15625,tnorm_0_1,crop,,survey stakeholders
-,5,share of produced crops allocated to animal feed in a local feed scenario,scenario_allocate_crop_feed_a,share,0.58125,0.775,0.96875,tnorm_0_1,crop,,survey stakeholders
-,5,share of produced crops allocated to human food in a local feed scenario,scenario_allocate_crop_food_a,share,0.0975,0.13,0.1625,tnorm_0_1,crop,,survey stakeholders
-,5,overall reduction of livestock units in local feed scenario,scenario_overall_livestock_reduction_a,share,0.225,0.3,0.375,tnorm_0_1,animal,,survey stakeholders
-,5,share of cattle livestock units in local feed scenario,scenario_share_cattle_a,share,0.48,0.64,0.8,tnorm_0_1,animal,,survey stakeholders
-,5,share of pig livestock units in local feed scenario,scenario_share_pig_a,share,0.1725,0.23,0.2875,tnorm_0_1,animal,,survey stakeholders
-,5,share of poultry livestock units in local feed scenario,scenario_share_poultry_a,share,0.06,0.08,0.1,tnorm_0_1,animal,,survey stakeholders
-,5,share of other animals livestock units in local feed scenario,scenario_share_others_a,share,0.045,0.06,0.075,tnorm_0_1,animal,,survey stakeholders
-,5,allocation of animal manure to export in a local feed scenario,scenario_allocate_manure_export_a,,0.161625,0.2155,0.269375,tnorm_0_1,animal,,survey stakeholders
-,5,allocation of animal manure to biogas in a local feed scenario,scenario_allocate_manure_biogas_a,,0.16875,0.225,0.28125,tnorm_0_1,animal,,survey stakeholders
-,5,allocation of animal manure to crop in a local feed scenario,scenario_allocate_manure_crop_a,,0.45375,0.605,0.75625,tnorm_0_1,animal,,survey stakeholders
+,5,share of produced crops allocated to biogas in a local feed scenario,scenario_allocate_crop_biogas_a,share,0.1,,0.325,tnorm_0_1,crop,,"survey stakeholders, took 10% and 90% quantiles"
+,5,share of produced crops allocated to animal feed in a local feed scenario,scenario_allocate_crop_feed_a,share,0.19,,0.79,tnorm_0_1,crop,,"survey stakeholders, took 10% and 90% quantiles"
+,5,share of produced crops allocated to human food in a local feed scenario,scenario_allocate_crop_food_a,share,0.06,,0.57,tnorm_0_1,crop,,"survey stakeholders, took 10% and 90% quantiles"
+,5,overall reduction of livestock units in local feed scenario,scenario_overall_livestock_reduction_a,share,0.145,,0.505,tnorm_0_1,animal,,"survey stakeholders, took 10% and 90% quantiles"
+,5,share of cattle livestock units in local feed scenario,scenario_share_cattle_a,share,0.598,,0.71,tnorm_0_1,animal,,"survey stakeholders, took 10% and 90% quantiles"
+,5,share of pig livestock units in local feed scenario,scenario_share_pig_a,share,0.174,,0.28,tnorm_0_1,animal,,"survey stakeholders, took 10% and 90% quantiles"
+,5,share of poultry livestock units in local feed scenario,scenario_share_poultry_a,share,0.028,,0.101,tnorm_0_1,animal,,"survey stakeholders, took 10% and 90% quantiles"
+,5,share of other animals livestock units in local feed scenario,scenario_share_others_a,share,0.047,,0.08,tnorm_0_1,animal,,"survey stakeholders, took 10% and 90% quantiles"
+,5,allocation of animal manure to export in a local feed scenario,scenario_allocate_manure_export_a,,0.01,,0.339,tnorm_0_1,animal,,"survey stakeholders, took 10% and 90% quantiles"
+,5,allocation of animal manure to biogas in a local feed scenario,scenario_allocate_manure_biogas_a,,0.085,,0.52,tnorm_0_1,animal,,"survey stakeholders, took 10% and 90% quantiles"
+,5,allocation of animal manure to crop in a local feed scenario,scenario_allocate_manure_crop_a,,0.182,,0.852,tnorm_0_1,animal,,"survey stakeholders, took 10% and 90% quantiles"
 ,5,share of produced crops allocated to biogas in a local feed scenario,scenario_allocate_crop_biogas_b,share,0.0975,0.13,0.1625,tnorm_0_1,crop,,survey stakeholders V2
 ,5,share of produced crops allocated to animal feed in a local feed scenario,scenario_allocate_crop_feed_b,share,0.585,0.78,0.975,tnorm_0_1,crop,,survey stakeholders V2
 ,5,share of produced crops allocated to human food in a local feed scenario,scenario_allocate_crop_food_b,share,0.10125,0.135,0.16875,tnorm_0_1,crop,,survey stakeholders V2
