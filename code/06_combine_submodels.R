@@ -1818,13 +1818,38 @@ combined_function <- function() {
 
 
       # N BALANCE----
-      N_animal_in <- N_feed_import + N_animal_local_input
-      P_animal_in <- P_feed_import + P_animal_local_input
-      K_animal_in <- K_feed_import + K_animal_local_input
+      N_animal_in <- N_feed_import + (crop_output$N_straw + crop_output$N_grassland +
+                                        crop_output$N_crop_animal_feeding_processed +
+                                        crop_output$N_crop_animal_feeding_unprocessed)
+      P_animal_in <- P_feed_import + (crop_output$P_straw + crop_output$P_grassland +
+                                        crop_output$P_crop_animal_feeding_processed +
+                                        crop_output$P_crop_animal_feeding_unprocessed)
+      K_animal_in <- K_feed_import + (crop_output$K_straw + crop_output$K_grassland +
+                                        crop_output$K_crop_animal_feeding_processed +
+                                        crop_output$K_crop_animal_feeding_unprocessed)
 
-      N_animal_out <- N_animal_output_produced
-      P_animal_out <- P_animal_output_produced
-      K_animal_out <- K_animal_output_produced
+      N_animal_out <-  animal_output$N_milk_available +
+                          animal_output$N_egg_available +
+                          animal_output$N_manure_biogas +
+                          animal_output$N_manure_crop +
+                          animal_output$export_manure_N_kg +
+                          animal_output$N_housing_loss +
+                          animal_output$N_to_slaughter
+      P_animal_out <- animal_output$P_milk_available +
+                          animal_output$P_egg_available +
+                          animal_output$P_manure_biogas +
+                          animal_output$P_manure_crop +
+                          animal_output$export_manure_P_kg +
+                          animal_output$P_housing_loss +
+                          animal_output$P_to_slaughter
+      K_animal_out <- animal_output$K_milk_available +
+                        animal_output$K_egg_available +
+                        animal_output$K_manure_biogas +
+                        animal_output$K_manure_crop +
+                        animal_output$export_manure_K_kg +
+                        animal_output$K_housing_loss +
+                        animal_output$K_to_slaughter
+
 
       N_animal_balance <- N_animal_in - N_animal_out
       P_animal_balance <- P_animal_in - P_animal_out
@@ -1979,7 +2004,10 @@ combined_function <- function() {
         net_food_import_K = c(combined_output$net_food_import_K, adj_length(K_total_food_import, n_rep)),
         net_feed_import_N = c(combined_output$net_feed_import_N, adj_length(N_feed_import, n_rep)),
         net_feed_import_P = c(combined_output$net_feed_import_P, adj_length(P_feed_import, n_rep)),
-        net_feed_import_K = c(combined_output$net_feed_import_K, adj_length(K_feed_import, n_rep))
+        net_feed_import_K = c(combined_output$net_feed_import_K, adj_length(K_feed_import, n_rep)),
+        animal_balance_N = c(animal_balance_N, adj_length(N_animal_balance, n_rep)),
+        animal_balance_P = c(animal_balance_P, adj_length(P_animal_balance, n_rep)),
+        animal_balance_K = c(animal_balance_K, adj_length(K_animal_balance, n_rep))
       )
     } # end of loop for different stakeholders answers
   } # end of the loop for the different scenarios   
