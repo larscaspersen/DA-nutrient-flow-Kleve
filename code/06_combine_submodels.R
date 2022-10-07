@@ -1347,9 +1347,10 @@ combined_function <- function() {
         #----------------------------------#
         
         # crop to feed --> channed changes to unprocessed feed because better buffer capacity
-        crop_output$N_crop_animal_feeding_unprocessed <- buffered_crop_feed_N - crop_output$N_crop_animal_feeding_processed
-        crop_output$P_crop_animal_feeding_unprocessed <- buffered_crop_feed_P - crop_output$P_crop_animal_feeding_processed
-        crop_output$K_crop_animal_feeding_unprocessed <- buffered_crop_feed_K - crop_output$K_crop_animal_feeding_processed
+        crop_output$N_crop_animal_feeding_processed <- buffered_crop_feed_N - crop_output$N_crop_animal_feeding_unprocessed
+        crop_output$P_crop_animal_feeding_processed <- buffered_crop_feed_P - crop_output$P_crop_animal_feeding_unprocessed
+        crop_output$K_crop_animal_feeding_processed <- buffered_crop_feed_K - crop_output$K_crop_animal_feeding_unprocessed
+        
         
         # crop to local human consumption
         crop_output$N_crop_human_consumption_processed <- buffered_crop_food_N
@@ -1987,6 +1988,9 @@ combined_function <- function() {
         export_egg_N = c(combined_output$export_egg_N, adj_length(N_egg_export, n_rep)),
         export_egg_P = c(combined_output$export_egg_P, adj_length(P_egg_export, n_rep)),
         export_egg_K = c(combined_output$export_egg_K, adj_length(K_egg_export, n_rep)),
+        dairy_export_N = c(combined_output$dairy_export_N, adj_length(N_dairy_export, n_rep)),
+        dairy_export_P = c(combined_output$dairy_export_P, adj_length(P_dairy_export, n_rep)),
+        dairy_export_K = c(combined_output$dairy_export_K, adj_length(K_dairy_export, n_rep)),
         slaughter_waste_N = c(combined_output$slaughter_waste_N, adj_length(animal_output$N_slaughter_waste, n_rep)),
         slaughter_waste_P = c(combined_output$slaughter_waste_P, adj_length(animal_output$P_slaughter_waste, n_rep)),
         slaughter_waste_K = c(combined_output$slaughter_waste_K, adj_length(animal_output$K_slaughter_waste, n_rep)),
@@ -2005,9 +2009,9 @@ combined_function <- function() {
         net_feed_import_N = c(combined_output$net_feed_import_N, adj_length(N_feed_import, n_rep)),
         net_feed_import_P = c(combined_output$net_feed_import_P, adj_length(P_feed_import, n_rep)),
         net_feed_import_K = c(combined_output$net_feed_import_K, adj_length(K_feed_import, n_rep)),
-        animal_balance_N = c(animal_balance_N, adj_length(N_animal_balance, n_rep)),
-        animal_balance_P = c(animal_balance_P, adj_length(P_animal_balance, n_rep)),
-        animal_balance_K = c(animal_balance_K, adj_length(K_animal_balance, n_rep))
+        animal_balance_N = c(combined_output$animal_balance_N, adj_length(N_animal_balance, n_rep)),
+        animal_balance_P = c(combined_output$animal_balance_P, adj_length(P_animal_balance, n_rep)),
+        animal_balance_K = c(combined_output$animal_balance_K, adj_length(K_animal_balance, n_rep))
       )
     } # end of loop for different stakeholders answers
   } # end of the loop for the different scenarios   
