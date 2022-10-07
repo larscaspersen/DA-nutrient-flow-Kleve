@@ -8,7 +8,7 @@ old_df$stakeholder <- 'reference_year'
 old_df$median <- c(24, 67, 9, 45, 63, 28, 4, 4, 53, 10, 36)
 
 
-ggplot(answers, aes(x = var, y = median, col = stakeholder)) + 
+ggplot(answers, aes(x = var, y = median, col = stakeholder_code)) + 
   geom_point(position=position_dodge(width=0.5), size = 1.5) +
   geom_errorbar(aes(ymin=lower, ymax=upper), width=.2,
                 position=position_dodge(0.5))+
