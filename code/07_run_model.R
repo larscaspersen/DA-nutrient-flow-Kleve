@@ -17,6 +17,10 @@ nitrogen_mc_simulation <- mcSimulation(
 )
 
 
+
+saveRDS(nitrogen_mc_simulation, file = 'data/model_output_flows.rds')
+
+
 #everything with same digit at the end of the name belongs together
 #eg scenario1, sewageN1, ....
 #the different numbers come from the scenarios, the stakeholders answers and the strict reductions
@@ -85,6 +89,7 @@ nitrogen_mc_simulation <- mcSimulation(
   functionSyntax = "plainNames"
 )
 
+saveRDS(nitrogen_mc_simulation, file = 'data/model_output_indicators.rds')
 
 #everything with same digit at the end of the name belongs together
 #eg scenario1, sewageN1, ....
