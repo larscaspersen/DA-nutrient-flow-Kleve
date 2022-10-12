@@ -1679,14 +1679,20 @@ combined_function <- function() {
       # this section does not work vectorized
       # use ifelse instead
 
-      N_egg_import <- ifelse((consumption_output$consumed_N_egg - animal_output$N_egg_available) > 0,
-        yes = (consumption_output$consumed_N_egg - animal_output$N_egg_available), no = 0
+      N_dairy_and_egg_import <- ifelse(((consumption_output$consumed_N_egg - animal_output$N_egg_available) + 
+                                      (consumption_output$consumed_N_dairy - animal_output$N_milk_available)) > 0,
+        yes = ((consumption_output$consumed_N_egg - animal_output$N_egg_available) + 
+                 (consumption_output$consumed_N_dairy - animal_output$N_milk_available)), no = 0
       )
-      P_egg_import <- ifelse((consumption_output$consumed_P_egg - animal_output$P_egg_available) > 0,
-        yes = (consumption_output$consumed_P_egg - animal_output$P_egg_available), no = 0
+      P_dairy_and_egg_import <- ifelse(((consumption_output$consumed_P_egg - animal_output$P_egg_available) + 
+                                      (consumption_output$consumed_P_dairy - animal_output$P_milk_available)) > 0,
+        yes = ((consumption_output$consumed_P_egg - animal_output$P_egg_available) + 
+                 (consumption_output$consumed_P_dairy - animal_output$P_milk_available)), no = 0
       )
-      K_egg_import <- ifelse((consumption_output$consumed_K_egg - animal_output$K_egg_available) > 0,
-        yes = (consumption_output$consumed_K_egg - animal_output$K_egg_available), no = 0
+      K_dairy_and_egg_import <- ifelse(((consumption_output$consumed_K_egg - animal_output$K_egg_available) +
+                                     (consumption_output$consumed_K_dairy - animal_output$K_milk_available))> 0,
+        yes = ((consumption_output$consumed_K_egg - animal_output$K_egg_available) +
+                 (consumption_output$consumed_K_dairy - animal_output$K_milk_available)), no = 0
       )
 
       N_meat_import <- ifelse((consumption_output$consumed_N_meat - animal_output$N_meat_local_to_consumption) > 0,
@@ -1699,15 +1705,6 @@ combined_function <- function() {
         (consumption_output$consumed_K_meat - animal_output$K_meat_local_to_consumption), 0
       )
 
-      N_dairy_import <- ifelse((consumption_output$consumed_N_dairy - animal_output$N_milk_available) > 0,
-        (consumption_output$consumed_N_dairy - animal_output$N_milk_available), 0
-      )
-      P_dairy_import <- ifelse((consumption_output$consumed_P_dairy - animal_output$P_milk_available) > 0,
-        (consumption_output$consumed_P_dairy - animal_output$P_milk_available), 0
-      )
-      K_dairy_import <- ifelse((consumption_output$consumed_K_dairy - animal_output$K_milk_available) > 0,
-        (consumption_output$consumed_K_dairy - animal_output$K_milk_available), 0
-      )
 
       N_vegetable_import <- ifelse((consumption_output$consumed_N_vegetable - crop_output$N_crop_human_consumption_processed) > 0,
         (consumption_output$consumed_N_vegetable - crop_output$N_crop_human_consumption_processed), 0
@@ -1719,23 +1716,27 @@ combined_function <- function() {
         (consumption_output$consumed_K_vegetable - crop_output$K_crop_human_consumption_processed), 0
       ) + consumption_output$consumed_K_foreign_vegetable
 
-      N_total_food_import <- N_egg_import + N_dairy_import + N_meat_import + N_vegetable_import
-      P_total_food_import <- P_egg_import + P_dairy_import + P_meat_import + P_vegetable_import
-      K_total_food_import <- K_egg_import + K_dairy_import + K_meat_import + K_vegetable_import
+      N_total_food_import <- N_dairy_and_egg_import + N_meat_import + N_vegetable_import
+      P_total_food_import <- P_dairy_and_egg_import + P_meat_import + P_vegetable_import
+      K_total_food_import <- K_dairy_and_egg_import + K_meat_import + K_vegetable_import
 
 
       # food exports (prevent negative exports if consumption exceeds the production)
 
-      N_egg_export <- ifelse((animal_output$N_egg_available - consumption_output$consumed_N_egg) > 0,
+      N_dairy_and_egg_export <- ifelse(((animal_output$N_egg_available - consumption_output$consumed_N_egg) + 
+                                          (animal_output$N_milk_available - consumption_output$consumed_N_dairy)) > 0,
         (animal_output$N_egg_available - consumption_output$consumed_N_egg), 0
       )
-      P_egg_export <- ifelse((animal_output$P_egg_available - consumption_output$consumed_P_egg) > 0,
+      P_dairy_and_egg_export <- ifelse(((animal_output$P_egg_available - consumption_output$consumed_P_egg)+ 
+                                          (animal_output$P_milk_available - consumption_output$consumed_P_dairy)) > 0,
         (animal_output$P_egg_available - consumption_output$consumed_P_egg), 0
       )
-      K_egg_export <- ifelse((animal_output$K_egg_available - consumption_output$consumed_K_egg) > 0,
+      K_dairy_and_egg_export <- ifelse(((animal_output$K_egg_available - consumption_output$consumed_K_egg)+ 
+                                          (animal_output$K_milk_available - consumption_output$consumed_K_dairy)) > 0,
         (animal_output$K_egg_available - consumption_output$consumed_K_egg), 0
       )
-
+      
+      
       N_meat_export <- ifelse((animal_output$N_meat_local_to_consumption - consumption_output$consumed_N_meat) > 0,
         (animal_output$N_meat_local_to_consumption - consumption_output$consumed_N_meat), 0
       )
@@ -1744,16 +1745,6 @@ combined_function <- function() {
       )
       K_meat_export <- ifelse((animal_output$K_meat_local_to_consumption - consumption_output$consumed_K_meat) > 0,
         (animal_output$K_meat_local_to_consumption - consumption_output$consumed_K_meat), 0
-      )
-
-      N_dairy_export <- ifelse((animal_output$N_milk_available - consumption_output$consumed_N_dairy) > 0,
-        (animal_output$N_milk_available - consumption_output$consumed_N_dairy), 0
-      )
-      P_dairy_export <- ifelse((animal_output$P_milk_available - consumption_output$consumed_P_dairy) > 0,
-        (animal_output$P_milk_available - consumption_output$consumed_P_dairy), 0
-      )
-      K_dairy_export <- ifelse((animal_output$K_milk_available - consumption_output$consumed_K_dairy) > 0,
-        (animal_output$K_milk_available - consumption_output$consumed_K_dairy), 0
       )
 
       N_vegetable_export <- ifelse((crop_output$N_crop_human_consumption_processed - consumption_output$consumed_N_vegetable) > 0,
@@ -1770,15 +1761,12 @@ combined_function <- function() {
 
 
       # get amount of local products which also get consumed locally
-      N_local_animal_products_consumed <- (animal_output$N_egg_available - N_egg_export) +
-        (animal_output$N_meat_local_to_consumption - N_meat_export) +
-        (animal_output$N_milk_available - N_dairy_export)
-      P_local_animal_products_consumed <- (animal_output$P_egg_available - P_egg_export) +
-        (animal_output$P_meat_local_to_consumption - P_meat_export) +
-        (animal_output$K_milk_available - P_dairy_export)
-      K_local_animal_products_consumed <- (animal_output$K_egg_available - K_egg_export) +
-        (animal_output$K_meat_local_to_consumption - K_meat_export) +
-        (animal_output$K_milk_available - K_dairy_export)
+      N_local_animal_products_consumed <- (animal_output$N_egg_available + animal_output$N_milk_available  - N_dairy_and_egg_export) +
+        (animal_output$N_meat_local_to_consumption - N_meat_export)
+      P_local_animal_products_consumed <- (animal_output$P_egg_available + animal_output$P_milk_available - P_dairy_and_egg_export) +
+        (animal_output$P_meat_local_to_consumption - P_meat_export)
+      K_local_animal_products_consumed <- (animal_output$K_egg_available + animal_output$K_milk_available - K_dairy_and_egg_export) +
+        (animal_output$K_meat_local_to_consumption - K_meat_export)
 
 
 
@@ -1791,27 +1779,21 @@ combined_function <- function() {
 
       # combine import and export to list
       import_export <- list(
-        N_egg_import = N_egg_import,
-        P_egg_import = P_egg_import,
-        K_egg_import = K_egg_import,
+        N_dairy_and_egg_export = N_dairy_and_egg_import,
+        P_dairy_and_egg_import = P_dairy_and_egg_import,
+        K_dairy_and_egg_import = K_dairy_and_egg_import,
         N_meat_import = N_meat_import,
         P_meat_import = P_meat_import,
         K_meat_import = K_meat_import,
-        N_dairy_import = N_dairy_import,
-        P_dairy_import = P_dairy_import,
-        K_dairy_import = K_dairy_import,
         N_vegetable_import = N_vegetable_import,
         P_vegetable_import = P_vegetable_import,
         K_vegetable_import = K_vegetable_import,
-        N_egg_export = N_egg_export,
-        P_egg_export = P_egg_export,
-        K_egg_export = K_egg_export,
+        N_dairy_and_egg_export = N_dairy_and_egg_export,
+        P_dairy_and_egg_export = P_dairy_and_egg_export,
+        K_dairy_and_egg_export = K_dairy_and_egg_export,
         N_meat_export = N_meat_export,
         P_meat_export = P_meat_export,
         K_meat_export = K_meat_export,
-        N_dairy_export = N_dairy_export,
-        P_dairy_export = P_dairy_export,
-        K_dairy_export = K_dairy_export,
         N_vegetable_export = N_vegetable_export,
         P_vegetable_export = P_vegetable_export,
         K_vegetable_export = K_vegetable_export
@@ -1964,9 +1946,9 @@ combined_function <- function() {
         export_vegetable_N = c(combined_output$export_vegetable_N, adj_length(N_vegetable_export, n_rep)),
         export_vegetable_P = c(combined_output$export_vegetable_P, adj_length(P_vegetable_export, n_rep)),
         export_vegetable_K = c(combined_output$export_vegetable_K, adj_length(K_vegetable_export, n_rep)),
-        imported_animal_products_N = c(combined_output$imported_animal_products_N, adj_length(N_meat_import + N_egg_import + N_dairy_import, n_rep)),
-        imported_animal_products_P = c(combined_output$imported_animal_products_P, adj_length(P_meat_import + P_egg_import + P_dairy_import, n_rep)),
-        imported_animal_products_K = c(combined_output$imported_animal_products_K, adj_length(K_meat_import + K_egg_import + K_dairy_import, n_rep)),
+        import_dairy_egg_N = c(combined_output$import_dairy_egg_N, adj_length(N_dairy_and_egg_export, n_rep)),
+        import_dairy_egg_P = c(combined_output$import_dairy_egg_P, adj_length(P_dairy_and_egg_export, n_rep)),
+        import_dairy_egg_K = c(combined_output$import_dairy_egg_K, adj_length(K_dairy_and_egg_export, n_rep)),
         imported_vegetal_products_N = c(combined_output$imported_vegetal_products_N, adj_length(N_vegetable_import, n_rep)),
         imported_vegetal_products_P = c(combined_output$imported_vegetal_products_P, adj_length(P_vegetable_import, n_rep)),
         imported_vegetal_products_K = c(combined_output$imported_vegetal_products_K, adj_length(K_vegetable_import, n_rep)),
@@ -1985,12 +1967,9 @@ combined_function <- function() {
         import_meat_N = c(combined_output$import_meat_N, adj_length(N_meat_import, n_rep)),
         import_meat_P = c(combined_output$import_meat_P, adj_length(P_meat_import, n_rep)),
         import_meat_K = c(combined_output$import_meat_K, adj_length(K_meat_import, n_rep)),
-        export_egg_N = c(combined_output$export_egg_N, adj_length(N_egg_export, n_rep)),
-        export_egg_P = c(combined_output$export_egg_P, adj_length(P_egg_export, n_rep)),
-        export_egg_K = c(combined_output$export_egg_K, adj_length(K_egg_export, n_rep)),
-        dairy_export_N = c(combined_output$dairy_export_N, adj_length(N_dairy_export, n_rep)),
-        dairy_export_P = c(combined_output$dairy_export_P, adj_length(P_dairy_export, n_rep)),
-        dairy_export_K = c(combined_output$dairy_export_K, adj_length(K_dairy_export, n_rep)),
+        export_dairy_egg_N = c(combined_output$import_dairy_egg_N, adj_length(N_dairy_and_egg_export, n_rep)),
+        export_dairy_egg_P = c(combined_output$import_dairy_egg_P, adj_length(P_dairy_and_egg_export, n_rep)),
+        export_dairy_egg_K = c(combined_output$import_dairy_egg_K, adj_length(K_dairy_and_egg_export, n_rep)),
         slaughter_waste_N = c(combined_output$slaughter_waste_N, adj_length(animal_output$N_slaughter_waste, n_rep)),
         slaughter_waste_P = c(combined_output$slaughter_waste_P, adj_length(animal_output$P_slaughter_waste, n_rep)),
         slaughter_waste_K = c(combined_output$slaughter_waste_K, adj_length(animal_output$K_slaughter_waste, n_rep)),
