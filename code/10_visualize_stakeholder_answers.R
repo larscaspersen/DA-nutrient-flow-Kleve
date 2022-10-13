@@ -56,7 +56,7 @@ ggplot(answers, aes(x = var, y = middle)) +
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
 
 
-ggsave(filename = 'figures/stakeholder_answers.jpeg', device = 'jpeg', width = 20, height = 15, units = 'cm')
+#ggsave(filename = 'figures/stakeholder_answers.jpeg', device = 'jpeg', width = 20, height = 15, units = 'cm')
 
 
 
@@ -107,31 +107,39 @@ ggplot(answers, aes(x = var, y = middle)) +
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
 
 
-ggsave(filename = 'figures/stakeholder_answers_V2.jpeg', device = 'jpeg', width = 20, height = 15, units = 'cm')
+#ggsave(filename = 'figures/stakeholder_answers_V2.jpeg', device = 'jpeg', width = 20, height = 15, units = 'cm')
+
+nsim <- 10000
 
 
 
+answers %>% 
+  filter(var == 'crop_feed') %>%
+  summarise(lower = quantile(median, probs = 0.05),
+            upper = quantile(median, probs = 0.95))
+
+current_way <-   decisionSupport::rmvnorm90ci_exact(n = nsim, lower = 0.236, upper = 0.79,correlationMatrix = 1)
+
+answers_summarised
+
+#using median and plus minus sd
+sd_way <- decisionSupport::rmvnorm90ci_exact(n = nsim, lower = 0.53, upper = 1.0 ,correlationMatrix = 1)
 
 
+#chance event, ranges are max and min of the two groups, weight is the share to total answers
+answers %>% 
+  filter(var == 'crop_feed')
 
+g1 <- decisionSupport::rmvnorm90ci_exact(n = nsim, lower = 0.775, upper = 0.79 ,correlationMatrix = 1)
+g2 <- decisionSupport::rmvnorm90ci_exact(n = nsim, lower = 0.14, upper = 0.575 ,correlationMatrix = 1)
+chance_way <- c()
 
+for(i in 1:nsim){
+  chance_way[i] <- decisionSupport::chance_event(5/9, value_if = g1[i], value_if_not = g2[i])
+}
 
+#skewed distribution
 
-
-
-
-
-
-
-
-
-
-
-
-#play wiht skewed distributions
-
-
-library(rootSolve)
 library(sn)
 model <- function(x, parms) {
   omega = x[1]
@@ -151,15 +159,36 @@ quantile(answers$median[answers$var == 'crop_feed'], c(0.05, 0.5, 0.95))
 mean(answers$median[answers$var == 'crop_feed'])
 
 
-
-
-res <- optim(par = c(12, 1), fn = model, parms = c(61, 38.8, 79.6), method = "Nelder-Mead", 
+res <- optim(par = c(12, 1), fn = model, parms = c(60.6, 23.6, 79.0), method = "Nelder-Mead", 
       lower = c(0.01, -1000), upper = c(1000,1000))
 
-xi <- (77.5 - res$par[1]*res$par[2]*sqrt(2/(pi*(1+res$par[2]^2))))
+xi <- (60.6 - res$par[1]*res$par[2]*sqrt(2/(pi*(1+res$par[2]^2))))
 
 x <- seq(30, 120, by=0.2)
 plot(sn::dsn(x, omega = res$par[1], alpha = res$par[2], xi = xi), x = x)
+
+skewed_way <- sn::rsn(n = nsim, xi = xi, omega = res$par[1], alpha = res$par[2])
+
+
+
+#bind everything to one dataframe
+dist_df <-  rbind(data.frame(value = chance_way, type = 'chance_event'),
+data.frame(value = skewed_way / 100, type = 'skewed_distribution'),
+data.frame(value = current_way, type = 'answers_quantiles'),
+data.frame(value = sd_way, type = 'median_answer_and_sd'))
+
+library(ggplot2)
+
+ggplot(dist_df, aes(x = value)) + 
+  geom_histogram(bins = 150) + 
+  geom_vline(xintercept = answers$median[answers$var == 'crop_feed'] / 100, col = 'red')+
+  facet_wrap(~type, scales = 'free_y', ncol = 1, nrow = 4)
+
+ggsave(filename = 'figures/translate_stakeholder_answers_crop_feed.jpeg', device = 'jpeg', 
+       width = 20, height = 15, units = 'cm')
+
+
+#indicate answers with vertical lines
 
 
 hist(answers$median[answers$var == 'crop_feed'], breaks = 9)
