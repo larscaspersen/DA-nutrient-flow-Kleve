@@ -1,0 +1,100 @@
+stakeholder,stakeholder_code,stakeholder_group,var,middle,upper ,lower,category,subgroup
+LANUV,a,nature,crop_biogas,12,,,crop,a
+LANUV,a,nature,crop_feed,79,,,crop,a
+LANUV,a,nature,crop_food,9,,,crop,a
+LANUV,a,nature,animal_reduction,20,,,livestock_reduction,a
+LANUV,a,nature,cattle,71,,,livestock_compostion,a
+LANUV,a,nature,pig,18,,,livestock_compostion,a
+LANUV,a,nature,poultry,6,,,livestock_compostion,a
+LANUV,a,nature,other,6,,,livestock_compostion,a
+LANUV,a,nature,manure_export,43,,,manure,a
+LANUV,a,nature,manure_biogas,30,,,manure,a
+LANUV,a,nature,manure_crop,26,,,manure,a
+Naturschutzzentrum,b,nature,crop_biogas,17.5,15,20,crop,a
+Naturschutzzentrum,b,nature,crop_feed,77.5,,,crop,a
+Naturschutzzentrum,b,nature,crop_food,7,5,9,crop,a
+Naturschutzzentrum,b,nature,animal_reduction,50,,,livestock_reduction,a
+Naturschutzzentrum,b,nature,cattle,63,,,livestock_compostion,a
+Naturschutzzentrum,b,nature,pig,28,,,livestock_compostion,a
+Naturschutzzentrum,b,nature,poultry,0,,,livestock_compostion,a
+Naturschutzzentrum,b,nature,other,8,,,livestock_compostion,a
+Naturschutzzentrum,b,nature,manure_export,0,,,manure,a
+Naturschutzzentrum,b,nature,manure_biogas,5,,,manure,a
+Naturschutzzentrum,b,nature,manure_crop,95,,,manure,a
+Schönmackers,c,waste,crop_biogas,16,,,crop,a
+Schönmackers,c,waste,crop_feed,78,,,crop,a
+Schönmackers,c,waste,crop_food,6,,,crop,a
+Schönmackers,c,waste,animal_reduction,25,,,livestock_reduction,a
+Schönmackers,c,waste,cattle,63,,,livestock_compostion,a
+Schönmackers,c,waste,pig,28,,,livestock_compostion,a
+Schönmackers,c,waste,poultry,4,,,livestock_compostion,a
+Schönmackers,c,waste,other,4,,,livestock_compostion,a
+Schönmackers,c,waste,manure_export,30,,,manure,a
+Schönmackers,c,waste,manure_biogas,40,,,manure,a
+Schönmackers,c,waste,manure_crop,30,,,manure,a
+Pruys,d,farming,crop_biogas,0,,,crop,a
+Pruys,d,farming,crop_feed,79,,,crop,a
+Pruys,d,farming,crop_food,21,,,crop,a
+Pruys,d,farming,animal_reduction,15,10,20,livestock_reduction,a
+Pruys,d,farming,cattle,63,,,livestock_compostion,a
+Pruys,d,farming,pig,23,,,livestock_compostion,a
+Pruys,d,farming,poultry,6,,,livestock_compostion,a
+Pruys,d,farming,other,5,,,livestock_compostion,a
+Pruys,d,farming,manure_export,10,,,manure,a
+Pruys,d,farming,manure_biogas,20,,,manure,a
+Pruys,d,farming,manure_crop,70,,,manure,a
+Prof. Wiedemann,e,science,crop_biogas,10,,,crop,a
+Prof. Wiedemann,e,science,crop_feed,77.5,75,80,crop,a
+Prof. Wiedemann,e,science,crop_food,15,,,crop,a
+Prof. Wiedemann,e,science,animal_reduction,30,,,livestock_reduction,a
+Prof. Wiedemann,e,science,cattle,57,,,livestock_compostion,a
+Prof. Wiedemann,e,science,pig,20,,,livestock_compostion,a
+Prof. Wiedemann,e,science,poultry,15,,,livestock_compostion,a
+Prof. Wiedemann,e,science,other,8,,,livestock_compostion,a
+Prof. Wiedemann,e,science,manure_export,30,,,manure,a
+Prof. Wiedemann,e,science,manure_biogas,10,,,manure,a
+Prof. Wiedemann,e,science,manure_crop,60,,,manure,a
+Reyers,f,farming,crop_biogas,35,32.5,37.5,crop,a
+Reyers,f,farming,crop_feed,45,40,50,crop,b
+Reyers,f,farming,crop_food,20,17.5,22.5,crop,a
+Reyers,f,farming,animal_reduction,50,,,livestock_reduction,a
+Reyers,f,farming,cattle,61,,,livestock_compostion,a
+Reyers,f,farming,pig,27,,,livestock_compostion,a
+Reyers,f,farming,poultry,4,,,livestock_compostion,a
+Reyers,f,farming,other,8,,,livestock_compostion,a
+Reyers,f,farming,manure_export,20,,,manure,a
+Reyers,f,farming,manure_biogas,80,,,manure,a
+Reyers,f,farming,manure_crop,0,,,manure,a
+Prof. Kleinke,g,science,crop_biogas,19,14,24,crop,a
+Prof. Kleinke,g,science,crop_feed,14,9,19,crop,b
+Prof. Kleinke,g,science,crop_food,62,57,67,crop,b
+Prof. Kleinke,g,science,animal_reduction,33,,,livestock_reduction,a
+Prof. Kleinke,g,science,cattle,71,,,livestock_compostion,a
+Prof. Kleinke,g,science,pig,16,,,livestock_compostion,a
+Prof. Kleinke,g,science,poultry,6,,,livestock_compostion,a
+Prof. Kleinke,g,science,other,6,,,livestock_compostion,a
+Prof. Kleinke,g,science,manure_export,15,,,manure,a
+Prof. Kleinke,g,science,manure_biogas,10,,,manure,a
+Prof. Kleinke,g,science,manure_crop,75,,,manure,a
+USK,h,waste,crop_biogas,24,,,crop,a
+USK,h,waste,crop_feed,38,,,crop,b
+USK,h,waste,crop_food,38,,,crop,b
+USK,h,waste,animal_reduction,55,,,livestock_reduction,a
+USK,h,waste,cattle,63,,,livestock_compostion,a
+USK,h,waste,pig,20,,,livestock_compostion,a
+USK,h,waste,poultry,8,,,livestock_compostion,a
+USK,h,waste,other,8,,,livestock_compostion,a
+USK,h,waste,manure_export,0,,,manure,a
+USK,h,waste,manure_biogas,19,,,manure,a
+USK,h,waste,manure_crop,81,,,manure,a
+Wischmann,g,food processing,crop_biogas,24,,,crop,a
+Wischmann,g,food processing,crop_feed,57.5,55,60,crop,b
+Wischmann,g,food processing,crop_food,18.5,16,21,crop,a
+Wischmann,g,food processing,animal_reduction,3,,,livestock_reduction,a
+Wischmann,g,food processing,cattle,65,,,livestock_compostion,a
+Wischmann,g,food processing,pig,26,,,livestock_compostion,a
+Wischmann,g,food processing,poultry,5,,,livestock_compostion,a
+Wischmann,g,food processing,other,4,,,livestock_compostion,a
+Wischmann,g,food processing,manure_export,52,,,manure,a
+Wischmann,g,food processing,manure_biogas,11,,,manure,a
+Wischmann,g,food processing,manure_crop,37,,,manure,a
