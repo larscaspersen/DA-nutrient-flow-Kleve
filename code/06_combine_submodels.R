@@ -49,11 +49,11 @@ combined_function <- function() {
   
   
   #draw values for manure_biogas, manure_export, manure_crop, crop_feed and crop_food
-  scenario_allocate_crop_feed_a <- sn::rsn(n = 1, xi = xi_crop_feed, omega = omega_crop_feed, alpha = alpha_crop_feed)
-  scenario_allocate_crop_food_a <- sn::rsn(n = 1, xi = xi_crop_food, omega = omega_crop_food, alpha = alpha_crop_food)
-  scenario_allocate_manure_biogas_a <- sn::rsn(n = 1, xi = xi_manure_biogas, omega = omega_manure_biogas, alpha = omega_manure_biogas)
-  scenario_allocate_manure_crop_a <- sn::rsn(n = 1, xi = xi_manure_crop, omega = omega_manure_crop, alpha = alpha_manure_crop)
-  scenario_allocate_manure_export_a <- sn::rsn(n = 1, xi = xi_manure_export, omega = omega_manure_export, alpha = alpha_manure_export)
+  scenario_allocate_crop_feed_a <- as.numeric(sn::rsn(n = 1, xi = xi_crop_feed, omega = omega_crop_feed, alpha = alpha_crop_feed) / 100)
+  scenario_allocate_crop_food_a <- as.numeric(sn::rsn(n = 1, xi = xi_crop_food, omega = omega_crop_food, alpha = alpha_crop_food) / 100)
+  scenario_allocate_manure_biogas_a <- as.numeric(sn::rsn(n = 1, xi = xi_manure_biogas, omega = omega_manure_biogas, alpha = omega_manure_biogas) / 100)
+  scenario_allocate_manure_crop_a <- as.numeric(sn::rsn(n = 1, xi = xi_manure_crop, omega = omega_manure_crop, alpha = alpha_manure_crop) / 100)
+  scenario_allocate_manure_export_a <- as.numeric(sn::rsn(n = 1, xi = xi_manure_export, omega = omega_manure_export, alpha = alpha_manure_export) / 100)
   
 
   # combined the stakeholders answers to a vector
@@ -2017,21 +2017,26 @@ combined_function <- function() {
     combined_output$import_inorganic_fertilizer_N +
     combined_output$import_organic_fertilizer_N +
     combined_output$import_OFMSW_N +
-    combined_output$imported_animal_products_N
+    combined_output$import_dairy_egg_N + 
+    combined_output$import_meat_N
 
   total_input_P <- combined_output$net_feed_import_P +
     combined_output$imported_vegetal_products_P +
     combined_output$import_inorganic_fertilizer_P +
     combined_output$import_organic_fertilizer_P +
     combined_output$import_OFMSW_P +
-    combined_output$imported_animal_products_P
+    combined_output$import_dairy_egg_P + 
+    combined_output$import_meat_P
+  
 
   total_input_K <- combined_output$net_feed_import_K +
     combined_output$imported_vegetal_products_K +
     combined_output$import_inorganic_fertilizer_K +
     combined_output$import_organic_fertilizer_K +
     combined_output$import_OFMSW_K +
-    combined_output$imported_animal_products_K
+    combined_output$import_dairy_egg_K + 
+    combined_output$import_meat_K
+  
 
 
   # use efficiency
@@ -2127,7 +2132,8 @@ combined_function <- function() {
       combined_output$net_feed_import_N +
       combined_output$import_inorganic_fertilizer_N +
       combined_output$imported_vegetal_products_N +
-      combined_output$imported_animal_products_N +
+      combined_output$import_dairy_egg_N +
+       combined_output$import_meat_N +
       combined_output$import_organic_fertilizer_N)) * 100
 
   share_reuse_to_total_input_P <- ((combined_output$manure_to_crop_P +
@@ -2153,7 +2159,8 @@ combined_function <- function() {
       combined_output$net_feed_import_P +
       combined_output$import_inorganic_fertilizer_P +
       combined_output$imported_vegetal_products_P +
-      combined_output$imported_animal_products_P +
+       combined_output$import_dairy_egg_P +
+       combined_output$import_meat_P +
       combined_output$import_organic_fertilizer_P)) * 100
 
   share_reuse_to_total_input_K <- ((combined_output$manure_to_crop_K +
@@ -2179,7 +2186,8 @@ combined_function <- function() {
       combined_output$net_feed_import_K +
       combined_output$import_inorganic_fertilizer_K +
       combined_output$imported_vegetal_products_K +
-      combined_output$imported_animal_products_K +
+       combined_output$import_dairy_egg_K +
+       combined_output$import_meat_K +
       combined_output$import_organic_fertilizer_K)) * 100
 
   # recycling_rate
