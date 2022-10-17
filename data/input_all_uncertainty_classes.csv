@@ -603,16 +603,11 @@ I guess these scenario specific variables can all be categorized under level 5 u
 ,5,kg of inorganic P needed for the same fertiliztation effect of 1kg manure N,convert_manure_to_inorganic_P,conversion rate,0.8,0.85,0.9,posnorm,crop,,cite Bernou
 ,5,kg of inorganic K needed for the same fertiliztation effect of 1kg manure N,convert_manure_to_inorganic_K,conversion rate,0.8,0.85,0.9,posnorm,crop,,cite Bernou
 ,5,share of produced crops allocated to biogas in a local feed scenario,scenario_allocate_crop_biogas_a,share,0.035,0.1675,0.3115,tnorm_0_1,crop,,"survey stakeholders, took 5% and 95% quantiles"
-,5,share of produced crops allocated to animal feed in a local feed scenario,scenario_allocate_crop_feed_a,share,0.4045,0.775,0.79,tnorm_0_1,crop,,"survey stakeholders, took 5% and 95% quantiles"
-,5,share of produced crops allocated to human food in a local feed scenario,scenario_allocate_crop_food_a,share,0.0635,0.1675,0.3205,tnorm_0_1,crop,,"survey stakeholders, took 5% and 95% quantiles"
 ,5,overall reduction of livestock units in local feed scenario,scenario_overall_livestock_reduction_a,share,0.072,,0.5325,tnorm_0_1,animal,,"survey stakeholders, took 5% and 95% quantiles"
 ,5,share of cattle livestock units in local feed scenario,scenario_share_cattle_a,share,0.584,,0.689,tnorm_0_1,animal,,"survey stakeholders, took 5% and 95% quantiles"
 ,5,share of pig livestock units in local feed scenario,scenario_share_pig_a,share,0.187,,0.28,tnorm_0_1,animal,,"survey stakeholders, took 5% and 95% quantiles"
 ,5,share of poultry livestock units in local feed scenario,scenario_share_poultry_a,share,0.014,,0.125,tnorm_0_1,animal,,"survey stakeholders, took 5% and 95% quantiles"
 ,5,share of other animals livestock units in local feed scenario,scenario_share_others_a,share,0.04,,0.08,tnorm_0_1,animal,,"survey stakeholders, took 5% and 95% quantiles"
-,5,allocation of animal manure to export in a local feed scenario,scenario_allocate_manure_export_a,,0.01,,0.4885,tnorm_0_1,animal,,"survey stakeholders, took 5% and 95% quantiles"
-,5,allocation of animal manure to biogas in a local feed scenario,scenario_allocate_manure_biogas_a,,0.0675,,0.66,tnorm_0_1,animal,,"survey stakeholders, took 5% and 95% quantiles"
-,5,allocation of animal manure to crop in a local feed scenario,scenario_allocate_manure_crop_a,,0.091,,0.901,tnorm_0_1,animal,,"survey stakeholders, took 5% and 95% quantiles"
 ,1,,n_dairy_cow_1962,,40866.21,41279,41691.79,posnorm,animal,,
 ,1,,n_other_cattle_1962,,54707.4,55260,55812.6,posnorm,animal,,
 ,1,,n_pig_1962,,130800.78,132122,133443.22,posnorm,animal,,

@@ -46,6 +46,15 @@ combined_function <- function() {
   model_evaluation <- list()
 
   combined_output <- list()
+  
+  
+  #draw values for manure_biogas, manure_export, manure_crop, crop_feed and crop_food
+  scenario_allocate_crop_feed_a <- sn::rsn(n = 1, xi = xi_crop_feed, omega = omega_crop_feed, alpha = alpha_crop_feed)
+  scenario_allocate_crop_food_a <- sn::rsn(n = 1, xi = xi_crop_food, omega = omega_crop_food, alpha = alpha_crop_food)
+  scenario_allocate_manure_biogas_a <- sn::rsn(n = 1, xi = xi_manure_biogas, omega = omega_manure_biogas, alpha = omega_manure_biogas)
+  scenario_allocate_manure_crop_a <- sn::rsn(n = 1, xi = xi_manure_crop, omega = omega_manure_crop, alpha = alpha_manure_crop)
+  scenario_allocate_manure_export_a <- sn::rsn(n = 1, xi = xi_manure_export, omega = omega_manure_export, alpha = alpha_manure_export)
+  
 
   # combined the stakeholders answers to a vector
   all_scenario_allocate_crop_biogas <- c(
@@ -91,6 +100,7 @@ combined_function <- function() {
   all_scenario_share_poultry <- c(
     scenario_share_poultry_a
   )
+  
 
   #---------------------------#
   # Scenario Loop ####
