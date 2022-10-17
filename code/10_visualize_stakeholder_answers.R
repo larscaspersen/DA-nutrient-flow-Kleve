@@ -286,6 +286,14 @@ for(question in unique(answers$var)){
 }
 
 
+#retrieve the fitted values for crop_feed, crop_food, manure_export, manure_biogas, manure_crop
+
+get_skewed_dist_parameter(answers$middle[answers$var == 'crop_feed'])
+get_skewed_dist_parameter(answers$middle[answers$var == 'crop_food'])
+get_skewed_dist_parameter(answers$middle[answers$var == 'manure_biogas'])
+get_skewed_dist_parameter(answers$middle[answers$var == 'manure_crop'])
+get_skewed_dist_parameter(answers$middle[answers$var == 'manure_export'])
+
 
 
 
