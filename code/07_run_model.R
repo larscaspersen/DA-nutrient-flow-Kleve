@@ -19,6 +19,22 @@ nitrogen_mc_simulation <- mcSimulation(
 end <- Sys.time()
 end - start
 
+
+nitrogen_mc_simulation$x$scenario_allocate_crop_feed_a <- as.numeric(nitrogen_mc_simulation$y[,'scenario_allocate_crop_feed_a'])
+nitrogen_mc_simulation$x$scenario_allocate_crop_food_a <- as.numeric(nitrogen_mc_simulation$y[,'scenario_allocate_crop_food_a'])
+nitrogen_mc_simulation$x$scenario_allocate_manure_biogas_a <- as.numeric(nitrogen_mc_simulation$y[,'scenario_allocate_manure_biogas_a'])
+nitrogen_mc_simulation$x$scenario_allocate_manure_export_a <- as.numeric(nitrogen_mc_simulation$y[,'scenario_allocate_manure_export_a'])
+nitrogen_mc_simulation$x$scenario_allocate_manure_crop_a <- as.numeric(nitrogen_mc_simulation$y[,'scenario_allocate_manure_crop_a'])
+
+#find which position columns have
+drop_col <-  which(colnames(nitrogen_mc_simulation$y) %in% c('scenario_allocate_crop_feed_a', 'scenario_allocate_crop_food_a',
+                                          'scenario_allocate_manure_biogas_a', 'scenario_allocate_manure_export_a',
+                                          'scenario_allocate_manure_crop_a'))
+
+#remove the stuff from the y part
+nitrogen_mc_simulation$y <- subset(nitrogen_mc_simulation$y, select = -drop_col)
+
+
 saveRDS(nitrogen_mc_simulation, file = 'data/model_output_flows.rds')
 
 
@@ -89,6 +105,20 @@ nitrogen_mc_simulation <- mcSimulation(
   numberOfModelRuns = n_runs,
   functionSyntax = "plainNames"
 )
+
+nitrogen_mc_simulation$x$scenario_allocate_crop_feed_a <- as.numeric(nitrogen_mc_simulation$y[,'scenario_allocate_crop_feed_a'])
+nitrogen_mc_simulation$x$scenario_allocate_crop_food_a <- as.numeric(nitrogen_mc_simulation$y[,'scenario_allocate_crop_food_a'])
+nitrogen_mc_simulation$x$scenario_allocate_manure_biogas_a <- as.numeric(nitrogen_mc_simulation$y[,'scenario_allocate_manure_biogas_a'])
+nitrogen_mc_simulation$x$scenario_allocate_manure_export_a <- as.numeric(nitrogen_mc_simulation$y[,'scenario_allocate_manure_export_a'])
+nitrogen_mc_simulation$x$scenario_allocate_manure_crop_a <- as.numeric(nitrogen_mc_simulation$y[,'scenario_allocate_manure_crop_a'])
+
+#find which position columns have
+drop_col <-  which(colnames(nitrogen_mc_simulation$y) %in% c('scenario_allocate_crop_feed_a', 'scenario_allocate_crop_food_a',
+                                                             'scenario_allocate_manure_biogas_a', 'scenario_allocate_manure_export_a',
+                                                             'scenario_allocate_manure_crop_a'))
+
+#remove the stuff from the y part
+nitrogen_mc_simulation$y <- subset(nitrogen_mc_simulation$y, select = -drop_col)
 
 saveRDS(nitrogen_mc_simulation, file = 'data/model_output_indicators.rds')
 
