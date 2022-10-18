@@ -8,7 +8,6 @@ plot_flows <- TRUE
 result_flows <- readRDS('data/model_result_flows.rds')
 result_indicators <- readRDS('data/model_result_indicators.rds')
 
-
 diff_flows_df <- rbind.data.frame(result_flows$interventions[-1] - result_flows$reference_year[-1],
                                   result_flows$interventions_animal_adjusted[-1] - result_flows$reference_year[-1],
                                   result_flows$interventions_crop_adjusted[-1] - result_flows$reference_year[-1])
@@ -33,13 +32,14 @@ result_indicators <- do.call(rbind, result_indicators)
 
 #change names of scenarios
 result_flows$scenario <- factor(result_flows$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted"),
-       labels = c('Reference', 'Participatory scenario', 'Livestock buffer scenario' ,'Crop buffer scenario'))
-result_indicators$scenario <- levels(result_indicators$scenario) <- c('Reference', 'Participatory scenario', 'Crop buffer scenario', 'Livestock buffer scenario')
+       labels = c('Ref', 'PS', 'LBS' ,'CBS'))
+result_indicators$scenario <- factor(result_indicators$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted"),
+                                labels = c('Ref', 'PS', 'LBS' ,'CBS'))
 
 diff_flows_df$scenario <- factor(diff_flows_df$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted"),
-       labels = c('Reference', 'Participatory scenario', 'Livestock buffer scenario' ,'Crop buffer scenario'))
+       labels = c('Ref', 'PS', 'LBS' ,'CBS'))
 diff_indicators_df$scenario <- factor(diff_indicators_df$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted"),
-       labels = c('Reference', 'Participatory scenario', 'Livestock buffer scenario' ,'Crop buffer scenario'))
+       labels = c('Ref', 'PS', 'LBS' ,'CBS'))
 
 
 #bring results in long format, bring differences in long format
@@ -239,7 +239,7 @@ if(plot_flows){
     
     
     #desnity plots of difference to baseline
-    p2 <-  diff_flows_long %>%
+    p2 <-  diff_indicators_long %>%
       filter(variable == flow) %>%
       ggplot(aes(x=as.numeric(value) ,y = scenario, fill = scenario)) +
       geom_density_ridges_gradient(scale=2) +
@@ -297,6 +297,10 @@ result_flows_long <- result_flows_long %>%
 results_indicators_long <- results_indicators_long %>% 
   mutate(variable = substring(variable, 1, nchar(variable)-1))
 
+results_indicators_long$variable <- factor(results_indicators_long$variable, 
+                                           levels = c("total_input", 'losses', "recycling_rate", "share_reuse_to_total_input", "use_efficiency"),
+                                           labels = c('Total Input', 'Losses', 'Recycling Rate', 'Reuse : Total Input', 'Use Efficiency'))
+
 
 
 
@@ -313,7 +317,7 @@ p1 <- results_indicators_long %>%
     legend.position="none",
     #legend.position = c(0.8, 0.1), # c(0,0) bottom left, c(1,1) top-right.
     #legend.background = element_rect(fill = "white", colour = NA),
-    axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)
+    #axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)
   )
 
 p2 <- results_indicators_long %>% 
@@ -328,7 +332,7 @@ p2 <- results_indicators_long %>%
     legend.position="none",
     #legend.position = c(0.8, 0.1), # c(0,0) bottom left, c(1,1) top-right.
     #legend.background = element_rect(fill = "white", colour = NA),
-    axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)
+    #axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)
   )
 
 p3 <- results_indicators_long %>% 
@@ -343,7 +347,7 @@ p3 <- results_indicators_long %>%
     legend.position="none",
     #legend.position = c(0.8, 0.1), # c(0,0) bottom left, c(1,1) top-right.
     #legend.background = element_rect(fill = "white", colour = NA),
-    axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)
+    #axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)
   )
 
 
@@ -360,6 +364,19 @@ rm(diff_flows_df, diff_flows_long, diff_indicators_df, diff_indicators_long, p1,
 result_flows <- readRDS('data/model_result_flows.rds')
 result_indicators <- readRDS('data/model_result_indicators.rds')
 
+
+#combine meat and dairy stuff
+result_flows <- purrr::map(result_flows, function(x){
+  x$import_animal_products_N <- x$import_dairy_egg_N + x$import_meat_N
+  x$export_animal_products_N <- x$export_dairy_egg_N + x$export_meat_N
+  
+  x$import_animal_products_P <- x$import_dairy_egg_P + x$import_meat_P
+  x$export_animal_products_P <- x$export_dairy_egg_P + x$export_meat_P
+  
+  x$import_animal_products_K <- x$import_dairy_egg_K + x$import_meat_K
+  x$export_animal_products_K <- x$export_dairy_egg_K + x$export_meat_K
+  return(x)
+})
 
 
 
@@ -378,9 +395,9 @@ rel_change_indicators <- dplyr::relocate(rel_change_indicators, scenario)
 
 
 rel_change_indicators$scenario <- factor(rel_change_indicators$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted"),
-                                 labels = c('Reference', 'Participatory scenario', 'Livestock buffer scenario' ,'Crop buffer scenario'))
+                                 labels = c('Ref', 'PS', 'LBS' ,'CBS'))
 rel_change_flows$scenario <- factor(rel_change_flows$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted"),
-                                      labels = c('Reference', 'Participatory scenario', 'Livestock buffer scenario' ,'Crop buffer scenario'))
+                                      labels = c('Ref', 'PS', 'LBS' ,'CBS'))
 
 
 
@@ -419,37 +436,59 @@ summarised_flows <- summarised_flows %>%
 summarised_indicators <- summarised_indicators %>% 
   mutate(variable = substring(variable, 1, nchar(variable)-1))
 
-
-
-
+unique(summarised_flows$variable)
 
 #only take flows Bernou wants to see
 summarised_flows <- summarised_flows %>%
   filter(variable %in% c('manure_to_crop', 'manure_export', 'manure_as_biogas_substrate',
                          'import_inorganic_fertilizer', 'vegetal_biogas_substrate',
-                         'feed_from_processed_crops', 'feed_crops', 'export_dairy_and_egg',
-                         'export_meat', 'net_food_import', 'crop_cultivation_losses',
-                         'animal_housing_and_storage_losses'))
+                         'feed_from_processed_crops', 
+                         'net_food_import', 'crop_cultivation_losses', 'import_animal_products', 
+                         'export_animal_products',
+                         'animal_housing_and_storage_losses', 'animal_balance'))
 
 
 summarised_flows$variable <- factor(summarised_flows$variable, 
-       levels = c('manure_to_crop', 'manure_export', 'manure_as_biogas_substrate',
-                                             'import_inorganic_fertilizer', 'vegetal_biogas_substrate',
-                                             'feed_from_processed_crops', 'feed_crops', 'export_dairy_and_egg',
-                                             'export_meat', 'net_food_import', 'crop_cultivation_losses',
-                                             'animal_housing_and_storage_losses'), 
+       levels = c('manure_to_crop',
+                  'manure_export',
+                  'manure_as_biogas_substrate',
+                  'import_inorganic_fertilizer',
+                  'vegetal_biogas_substrate',
+                  'feed_from_processed_crops',
+                  'import_animal_products',
+                  'export_animal_products',
+                  'net_food_import',
+                  'crop_cultivation_losses',
+                  'animal_housing_and_storage_losses',
+                  'animal_balance'), 
+       
        labels = c('Manure to crops',
-                 'Manure export',
-                  'Manure biogas substrate', 
-                  'Import inorganic fertilizers', 
+                  'Manure export',
+                  'Manure biogas substrate',
+                  'Import inorganic fertilizers',
                   'Vegetal biogas substrate',
-                  'Feed from processed crops', 
-                  'feed crops (maize silage)',
-                  'Dairy and egg export',
-                  'Meat export',
+                  'Feed from processed crops',
+                  'Animal products import',
+                  'Animal products export',
                   'Net food import',
                   'Cultivation losses',
-                  'Animal housing and storage losses'))
+                  'Animal housing and storage losses',
+                  'Stock balance animal subsystem'
+                  ))
+
+factor(summarised_flows$variable, levels = c('Manure to crops',
+                                             'Manure export',
+                                             'Manure biogas substrate',
+                                             'Import inorganic fertilizers',
+                                             'Vegetal biogas substrate',
+                                             'Feed from processed crops',
+                                             'Animal products import',
+                                             'Animal products export',
+                                             'Net food import',
+                                             'Cultivation losses',
+                                             'Animal housing and storage losses',
+                                             'Stock balance animal subsystem'
+))
 
 
 
@@ -483,10 +522,21 @@ p1 <- summarised_flows %>%
                        mid = "grey95", high = "#B35806") +
   geom_point(aes(size = iqr_adusted), data = summarised_flows[summarised_flows$nutrient == 'N',], col = 'grey50') + 
   scale_size(range = c(.1, 7), name="IQR (%)") +
-  theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
+  theme_bw() + ylab('Nitrogen flow') + xlab('Scenario')+
+  scale_y_discrete(limits=rev(c('Manure to crops',
+                            'Manure export',
+                            'Manure biogas substrate',
+                            'Import inorganic fertilizers',
+                            'Vegetal biogas substrate',
+                            'Feed from processed crops',
+                            'Animal products import',
+                            'Animal products export',
+                            'Net food import',
+                            'Cultivation losses',
+                            'Animal housing and storage losses',
+                            'Stock balance animal subsystem')))
 
-ggsave(p1, filename = 'flow_changes.jpg', path = 'figures/', device = 'jpeg', height = 20, width = 15, units = 'cm')
+ggsave(p1, filename = 'flow_changes_N.jpg', path = 'figures/', device = 'jpeg', height = 20, width = 15, units = 'cm')
 
 
 p2 <- summarised_flows %>%
@@ -503,7 +553,19 @@ p2 <- summarised_flows %>%
   geom_point(aes(size = iqr_adusted), data = summarised_flows[summarised_flows$nutrient == 'P',], col = 'grey50') + 
   scale_size(range = c(.1, 7), name="IQR (%)") +
   theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
+  ylab('Phosporous flow') + xlab('Scenario')+
+  scale_y_discrete(limits=rev(c('Manure to crops',
+                                'Manure export',
+                                'Manure biogas substrate',
+                                'Import inorganic fertilizers',
+                                'Vegetal biogas substrate',
+                                'Feed from processed crops',
+                                'Animal products import',
+                                'Animal products export',
+                                'Net food import',
+                                'Cultivation losses',
+                                'Animal housing and storage losses',
+                                'Stock balance animal subsystem')))
 
 ggsave(p2, filename = 'flow_changes_P.jpg', path = 'figures/', device = 'jpeg', height = 20, width = 15, units = 'cm')
 
@@ -521,8 +583,19 @@ p3 <- summarised_flows %>%
                        mid = "grey95", high = "#B35806") +
   geom_point(aes(size = iqr_adusted), data = summarised_flows[summarised_flows$nutrient == 'K',], col = 'grey50') + 
   scale_size(range = c(.1, 7), name="IQR (%)") +
-  theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
+  theme_bw() +  ylab('Potassium flow') + xlab('Scenario')+
+  scale_y_discrete(limits=rev(c('Manure to crops',
+                                'Manure export',
+                                'Manure biogas substrate',
+                                'Import inorganic fertilizers',
+                                'Vegetal biogas substrate',
+                                'Feed from processed crops',
+                                'Animal products import',
+                                'Animal products export',
+                                'Net food import',
+                                'Cultivation losses',
+                                'Animal housing and storage losses',
+                                'Stock balance animal subsystem')))
 
 ggsave(p3, filename = 'flow_changes_K.jpg', path = 'figures/', device = 'jpeg', height = 20, width = 15, units = 'cm')
 
@@ -547,6 +620,12 @@ summarised_indicators$median_adjusted <- ifelse(summarised_indicators$median_adj
 library(ggnewscale)
 RColorBrewer::brewer.pal(7, 'PuOr')
 
+summarised_indicators$variable <- factor(summarised_indicators$variable, 
+                                           levels = c("total_input", 'losses', "recycling_rate", "share_reuse_to_total_input", "use_efficiency"),
+                                           labels = c('Total Input', 'Losses', 'Recycling Rate', 'Reuse : Total Input', 'Use Efficiency'))
+
+
+
 p4 <- summarised_indicators %>%
   filter(nutrient == 'N', median_adjusted >= 0) %>%
   ggplot(aes(x = scenario, y = variable)) +
@@ -561,7 +640,12 @@ p4 <- summarised_indicators %>%
   geom_point(aes(size = iqr_adusted), data = summarised_indicators[summarised_indicators$nutrient == 'N',], col = 'grey50') + 
   scale_size(range = c(.1, 7), name="IQR (%)") +
   theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
+  ylab('Circularity Indicators') + xlab('Scenario')+
+  scale_y_discrete(limits=rev(c('Total Input',
+                                'Losses',
+                                'Use Efficiency',
+                                'Recycling Rate',
+                                'Reuse : Total Input')))
 
 ggsave(p4, filename = 'indicators_changes_N.jpg', path = 'figures/', device = 'jpeg', height = 20, width = 15, units = 'cm')
 
@@ -580,7 +664,12 @@ p5 <- summarised_indicators %>%
   geom_point(aes(size = iqr_adusted), data = summarised_indicators[summarised_indicators$nutrient == 'P',], col = 'grey50') + 
   scale_size(range = c(.1, 7), name="IQR (%)") +
   theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
+  ylab('Circularity Indicators') + xlab('Scenario')+
+  scale_y_discrete(limits=rev(c('Total Input',
+                                'Losses',
+                                'Use Efficiency',
+                                'Recycling Rate',
+                                'Reuse : Total Input')))
 
 ggsave(p5, filename = 'indicators_changes_P.jpg', path = 'figures/', device = 'jpeg', height = 20, width = 15, units = 'cm')
 
@@ -599,9 +688,11 @@ p6 <- summarised_indicators %>%
   geom_point(aes(size = iqr_adusted), data = summarised_indicators[summarised_indicators$nutrient == 'K',], col = 'grey50') + 
   scale_size(range = c(.1, 7), name="IQR (%)") +
   theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
+  ylab('Circularity Indicators') + xlab('Scenario')+
+  scale_y_discrete(limits=rev(c('Total Input',
+                                'Losses',
+                                'Use Efficiency',
+                                'Recycling Rate',
+                                'Reuse : Total Input'))) 
 
 ggsave(p6, filename = 'indicators_changes_K.jpg', path = 'figures/', device = 'jpeg', height = 20, width = 15, units = 'cm')
-
-
-
