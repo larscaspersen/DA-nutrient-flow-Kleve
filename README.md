@@ -1,155 +1,134 @@
-Decision Analysis on nutrient flows in Kleve, Germany
+Investigating nutrient flows in Kleve using decision analysis tools
 ================
 L. Caspersen
-6/29/2021
+18/10/2022
 
-## Imports and exports of nutrients are unbalanced
+## What is this repo about?
 
-Regions with intensive agriculture often show environmental problems
-caused by nutrient excess of agro-food-waste systems that have become
-increasingly linear over previous decades. Local demand and supply of
-nutrients increasingly become detached from each other. Substance flow
-analysis of nutrient should consider the whole agro-food-waste system
-including crop prdocution, animal production, food and feed processing,
-consumtption, and waste management (Wiel et al. 2020) Substance flow
-analysis (SFA) of Kleve, Germany, for instance revealed that especially
-the animal keeping of such an export oriented district drives the
-nutrient flows. Roughly 40%, 45% and 65% of districts N, P and K flows,
-respectively, can be accounted to feed import, manure application, and
-losses from housing and manure storage (Wiel et al. N.D.).
+As the title already says, we want to investigate nutrient flows for the
+district of Kleve, Germany. The agricultural sector of Kleve is intense
+and often export oriented. Animal husbandry (especially dairy cows)
+plays an important role along side with other intense farming systems
+like cropping (for example potatos) or ornamental production.
+Furthermore, Kleve is home to many food processors. A review of
+substance flow analyses showed, that supply and demand of the
+agro-food-waste system has become detached (Wiel et al. 2020). This is
+also the case for Kleve, whose substance flow has become more linear
+with a large share of imports and exports (Wiel et al. 2021). This repo
+builds upon the work of Wiel et al. (2021), who mapped the substance
+flows for nitrogen (N), phosporous (P), potassium (K) and to a lesser
+extent carbon (C). A simplified example of the traditional output of
+substance flow analysis can be seen in the figure below. Originally
+there were several substance flows between the subsystems within Kleve
+and flows entering and leaving the district. However, for the sake of
+simplicity they were lumped together. For a more detailed figure, please
+refer to Wiel et al. (2021).
 
-<div class="figure" style="text-align: center">
+<img src="figures/simplified model.jpg" title="Nitrogen SFA with flows in ton year-1. I=import E=export. WwT=wastewater treatment." alt="Nitrogen SFA with flows in ton year-1. I=import E=export. WwT=wastewater treatment." width="70%" style="display: block; margin: auto;" />
 
-<img src="figures/SFA_N_bernou.PNG" alt="Nitrogen SFA with flows in ton year-1. I=import E=export. WwT=wastewater treatment." width="100%" />
-<p class="caption">
-Nitrogen SFA with flows in ton year-1. I=import E=export. WwT=wastewater
-treatment.
-</p>
+However, the analysis suffered from some shortcomings. In principle the
+study acknowledged uncertainty in the SFA calculations by assigning
+different uncertainty levels to the calculated flows, based on the
+reliability of the input data. However, the uncertainty only is
+introduced in the last step, while it was ignored in the actual
+calculations. This leads to an underestimation of the actual uncertainty
+involved when calculating the substance flows. In this repository, the
+uncertainty of each input was assessed and a Monte-Carlo simulation with
+the uncertainty inputs was carried out. More importantly, we
+investigated the impact of different scenarios on the substance flow of
+the system. We were especially interested in the effect of enforcing a
+higher share of local feed to the animals. For the beginning, we worked
+on an extreme scenario in which all the feed needs to be locally
+sourced. Stakeholders coming from different industries (farming, food
+processing, waste treatment, environment, research) were interviewed on
+possible implications of the scenario. The answers of that approach were
+then integrated into the existing model. This approach is sometimes also
+called participatory modelling.
 
-</div>
+The outcomes of a Monte-Carlo simulation is usually in form
+distributions, an example can be seen in case of crop cultivation losses
+for nitrogen. The shown scenarios are the Reference year 2020 (Ref), the
+participatory scenario (PS) of strict local feed, livestock buffered
+scenario (LBS) of local feed and the crop buffered scenario (CBS) of
+local feed. The latter two scenarios are modifications of the
+participatory scenario, because often the stakeholder expectations were
+not well synchronized with each other leading to over- or
+under-allocations of different substance flows. Especially the
+allocation of crops to animals and the expected change in livestock herd
+size. So we decided to either let the herdsize buffer the unfitting
+ratio of allocated feed to herdsize (LBS) or a more drastic change in
+crop allocation buffers the missmatch (CBS).
 
-## Participatory research towards a more circular nutrient management
+<img src="figures/flows/distributions/crop_cultivation_losses_N.jpg" title="N" alt="N" width="70%" style="display: block; margin: auto;" />
 
-Facing the intensifying negative impacts of a decoupled demand and
-supply of nutrients intesified efforts towards nurtient recycling within
-the systems can be expected in the future. For instance the in 2017
-legislated decree on sewage sludge (Kläschlammverordnung) states, that
-in 2032 the latest most of the waste water treatment plants need to use
-a technology to improve the phosphorous retrieval from wastewater. More
-changes towards a more circular nutrient manageement are plausible, but
-how could they look like and what would be the consequences? To
-elaborate these questions the decision analysis method will be utilized.
-Originally developed for consulting on business decisions, the method
-attained increasing attention to assist in risky agricultural decisions
-(Luedeling and Shepherd 2016) such as the adoption of agroforestry
-practices (Do, Luedeling, and Whitney 2020) or the installation of hail
-nets in fruit orchards (Rojas et al. 2021). Advantages of the method
-include participatory approach involving stakeholders in the model
-development and making use of expert knowledge for parametrization.
-Especially the ability to handle uncertainty, which is in SFA surely
-present, makes the decision analysis approach viable for this project.
-Furthermore, the spark of farmer protests in Germany and elsehere in the
-response to tighter envrionmental legislation underlines the need to
-participatory research and policy making.
+The project investigated in total 44 different substance streams for
+three nutrient and four scenarios (including the reference year), which
+leads to a total of 528 resulting individual distributions. One of a the
+projects challenge was to summarize the results. One approach was to
+look at different circularity indicators, which includes the amount of
+total inputs, environmental losses, share recycling within the
+agro-food-waste system, the use efficiency and the share of reuse to
+total inputs (citation here). Another approach was to map the median
+change relative to the reference year for selected substance flows or
+indicators together with the interquartile range of the distributions.
+This approach was adopted from (Fernandez et al. 2022). An example for
+selected flows for nitrogen can be seen in the figure below.
 
-## Outcomes sofar
+<img src="figures/flow_changes_N.jpg" width="60%" style="display: block; margin: auto;" />
 
-Usually, participatory methods such as decision analysis rely on
-workshops held in presence, which are in light of the current situation
-not feasable. Sofar response rates, espcially in the agricultural
-subsystem, were low to digital meeting, therefore the first draft of a
-visual model, one of the first steps in such a workshop, was instead
-carried out by us researchers (include figure). Sofar it resembles the
-previously shown SFA outcome, but especially the addition of animal
-numbers and fodder composition are expected to affect the substance
-flows.
+Also classical boxplots for the circularity indicators can be an option,
+as we can see for the circularity indicators for nitrogen.
 
-<div class="figure" style="text-align: center">
+<img src="figures/boxplot_indicators_N.jpeg" width="70%" style="display: block; margin: auto;" />
 
-<img src="figures/Untitled Diagram.png" alt="Graphical model of agro-food-waste system" width="80%" />
-<p class="caption">
-Graphical model of agro-food-waste system
-</p>
-
-</div>
-
-Right now, the team is busy recreating the SFA in R so that the
-substance flows can modelled in terms of distributions instead of single
-numbers. First results of this effort can be seen below.
-
-<div class="figure" style="text-align: center">
-
-<img src="figures/animal_inputs.png" alt="Entering and leaving flows of the animal subsystem" width="50%" /><img src="figures/animal_outputs.png" alt="Entering and leaving flows of the animal subsystem" width="50%" />
-<p class="caption">
-Entering and leaving flows of the animal subsystem
-</p>
-
-</div>
-
-<div class="figure" style="text-align: center">
-
-<img src="figures/food_import.png" alt="Import and export of food (excluding crops) in Kleve" width="50%" /><img src="figures/food_export.png" alt="Import and export of food (excluding crops) in Kleve" width="50%" />
-<p class="caption">
-Import and export of food (excluding crops) in Kleve
-</p>
-
-</div>
-
-## Challenges and what to do
-
-Participatory research is done best when stakeholders are interested in
-the outcomes and have a shared problem awareness. Reaching out and
-activating stakeholders lead to minimal sucess. Furthermore, the
-implementation of SFA in R is still carried out. The number of involved
-variables for the baseline scenario (which are more or less the findings
-of the SFA) involve around 250 parameters, even though only the animal
-subsystem is completely implemented so far. An even bigger challange is
-to formulate the scenario and its implications of a strict circular
-nutrient management, which we plan to compare with the baseline
-scenario.
+Further challenges lied in how to include the stakeholder answers into
+the model especially when the answers were clustered in different
+intervals. In case the answers are evenly spread, there is no problem in
+including the answers in normal distributions as it is usually done in
+decision analysis projects using the R package `decisionSupport`
+(Luedeling et al., n.d.). In some cases used normal distributions and in
+others we chose skewed normal distributions. For more details on that,
+please refer to this [github
+repository](https://github.com/hortibonn/including-unreliable-stakeholder-estimates-of-small-n).
 
 ## References
 
 <div id="refs" class="references csl-bib-body hanging-indent">
 
-<div id="ref-do2020decision" class="csl-entry">
+<div id="ref-fernandez2022prioritizing" class="csl-entry">
 
-Do, Hoa, Eike Luedeling, and Cory Whitney. 2020. “Decision Analysis of
-Agroforestry Options Reveals Adoption Risks for Resource-Poor Farmers.”
-*Agronomy for Sustainable Development* 40: 1–12.
-
-</div>
-
-<div id="ref-luedeling2016decision" class="csl-entry">
-
-Luedeling, Eike, and Keith Shepherd. 2016. “Decision-Focused
-Agricultural Research.” *Solutions* 7 (5): 46–54.
+Fernandez, Eduardo, Hoa Do, Eike Luedeling, Thi Thu Giang Luu, and Cory
+Whitney. 2022. “Prioritizing Farm Management Interventions to Improve
+Climate Change Adaptation and Mitigation Outcomes—a Case Study for
+Banana Plantations.” *Agronomy for Sustainable Development* 42 (4):
+1–13.
 
 </div>
 
-<div id="ref-rojas2021adapting" class="csl-entry">
+<div id="ref-decisionSupport" class="csl-entry">
 
-Rojas, Gonzalo, Eduardo Fernandez, Cory Whitney, Eike Luedeling, and
-Italo F Cuneo. 2021. “Adapting Sweet Cherry Orchards to Extreme Weather
-Events–Decision Analysis in Support of Farmers’ Investments in Central
-Chile.” *Agricultural Systems* 187: 103031.
-
-</div>
-
-<div id="ref-vdWiel2021SFA" class="csl-entry">
-
-Wiel, Bernou Zoë van der, Jan Weijma, Corina Everarda van Middelaar,
-Matthias Kleinke, Cees Jan Nico Buisman, and Florian Wichern. N.D.
-“Towards Nutrient Circularity: A Multi-Substance Flow Analysis of
-District Cleves’ Agro-Food-Waste System,” N.D.
+Luedeling, Eike, Lutz Goehring, Katja Schiffers, Cory Whitney, and
+Eduardo Fernandez. n.d. “Decision Support – Quantitative Support of
+Decision Making Under Uncertainty.”
+<https://cran.r-project.org/web/packages/decisionSupport/index.html>.
 
 </div>
 
 <div id="ref-vdwiel2020review" class="csl-entry">
 
-———. 2020. “Restoring Nutrient Circularity: A Review of Nutrient Stock
-and Flow Analyses of Local Agro-Food-Waste Systems.” *Resources,
-Conservation and Recycling* 160: 104901.
+Wiel, Bernou Zoë van der, Jan Weijma, Corina Everarda van Middelaar,
+Matthias Kleinke, Cees Jan Nico Buisman, and Florian Wichern. 2020.
+“Restoring Nutrient Circularity: A Review of Nutrient Stock and Flow
+Analyses of Local Agro-Food-Waste Systems.” *Resources, Conservation and
+Recycling* 160: 104901.
+
+</div>
+
+<div id="ref-van2021restoring" class="csl-entry">
+
+———. 2021. “Restoring Nutrient Circularity in a Nutrient-Saturated Area
+in Germany Requires Systemic Change.” *Nutrient Cycling in
+Agroecosystems* 121 (2): 209–26.
 
 </div>
 
