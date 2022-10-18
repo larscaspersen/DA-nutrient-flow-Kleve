@@ -55,6 +55,17 @@ combined_function <- function() {
   scenario_allocate_manure_crop_a <- as.numeric(sn::rsn(n = 1, xi = xi_manure_crop, omega = omega_manure_crop, alpha = alpha_manure_crop) / 100)
   scenario_allocate_manure_export_a <- as.numeric(sn::rsn(n = 1, xi = xi_manure_export, omega = omega_manure_export, alpha = alpha_manure_export) / 100)
   
+  scenario_allocate_crop_feed_a <- ifelse(scenario_allocate_crop_feed_a > 1, yes = 1, 
+         no = ifelse(scenario_allocate_crop_feed_a < 0, yes = 0, no = scenario_allocate_crop_feed_a))
+  scenario_allocate_crop_food_a <- ifelse(scenario_allocate_crop_food_a > 1, yes = 1, 
+         no = ifelse(scenario_allocate_crop_feed_a < 0, yes = 0, no = scenario_allocate_crop_food_a))
+  scenario_allocate_manure_biogas_a <- ifelse(scenario_allocate_manure_biogas_a > 1, yes = 1, 
+         no = ifelse(scenario_allocate_crop_feed_a < 0, yes = 0, no = scenario_allocate_manure_biogas_a))
+  scenario_allocate_manure_crop_a <- ifelse(scenario_allocate_manure_crop_a > 1, yes = 1, 
+         no = ifelse(scenario_allocate_manure_crop_a < 0, yes = 0, no = scenario_allocate_manure_crop_a))
+  scenario_allocate_manure_export_a <- ifelse(scenario_allocate_manure_export_a > 1, yes = 1, 
+         no = ifelse(scenario_allocate_manure_export_a < 0, yes = 0, no = scenario_allocate_manure_export_a))
+  
 
   # combined the stakeholders answers to a vector
   all_scenario_allocate_crop_biogas <- c(
@@ -1735,15 +1746,18 @@ combined_function <- function() {
 
       N_dairy_and_egg_export <- ifelse(((animal_output$N_egg_available - consumption_output$consumed_N_egg) + 
                                           (animal_output$N_milk_available - consumption_output$consumed_N_dairy)) > 0,
-        (animal_output$N_egg_available - consumption_output$consumed_N_egg), 0
+        ((animal_output$N_egg_available - consumption_output$consumed_N_egg)+
+           (animal_output$N_milk_available - consumption_output$consumed_N_dairy)), 0
       )
       P_dairy_and_egg_export <- ifelse(((animal_output$P_egg_available - consumption_output$consumed_P_egg)+ 
                                           (animal_output$P_milk_available - consumption_output$consumed_P_dairy)) > 0,
-        (animal_output$P_egg_available - consumption_output$consumed_P_egg), 0
+        ((animal_output$P_egg_available - consumption_output$consumed_P_egg)+
+           (animal_output$P_milk_available - consumption_output$consumed_P_dairy)), 0
       )
       K_dairy_and_egg_export <- ifelse(((animal_output$K_egg_available - consumption_output$consumed_K_egg)+ 
                                           (animal_output$K_milk_available - consumption_output$consumed_K_dairy)) > 0,
-        (animal_output$K_egg_available - consumption_output$consumed_K_egg), 0
+        ((animal_output$K_egg_available - consumption_output$consumed_K_egg)+
+           (animal_output$K_milk_available - consumption_output$consumed_K_dairy)), 0
       )
       
       
@@ -1789,7 +1803,7 @@ combined_function <- function() {
 
       # combine import and export to list
       import_export <- list(
-        N_dairy_and_egg_export = N_dairy_and_egg_import,
+        N_dairy_and_egg_import = N_dairy_and_egg_import,
         P_dairy_and_egg_import = P_dairy_and_egg_import,
         K_dairy_and_egg_import = K_dairy_and_egg_import,
         N_meat_import = N_meat_import,
@@ -1956,9 +1970,9 @@ combined_function <- function() {
         export_vegetable_N = c(combined_output$export_vegetable_N, adj_length(N_vegetable_export, n_rep)),
         export_vegetable_P = c(combined_output$export_vegetable_P, adj_length(P_vegetable_export, n_rep)),
         export_vegetable_K = c(combined_output$export_vegetable_K, adj_length(K_vegetable_export, n_rep)),
-        import_dairy_egg_N = c(combined_output$import_dairy_egg_N, adj_length(N_dairy_and_egg_export, n_rep)),
-        import_dairy_egg_P = c(combined_output$import_dairy_egg_P, adj_length(P_dairy_and_egg_export, n_rep)),
-        import_dairy_egg_K = c(combined_output$import_dairy_egg_K, adj_length(K_dairy_and_egg_export, n_rep)),
+        import_dairy_egg_N = c(combined_output$import_dairy_egg_N, adj_length(N_dairy_and_egg_import, n_rep)),
+        import_dairy_egg_P = c(combined_output$import_dairy_egg_P, adj_length(P_dairy_and_egg_import, n_rep)),
+        import_dairy_egg_K = c(combined_output$import_dairy_egg_K, adj_length(K_dairy_and_egg_import, n_rep)),
         imported_vegetal_products_N = c(combined_output$imported_vegetal_products_N, adj_length(N_vegetable_import, n_rep)),
         imported_vegetal_products_P = c(combined_output$imported_vegetal_products_P, adj_length(P_vegetable_import, n_rep)),
         imported_vegetal_products_K = c(combined_output$imported_vegetal_products_K, adj_length(K_vegetable_import, n_rep)),
@@ -1977,9 +1991,9 @@ combined_function <- function() {
         import_meat_N = c(combined_output$import_meat_N, adj_length(N_meat_import, n_rep)),
         import_meat_P = c(combined_output$import_meat_P, adj_length(P_meat_import, n_rep)),
         import_meat_K = c(combined_output$import_meat_K, adj_length(K_meat_import, n_rep)),
-        export_dairy_egg_N = c(combined_output$import_dairy_egg_N, adj_length(N_dairy_and_egg_export, n_rep)),
-        export_dairy_egg_P = c(combined_output$import_dairy_egg_P, adj_length(P_dairy_and_egg_export, n_rep)),
-        export_dairy_egg_K = c(combined_output$import_dairy_egg_K, adj_length(K_dairy_and_egg_export, n_rep)),
+        export_dairy_egg_N = c(combined_output$export_dairy_egg_N, adj_length(N_dairy_and_egg_export, n_rep)),
+        export_dairy_egg_P = c(combined_output$export_dairy_egg_P, adj_length(P_dairy_and_egg_export, n_rep)),
+        export_dairy_egg_K = c(combined_output$export_dairy_egg_K, adj_length(K_dairy_and_egg_export, n_rep)),
         slaughter_waste_N = c(combined_output$slaughter_waste_N, adj_length(animal_output$N_slaughter_waste, n_rep)),
         slaughter_waste_P = c(combined_output$slaughter_waste_P, adj_length(animal_output$P_slaughter_waste, n_rep)),
         slaughter_waste_K = c(combined_output$slaughter_waste_K, adj_length(animal_output$K_slaughter_waste, n_rep)),
@@ -2000,7 +2014,12 @@ combined_function <- function() {
         net_feed_import_K = c(combined_output$net_feed_import_K, adj_length(K_feed_import, n_rep)),
         animal_balance_N = c(combined_output$animal_balance_N, adj_length(N_animal_balance, n_rep)),
         animal_balance_P = c(combined_output$animal_balance_P, adj_length(P_animal_balance, n_rep)),
-        animal_balance_K = c(combined_output$animal_balance_K, adj_length(K_animal_balance, n_rep))
+        animal_balance_K = c(combined_output$animal_balance_K, adj_length(K_animal_balance, n_rep)),
+        scenario_allocate_crop_feed_a = c(model_evaluation$scenario_allocate_crop_feed_a, scenario_allocate_crop_feed_a),
+        scenario_allocate_crop_food_a = c(model_evaluation$scenario_allocate_crop_food_a, scenario_allocate_crop_food_a),
+        scenario_allocate_manure_export_a = c(model_evaluation$scenario_allocate_manure_export_a, scenario_allocate_manure_export_a),
+        scenario_allocate_manure_crop_a = c(model_evaluation$scenario_allocate_manure_crop_a, scenario_allocate_manure_crop_a),
+        scenario_allocate_manure_biogas_a = c(model_evaluation$scenario_allocate_manure_biogas_a, scenario_allocate_manure_biogas_a)
       )
     } # end of loop for different stakeholders answers
   } # end of the loop for the different scenarios   
@@ -2279,7 +2298,12 @@ combined_function <- function() {
     recycling_rate_K = c(model_evaluation$recycling_rate_K, recycling_rate_K),
     losses_N = c(model_evaluation$losses_N, losses_N),
     losses_P = c(model_evaluation$losses_P, losses_P),
-    losses_K = c(model_evaluation$losses_K, losses_K)
+    losses_K = c(model_evaluation$losses_K, losses_K),
+    scenario_allocate_crop_feed_a = c(model_evaluation$scenario_allocate_crop_feed_a, scenario_allocate_crop_feed_a),
+    scenario_allocate_crop_food_a = c(model_evaluation$scenario_allocate_crop_food_a, scenario_allocate_crop_food_a),
+    scenario_allocate_manure_export_a = c(model_evaluation$scenario_allocate_manure_export_a, scenario_allocate_manure_export_a),
+    scenario_allocate_manure_crop_a = c(model_evaluation$scenario_allocate_manure_crop_a, scenario_allocate_manure_crop_a),
+    scenario_allocate_manure_biogas_a = c(model_evaluation$scenario_allocate_manure_biogas_a, scenario_allocate_manure_biogas_a)
   )
   
 
