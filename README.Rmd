@@ -17,7 +17,7 @@ A review of substance flow analyses showed, that supply and demand of the agro-f
 
 
 ```{r,out.width = "70%", echo = FALSE,fig.align='center', fig.show='hold', fig.cap="Nitrogen SFA with flows in ton year-1. I=import E=export. WwT=wastewater treatment."}
-knitr::include_graphics('figures/simplified model.jpg')
+knitr::include_graphics('example_figures/simplified model.jpg')
 
 ```
 
@@ -28,7 +28,7 @@ The outcomes of a Monte-Carlo simulation is usually in form distributions, an ex
 
 
 ```{r,out.width = "70%", echo = FALSE,fig.align='center', fig.show='hold', fig.cap="N"}
-knitr::include_graphics('figures/flows/distributions/crop_cultivation_losses_N.jpg')
+knitr::include_graphics('example_figures/crop_cultivation_losses_N.jpg')
 
 ```
 
@@ -36,14 +36,14 @@ The project investigated in total 44 different substance streams for three nutri
 One approach was to look at different circularity indicators, which includes the amount of total inputs, environmental losses, share recycling within the agro-food-waste system, the use efficiency and the share of reuse to total inputs (citation here). Another approach was to map the median change relative to the reference year for selected substance flows or indicators together with the interquartile range of the distributions. This approach was adopted from [@fernandez2022prioritizing]. An example for selected flows for nitrogen can be seen in the figure below.
 
 ```{r,out.width = "60%", echo = FALSE,fig.align='center', fig.show='hold', fig.cap=""}
-knitr::include_graphics('figures/flow_changes_N.jpg')
+knitr::include_graphics('example_figures/flow_changes_N.jpg')
 
 ```
 
 Also classical boxplots for the circularity indicators can be an option, as we can see for the circularity indicators for nitrogen.
 
 ```{r,out.width = "70%", echo = FALSE,fig.align='center', fig.show='hold', fig.cap=""}
-knitr::include_graphics('figures/boxplot_indicators_N.jpeg')
+knitr::include_graphics('example_figures/boxplot_indicators_N.jpeg')
 
 ```
 

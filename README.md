@@ -24,7 +24,7 @@ and flows entering and leaving the district. However, for the sake of
 simplicity they were lumped together. For a more detailed figure, please
 refer to Wiel et al. (2021).
 
-<img src="figures/simplified model.jpg" title="Nitrogen SFA with flows in ton year-1. I=import E=export. WwT=wastewater treatment." alt="Nitrogen SFA with flows in ton year-1. I=import E=export. WwT=wastewater treatment." width="70%" style="display: block; margin: auto;" />
+<img src="example_figures/simplified model.jpg" title="Nitrogen SFA with flows in ton year-1. I=import E=export. WwT=wastewater treatment." alt="Nitrogen SFA with flows in ton year-1. I=import E=export. WwT=wastewater treatment." width="70%" style="display: block; margin: auto;" />
 
 However, the analysis suffered from some shortcomings. In principle the
 study acknowledged uncertainty in the SFA calculations by assigning
@@ -59,7 +59,7 @@ size. So we decided to either let the herdsize buffer the unfitting
 ratio of allocated feed to herdsize (LBS) or a more drastic change in
 crop allocation buffers the missmatch (CBS).
 
-<img src="figures/flows/distributions/crop_cultivation_losses_N.jpg" title="N" alt="N" width="70%" style="display: block; margin: auto;" />
+<img src="example_figures/crop_cultivation_losses_N.jpg" title="N" alt="N" width="70%" style="display: block; margin: auto;" />
 
 The project investigated in total 44 different substance streams for
 three nutrient and four scenarios (including the reference year), which
@@ -74,12 +74,12 @@ indicators together with the interquartile range of the distributions.
 This approach was adopted from (Fernandez et al. 2022). An example for
 selected flows for nitrogen can be seen in the figure below.
 
-<img src="figures/flow_changes_N.jpg" width="60%" style="display: block; margin: auto;" />
+<img src="example_figures/flow_changes_N.jpg" width="60%" style="display: block; margin: auto;" />
 
 Also classical boxplots for the circularity indicators can be an option,
 as we can see for the circularity indicators for nitrogen.
 
-<img src="figures/boxplot_indicators_N.jpeg" width="70%" style="display: block; margin: auto;" />
+<img src="example_figures/boxplot_indicators_N.jpeg" width="70%" style="display: block; margin: auto;" />
 
 Further challenges lied in how to include the stakeholder answers into
 the model especially when the answers were clustered in different
