@@ -123,10 +123,10 @@ combined_function <- function() {
 
     # scenario
     # temp
-    scenario <- 'normal'
-    scenario <- 'all_adjustments'
-    scenario <- 'buffer_no_herdsize'
-    scenario <- 'back_to_roots'
+    #scenario <- 'normal'
+    #scenario <- 'all_adjustments'
+    #scenario <- 'buffer_no_herdsize'
+    #scenario <- 'back_to_roots'
 
 
     n_stakeholder_answers <- length(all_scenario_allocate_crop_biogas)

@@ -8,6 +8,7 @@ return_flows <- TRUE
 
 n_runs <- 10000
 
+
 start <- Sys.time()
 # let mc simulation run, just to test if everything works out
 nitrogen_mc_simulation <- mcSimulation(
@@ -20,11 +21,13 @@ end <- Sys.time()
 end - start
 
 
+#bring stakeholder_allocation to the inputs, not the outputs of the model
 nitrogen_mc_simulation$x$scenario_allocate_crop_feed_a <- as.numeric(nitrogen_mc_simulation$y[,'scenario_allocate_crop_feed_a'])
 nitrogen_mc_simulation$x$scenario_allocate_crop_food_a <- as.numeric(nitrogen_mc_simulation$y[,'scenario_allocate_crop_food_a'])
 nitrogen_mc_simulation$x$scenario_allocate_manure_biogas_a <- as.numeric(nitrogen_mc_simulation$y[,'scenario_allocate_manure_biogas_a'])
 nitrogen_mc_simulation$x$scenario_allocate_manure_export_a <- as.numeric(nitrogen_mc_simulation$y[,'scenario_allocate_manure_export_a'])
 nitrogen_mc_simulation$x$scenario_allocate_manure_crop_a <- as.numeric(nitrogen_mc_simulation$y[,'scenario_allocate_manure_crop_a'])
+
 
 #find which position columns have
 drop_col <-  which(colnames(nitrogen_mc_simulation$y) %in% c('scenario_allocate_crop_feed_a', 'scenario_allocate_crop_food_a',
@@ -75,7 +78,8 @@ levels(combined_results$scenario)
 levels(combined_results$scenario) <- list(reference_year  = "normal", 
                                           interventions = "all_adjustments_sh_1_stakeholder_reduction",
                                           interventions_animal_adjusted = 'all_adjustments_sh_1_strict_reduction',
-                                          interventions_crop_adjusted = 'buffer_no_herdsize_sh_1') 
+                                          interventions_crop_adjusted = 'buffer_no_herdsize_sh_1',
+                                          traditional_agriculture = "back_to_roots") 
 
 #split the results the different scenarios? In the end the scenarios are not a result but an input
 result_list <- split(x = combined_results, f = combined_results$scenario)
@@ -85,6 +89,7 @@ result_list$reference_year[,-1] <- lapply(result_list$reference_year[,-1], as.nu
 result_list$interventions[,-1] <- lapply(result_list$interventions[,-1], as.numeric)
 result_list$interventions_animal_adjusted[,-1] <- lapply(result_list$interventions_animal_adjusted[,-1], as.numeric)
 result_list$interventions_crop_adjusted[,-1] <- lapply(result_list$interventions_crop_adjusted[,-1], as.numeric)
+result_list$traditional_agriculture[,-1] <- lapply(result_list$traditional_agriculture[,-1], as.numeric)
 
 #save result list
 saveRDS(result_list, file = 'data/model_result_flows.rds')
@@ -159,7 +164,8 @@ levels(combined_results$scenario)
 levels(combined_results$scenario) <- list(reference_year  = "normal", 
                                           interventions = "all_adjustments_sh_1_stakeholder_reduction",
                                           interventions_animal_adjusted = 'all_adjustments_sh_1_strict_reduction',
-                                          interventions_crop_adjusted = 'buffer_no_herdsize_sh_1') 
+                                          interventions_crop_adjusted = 'buffer_no_herdsize_sh_1',
+                                          traditional_agriculture = "back_to_roots") 
 
 #split the results the different scenarios? In the end the scenarios are not a result but an input
 result_list <- split(x = combined_results, f = combined_results$scenario)
@@ -169,6 +175,8 @@ result_list$reference_year[,-1] <- lapply(result_list$reference_year[,-1], as.nu
 result_list$interventions[,-1] <- lapply(result_list$interventions[,-1], as.numeric)
 result_list$interventions_animal_adjusted[,-1] <- lapply(result_list$interventions_animal_adjusted[,-1], as.numeric)
 result_list$interventions_crop_adjusted[,-1] <- lapply(result_list$interventions_crop_adjusted[,-1], as.numeric)
+result_list$traditional_agriculture[,-1] <- lapply(result_list$traditional_agriculture[,-1], as.numeric)
+
 
 #save result list
 saveRDS(result_list, file = 'data/model_result_indicators.rds')

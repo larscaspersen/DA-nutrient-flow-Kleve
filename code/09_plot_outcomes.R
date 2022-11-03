@@ -10,15 +10,24 @@ result_indicators <- readRDS('data/model_result_indicators.rds')
 
 diff_flows_df <- rbind.data.frame(result_flows$interventions[-1] - result_flows$reference_year[-1],
                                   result_flows$interventions_animal_adjusted[-1] - result_flows$reference_year[-1],
-                                  result_flows$interventions_crop_adjusted[-1] - result_flows$reference_year[-1])
+                                  result_flows$interventions_crop_adjusted[-1] - result_flows$reference_year[-1],
+                                  result_flows$traditional_agriculture[-1] - result_flows$reference_year[-1])
 diff_indicators_df <- rbind.data.frame(result_indicators$interventions[-1] - result_indicators$reference_year[-1],
                                        result_indicators$interventions_animal_adjusted[-1] - result_indicators$reference_year[-1],
-                                       result_indicators$interventions_crop_adjusted[-1] - result_indicators$reference_year[-1])
+                                       result_indicators$interventions_crop_adjusted[-1] - result_indicators$reference_year[-1],
+                                       result_indicators$traditional_agriculture[-1] - result_indicators$reference_year[-1])
 
 
-diff_flows_df$scenario <- c(result_flows$interventions$scenario, result_flows$interventions_animal_adjusted$scenario, result_flows$interventions_crop_adjusted$scenario)
+diff_flows_df$scenario <- c(result_flows$interventions$scenario, 
+                            result_flows$interventions_animal_adjusted$scenario, 
+                            result_flows$interventions_crop_adjusted$scenario,
+                            result_flows$traditional_agriculture$scenario)
+
 diff_flows_df <- dplyr::relocate(diff_flows_df, scenario)
-diff_indicators_df$scenario <- c(result_indicators$interventions$scenario, result_indicators$interventions_animal_adjusted$scenario, result_indicators$interventions_crop_adjusted$scenario)
+diff_indicators_df$scenario <- c(result_indicators$interventions$scenario, 
+                                 result_indicators$interventions_animal_adjusted$scenario, 
+                                 result_indicators$interventions_crop_adjusted$scenario,
+                                 result_indicators$traditional_agriculture$scenario)
 diff_indicators_df <- dplyr::relocate(diff_indicators_df, scenario)
 
 
@@ -31,15 +40,15 @@ result_flows <- do.call(rbind, result_flows)
 result_indicators <- do.call(rbind, result_indicators)
 
 #change names of scenarios
-result_flows$scenario <- factor(result_flows$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted"),
-       labels = c('Ref', 'PS', 'LBS' ,'CBS'))
-result_indicators$scenario <- factor(result_indicators$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted"),
-                                labels = c('Ref', 'PS', 'LBS' ,'CBS'))
+result_flows$scenario <- factor(result_flows$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted", "traditional_agriculture"),
+       labels = c('Ref', 'PS', 'LBS' ,'CBS', "TA"))
+result_indicators$scenario <- factor(result_indicators$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted", "traditional_agriculture"),
+                                labels = c('Ref', 'PS', 'LBS' ,'CBS', "TA"))
 
-diff_flows_df$scenario <- factor(diff_flows_df$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted"),
-       labels = c('Ref', 'PS', 'LBS' ,'CBS'))
-diff_indicators_df$scenario <- factor(diff_indicators_df$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted"),
-       labels = c('Ref', 'PS', 'LBS' ,'CBS'))
+diff_flows_df$scenario <- factor(diff_flows_df$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted", "traditional_agriculture"),
+       labels = c('Ref', 'PS', 'LBS' ,'CBS', "TA"))
+diff_indicators_df$scenario <- factor(diff_indicators_df$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted", "traditional_agriculture"),
+       labels = c('Ref', 'PS', 'LBS' ,'CBS', "TA"))
 
 
 #bring results in long format, bring differences in long format
@@ -383,21 +392,29 @@ result_flows <- purrr::map(result_flows, function(x){
 #calculate change relative to the reference year
 rel_change_flows <- rbind.data.frame(((result_flows$interventions[-1] - result_flows$reference_year[-1]) / result_flows$reference_year[-1]) * 100,
                                   ((result_flows$interventions_animal_adjusted[-1] - result_flows$reference_year[-1]) / result_flows$reference_year[-1])*100,
-                                  ((result_flows$interventions_crop_adjusted[-1] - result_flows$reference_year[-1]) / result_flows$reference_year[-1]) * 100)
-rel_change_flows$scenario <- c(result_flows$interventions$scenario, result_flows$interventions_animal_adjusted$scenario, result_flows$interventions_crop_adjusted$scenario)
+                                  ((result_flows$interventions_crop_adjusted[-1] - result_flows$reference_year[-1]) / result_flows$reference_year[-1]) * 100,
+                                  ((result_flows$traditional_agriculture[-1] - result_flows$reference_year[-1]) / result_flows$reference_year[-1]) * 100)
+rel_change_flows$scenario <- c(result_flows$interventions$scenario, 
+                               result_flows$interventions_animal_adjusted$scenario, 
+                               result_flows$interventions_crop_adjusted$scenario,
+                               result_flows$traditional_agriculture$scenario)
 rel_change_flows <- dplyr::relocate(rel_change_flows, scenario)
 
 rel_change_indicators <- rbind.data.frame(((result_indicators$interventions[-1] - result_indicators$reference_year[-1]) / result_indicators$reference_year[-1]) * 100,
                                      ((result_indicators$interventions_animal_adjusted[-1] - result_indicators$reference_year[-1]) / result_indicators$reference_year[-1]) * 100,
-                                     ((result_indicators$interventions_crop_adjusted[-1] - result_indicators$reference_year[-1]) / result_indicators$reference_year[-1]) * 100)
-rel_change_indicators$scenario <- c(result_indicators$interventions$scenario, result_indicators$interventions_animal_adjusted$scenario, result_indicators$interventions_crop_adjusted$scenario)
+                                     ((result_indicators$interventions_crop_adjusted[-1] - result_indicators$reference_year[-1]) / result_indicators$reference_year[-1]) * 100,
+                                     ((result_indicators$traditional_agriculture[-1] - result_indicators$reference_year[-1]) / result_indicators$reference_year[-1]) * 100)
+rel_change_indicators$scenario <- c(result_indicators$interventions$scenario, 
+                                    result_indicators$interventions_animal_adjusted$scenario, 
+                                    result_indicators$interventions_crop_adjusted$scenario,
+                                    result_indicators$traditional_agriculture$scenario)
 rel_change_indicators <- dplyr::relocate(rel_change_indicators, scenario)
 
 
-rel_change_indicators$scenario <- factor(rel_change_indicators$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted"),
-                                 labels = c('Ref', 'PS', 'LBS' ,'CBS'))
-rel_change_flows$scenario <- factor(rel_change_flows$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted"),
-                                      labels = c('Ref', 'PS', 'LBS' ,'CBS'))
+rel_change_indicators$scenario <- factor(rel_change_indicators$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted", "traditional_agriculture"),
+                                 labels = c('Ref', 'PS', 'LBS' ,'CBS', 'TA'))
+rel_change_flows$scenario <- factor(rel_change_flows$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted", "traditional_agriculture"),
+                                      labels = c('Ref', 'PS', 'LBS' ,'CBS', 'TA'))
 
 
 
