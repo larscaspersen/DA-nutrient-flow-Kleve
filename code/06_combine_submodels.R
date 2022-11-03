@@ -126,7 +126,7 @@ combined_function <- function() {
     # scenario <- 'normal'
     # scenario <- 'all_adjustments'
     # scenario <- 'buffer_no_herdsize'
-    # scenario <- 'back_to_roots'
+    #scenario <- 'back_to_roots'
 
 
     n_stakeholder_answers <- length(all_scenario_allocate_crop_biogas)
@@ -157,13 +157,18 @@ combined_function <- function() {
 
       # levers for the different scenarios
       herdsize_adjustment <- herd_composition <- crop_adjustment <- manure_adjustment <- F
-
+      consumer_adjustment <- FALSE
+      
       # adjust levers depending on the scenario
       if (scenario == "all_adjustments") {
         herdsize_adjustment <- crop_adjustment <- manure_adjustment <- herd_composition <- TRUE
       } else if (scenario == "buffer_no_herdsize") {
         herdsize_adjustment <- crop_adjustment <- manure_adjustment <- herd_composition <- TRUE
-      } 
+      } else if (scenario == 'back_to_roots') {
+        #what kind of adjustments do we make?
+        #herdsize adjustment, herd_composition
+        consumer_adjustment <- TRUE
+      }
 
 
       # factor to scale biogas output to input in local feed scenario
@@ -188,144 +193,344 @@ combined_function <- function() {
       # CONSUMPTION SUBSYSTEM ####
       #--------------------------#
       
-      consumption_output <- calc_consume(
-        population = population,
-        consume_beef = consume_beef, 
-        N_content_beef = N_content_beef,
-        consume_beer = consume_beer,
-        N_content_beer =  N_content_beer,
-        consume_butter = consume_butter,
-        N_content_butter =  N_content_butter,
-        consume_cheese = consume_cheese, 
-        N_content_cheese =  N_content_cheese,
-        consume_citrus_fruits = consume_citrus_fruits,
-        N_content_citrus_fruits =  N_content_citrus_fruits,
-        consume_cocoa =  consume_cocoa,
-        N_content_cocoa =  N_content_cocoa,
-        consume_condensed_milk =  consume_condensed_milk,
-        N_content_condensed_milk =  N_content_condensed_milk,
-        consume_cream =  consume_cream,
-        N_content_cream =  N_content_cream,
-        consume_dried_fruit =  consume_dried_fruit,
-        N_content_dried_fruit =  N_content_dried_fruit,
-        consume_egg =  consume_egg,
-        N_content_egg =  N_content_egg,
-        consume_fish =  consume_fish,
-        N_content_fish =  N_content_fish,
-        consume_honey =  consume_honey,
-        N_content_honey =  N_content_honey,
-        consume_legumes =  consume_legumes,
-        N_content_legumes =  N_content_legumes,
-        consume_margarine =  consume_margarine,
-        N_content_margarine =  N_content_margarine,
-        consume_milk =  consume_milk,
-        N_content_milk =  N_content_milk,
-        consume_nuts =  consume_nuts,
-        N_content_nuts =  N_content_nuts,
-        consume_offal =  consume_offal,
-        N_content_offal =  N_content_offal,
-        consume_other_meat =  consume_other_meat,
-        N_content_other_meat =  N_content_other_meat,
-        consume_pork =  consume_pork,
-        N_content_pork =  N_content_pork,
-        consume_potato = consume_potato,
-        N_content_potato = N_content_potato,
-        consume_potato_starch = consume_potato_starch,
-        N_content_potato_starch = N_content_potato_starch,
-        consume_poultry = consume_poultry, 
-        N_content_poultry_meat = N_content_poultry_meat,
-        consume_rice = consume_rice,
-        N_content_rice =  N_content_rice,
-        consume_rye = consume_rye,
-        N_content_rye =  N_content_rye,
-        consume_sheep = consume_sheep,
-        N_content_sheep_meat =  N_content_sheep_meat,
-        consume_sugar = consume_sugar,
-        N_content_sugar =  N_content_sugar,
-        consume_tree_fruits = consume_tree_fruits,
-        N_content_tree_fruits =  N_content_tree_fruits,
-        consume_vegetables = consume_vegetables,
-        N_content_vegetables =  N_content_vegetables,
-        consume_wheat = consume_wheat,
-        N_content_wheat =  N_content_wheat,
-        consume_coffee = consume_coffee,
-        N_content_coffee =  N_content_coffee,
-        convert_coffee =  convert_coffee,
-        consume_black_tea = consume_black_tea,
-        N_content_black_tea =  N_content_black_tea,
-        convert_black_tea =  convert_black_tea,
-        consume_herb_tea = consume_herb_tea,
-        N_content_herb_tea =  N_content_herb_tea,
-        convert_herb_tea =  convert_herb_tea,
-        consume_sparkling_wine = consume_sparkling_wine,
-        N_content_sparkling_wine =  N_content_sparkling_wine,
-        P_content_beef =   P_content_beef,
-        P_content_beer =  P_content_beer,
-        P_content_butter =  P_content_butter,
-        P_content_cheese =  P_content_cheese,
-        P_content_citrus_fruits =  P_content_citrus_fruits,
-        P_content_cocoa = P_content_cocoa,
-        P_content_condensed_milk =  P_content_condensed_milk,
-        P_content_cream =  P_content_cream,
-        P_content_dried_fruit =  P_content_dried_fruit,
-        P_content_egg =  P_content_egg,
-        P_content_fish =  P_content_fish,
-        P_content_honey =  P_content_honey,
-        P_content_legumes =  P_content_legumes,
-        P_content_margarine =  P_content_margarine, 
-        P_content_milk = P_content_milk,
-        P_content_nuts =  P_content_nuts,
-        P_content_offal =  P_content_offal,
-        P_content_other_meat =  P_content_other_meat,
-        P_content_pork =  P_content_pork,
-        P_content_potato = P_content_potato,
-        P_content_potato_starch =  P_content_potato_starch,
-        P_content_poultry_meat = P_content_poultry_meat, 
-        P_content_rice = P_content_rice,
-        P_content_rye = P_content_rye,
-        P_content_sheep_meat =  P_content_sheep_meat,
-        P_content_sugar = P_content_sugar,
-        P_content_tree_fruits =  P_content_tree_fruits,
-        P_content_vegetables = P_content_vegetables,
-        P_content_wheat = P_content_wheat,
-        P_content_coffee = P_content_coffee,
-        P_content_black_tea =  P_content_black_tea,
-        P_content_herb_tea = P_content_herb_tea,
-        P_content_sparkling_wine =  P_content_sparkling_wine,
-        K_content_beef =   K_content_beef, 
-        K_content_beer = K_content_beer,
-        K_content_butter = K_content_butter,
-        K_content_cheese = K_content_cheese,
-        K_content_citrus_fruits =  K_content_citrus_fruits,
-        K_content_cocoa = K_content_cocoa,
-        K_content_condensed_milk =  K_content_condensed_milk,
-        K_content_cream = K_content_cream,
-        K_content_dried_fruit =  K_content_dried_fruit,
-        K_content_egg = K_content_egg,
-        K_content_fish =  K_content_fish,
-        K_content_honey = K_content_honey,
-        K_content_legumes =  K_content_legumes,
-        K_content_margarine = K_content_margarine,
-        K_content_milk =  K_content_milk,
-        K_content_nuts = K_content_nuts,
-        K_content_offal =  K_content_offal,
-        K_content_other_meat = K_content_other_meat,
-        K_content_pork =  K_content_pork,
-        K_content_potato = K_content_potato,
-        K_content_potato_starch =  K_content_potato_starch,
-        K_content_poultry_meat = K_content_poultry_meat,
-        K_content_rice =  K_content_rice,
-        K_content_rye = K_content_rye,
-        K_content_sheep_meat =  K_content_sheep_meat,
-        K_content_sugar = K_content_sugar,
-        K_content_tree_fruits =  K_content_tree_fruits,
-        K_content_vegetables = K_content_vegetables,
-        K_content_wheat = K_content_wheat,
-        K_content_coffee = K_content_coffee,
-        K_content_black_tea =  K_content_black_tea,
-        K_content_herb_tea = K_content_herb_tea, 
-        K_content_sparkling_wine = K_content_sparkling_wine
-      )
+      #---------------------------#
+      ## LEVER: consumption in 1960s ####
+      #---------------------------#
+      
+      #reducing consumption of animal products by x%
+      #increasing consumption of vegetal products by x%
+      if(consumer_adjustment == TRUE){
+        rf_meat_consumption <- 1 - 0.3
+        rf_dairy_egg_consumption <- 1 - 0.2
+        rf_plant_based_consumption <- 1 + 0.3
+        
+        #reduction in meet
+        consume_beef_changed <- consume_beef * rf_meat_consumption
+        consume_fish_changed <- consume_fish * rf_meat_consumption
+        consume_offal_changed <- consume_offal * rf_meat_consumption
+        consume_other_meat_changed <- consume_other_meat * rf_meat_consumption
+        consume_pork_changed <- consume_pork * rf_meat_consumption
+        consume_poultry_changed <- consume_poultry * rf_meat_consumption
+        consume_sheep_changed <- consume_sheep * rf_meat_consumption
+        
+        #reduction in dairy products
+        consume_butter_changed <- consume_butter * rf_dairy_egg_consumption
+        consume_cheese_changed <- consume_cheese * rf_dairy_egg_consumption
+        consume_condensed_milk_changed <- consume_condensed_milk * rf_dairy_egg_consumption
+        consume_cream_changed <- consume_cream * rf_dairy_egg_consumption
+        consume_egg_changed <- consume_egg * rf_dairy_egg_consumption
+        consume_milk_changed <- consume_milk * rf_dairy_egg_consumption
+        
+        #increase in plant based food
+        consume_legumes_changed <- consume_legumes * rf_plant_based_consumption
+        consume_vegetables_changed <- consume_vegetables * rf_plant_based_consumption
+        consume_margarine_changed <- consume_margarine * rf_plant_based_consumption
+        consume_tree_fruits_changed <- consume_tree_fruits * rf_plant_based_consumption
+        consume_potato_starch_changed <- consume_potato_starch * rf_plant_based_consumption
+        consume_rye_changed <- consume_rye * rf_plant_based_consumption
+        consume_potato_changed <- consume_potato * rf_plant_based_consumption
+        consume_wheat_changed <- consume_wheat * rf_plant_based_consumption
+        
+        #products remaining unchanged sofar
+        # consume_beer
+        # consume_black_tea
+        # consume_citrus_fruits
+        # consume_cocoa
+        # consume_coffee
+        # consume_dried_fruit
+        # consume_herb_tea
+        # consume_honey
+        # consume_nuts
+        # consume_rice
+        # consume_sparkling_wine
+        # consume_sugar
+        
+
+        
+        #recalculated consumption
+        consumption_output <- calc_consume(
+          population = population,
+          consume_beef = consume_beef_changed, 
+          N_content_beef = N_content_beef,
+          consume_beer = consume_beer,
+          N_content_beer =  N_content_beer,
+          consume_butter = consume_butter_changed,
+          N_content_butter =  N_content_butter,
+          consume_cheese = consume_cheese_changed, 
+          N_content_cheese =  N_content_cheese,
+          consume_citrus_fruits = consume_citrus_fruits,
+          N_content_citrus_fruits =  N_content_citrus_fruits,
+          consume_cocoa =  consume_cocoa,
+          N_content_cocoa =  N_content_cocoa,
+          consume_condensed_milk =  consume_condensed_milk_changed,
+          N_content_condensed_milk =  N_content_condensed_milk,
+          consume_cream =  consume_cream_changed,
+          N_content_cream =  N_content_cream,
+          consume_dried_fruit =  consume_dried_fruit,
+          N_content_dried_fruit =  N_content_dried_fruit,
+          consume_egg =  consume_egg_changed,
+          N_content_egg =  N_content_egg,
+          consume_fish =  consume_fish_changed,
+          N_content_fish =  N_content_fish,
+          consume_honey =  consume_honey,
+          N_content_honey =  N_content_honey,
+          consume_legumes =  consume_legumes_changed,
+          N_content_legumes =  N_content_legumes,
+          consume_margarine =  consume_margarine_changed,
+          N_content_margarine =  N_content_margarine,
+          consume_milk =  consume_milk_changed,
+          N_content_milk =  N_content_milk,
+          consume_nuts =  consume_nuts,
+          N_content_nuts =  N_content_nuts,
+          consume_offal =  consume_offal_changed,
+          N_content_offal =  N_content_offal,
+          consume_other_meat =  consume_other_meat_changed,
+          N_content_other_meat =  N_content_other_meat,
+          consume_pork =  consume_pork_changed,
+          N_content_pork =  N_content_pork,
+          consume_potato = consume_potato_changed,
+          N_content_potato = N_content_potato,
+          consume_potato_starch = consume_potato_starch_changed,
+          N_content_potato_starch = N_content_potato_starch,
+          consume_poultry = consume_poultry_changed, 
+          N_content_poultry_meat = N_content_poultry_meat,
+          consume_rice = consume_rice,
+          N_content_rice =  N_content_rice,
+          consume_rye = consume_rye_changed,
+          N_content_rye =  N_content_rye,
+          consume_sheep = consume_sheep_changed,
+          N_content_sheep_meat =  N_content_sheep_meat,
+          consume_sugar = consume_sugar,
+          N_content_sugar =  N_content_sugar,
+          consume_tree_fruits = consume_tree_fruits_changed,
+          N_content_tree_fruits =  N_content_tree_fruits,
+          consume_vegetables = consume_vegetables_changed,
+          N_content_vegetables =  N_content_vegetables,
+          consume_wheat = consume_wheat_changed,
+          N_content_wheat =  N_content_wheat,
+          consume_coffee = consume_coffee,
+          N_content_coffee =  N_content_coffee,
+          convert_coffee =  convert_coffee,
+          consume_black_tea = consume_black_tea,
+          N_content_black_tea =  N_content_black_tea,
+          convert_black_tea =  convert_black_tea,
+          consume_herb_tea = consume_herb_tea,
+          N_content_herb_tea =  N_content_herb_tea,
+          convert_herb_tea =  convert_herb_tea,
+          consume_sparkling_wine = consume_sparkling_wine,
+          N_content_sparkling_wine =  N_content_sparkling_wine,
+          P_content_beef =   P_content_beef,
+          P_content_beer =  P_content_beer,
+          P_content_butter =  P_content_butter,
+          P_content_cheese =  P_content_cheese,
+          P_content_citrus_fruits =  P_content_citrus_fruits,
+          P_content_cocoa = P_content_cocoa,
+          P_content_condensed_milk =  P_content_condensed_milk,
+          P_content_cream =  P_content_cream,
+          P_content_dried_fruit =  P_content_dried_fruit,
+          P_content_egg =  P_content_egg,
+          P_content_fish =  P_content_fish,
+          P_content_honey =  P_content_honey,
+          P_content_legumes =  P_content_legumes,
+          P_content_margarine =  P_content_margarine, 
+          P_content_milk = P_content_milk,
+          P_content_nuts =  P_content_nuts,
+          P_content_offal =  P_content_offal,
+          P_content_other_meat =  P_content_other_meat,
+          P_content_pork =  P_content_pork,
+          P_content_potato = P_content_potato,
+          P_content_potato_starch =  P_content_potato_starch,
+          P_content_poultry_meat = P_content_poultry_meat, 
+          P_content_rice = P_content_rice,
+          P_content_rye = P_content_rye,
+          P_content_sheep_meat =  P_content_sheep_meat,
+          P_content_sugar = P_content_sugar,
+          P_content_tree_fruits =  P_content_tree_fruits,
+          P_content_vegetables = P_content_vegetables,
+          P_content_wheat = P_content_wheat,
+          P_content_coffee = P_content_coffee,
+          P_content_black_tea =  P_content_black_tea,
+          P_content_herb_tea = P_content_herb_tea,
+          P_content_sparkling_wine =  P_content_sparkling_wine,
+          K_content_beef =   K_content_beef, 
+          K_content_beer = K_content_beer,
+          K_content_butter = K_content_butter,
+          K_content_cheese = K_content_cheese,
+          K_content_citrus_fruits =  K_content_citrus_fruits,
+          K_content_cocoa = K_content_cocoa,
+          K_content_condensed_milk =  K_content_condensed_milk,
+          K_content_cream = K_content_cream,
+          K_content_dried_fruit =  K_content_dried_fruit,
+          K_content_egg = K_content_egg,
+          K_content_fish =  K_content_fish,
+          K_content_honey = K_content_honey,
+          K_content_legumes =  K_content_legumes,
+          K_content_margarine = K_content_margarine,
+          K_content_milk =  K_content_milk,
+          K_content_nuts = K_content_nuts,
+          K_content_offal =  K_content_offal,
+          K_content_other_meat = K_content_other_meat,
+          K_content_pork =  K_content_pork,
+          K_content_potato = K_content_potato,
+          K_content_potato_starch =  K_content_potato_starch,
+          K_content_poultry_meat = K_content_poultry_meat,
+          K_content_rice =  K_content_rice,
+          K_content_rye = K_content_rye,
+          K_content_sheep_meat =  K_content_sheep_meat,
+          K_content_sugar = K_content_sugar,
+          K_content_tree_fruits =  K_content_tree_fruits,
+          K_content_vegetables = K_content_vegetables,
+          K_content_wheat = K_content_wheat,
+          K_content_coffee = K_content_coffee,
+          K_content_black_tea =  K_content_black_tea,
+          K_content_herb_tea = K_content_herb_tea, 
+          K_content_sparkling_wine = K_content_sparkling_wine
+        )
+        
+        
+
+      } else {
+       #usual case: no change in the consumption
+        
+        consumption_output <- calc_consume(
+          population = population,
+          consume_beef = consume_beef, 
+          N_content_beef = N_content_beef,
+          consume_beer = consume_beer,
+          N_content_beer =  N_content_beer,
+          consume_butter = consume_butter,
+          N_content_butter =  N_content_butter,
+          consume_cheese = consume_cheese, 
+          N_content_cheese =  N_content_cheese,
+          consume_citrus_fruits = consume_citrus_fruits,
+          N_content_citrus_fruits =  N_content_citrus_fruits,
+          consume_cocoa =  consume_cocoa,
+          N_content_cocoa =  N_content_cocoa,
+          consume_condensed_milk =  consume_condensed_milk,
+          N_content_condensed_milk =  N_content_condensed_milk,
+          consume_cream =  consume_cream,
+          N_content_cream =  N_content_cream,
+          consume_dried_fruit =  consume_dried_fruit,
+          N_content_dried_fruit =  N_content_dried_fruit,
+          consume_egg =  consume_egg,
+          N_content_egg =  N_content_egg,
+          consume_fish =  consume_fish,
+          N_content_fish =  N_content_fish,
+          consume_honey =  consume_honey,
+          N_content_honey =  N_content_honey,
+          consume_legumes =  consume_legumes,
+          N_content_legumes =  N_content_legumes,
+          consume_margarine =  consume_margarine,
+          N_content_margarine =  N_content_margarine,
+          consume_milk =  consume_milk,
+          N_content_milk =  N_content_milk,
+          consume_nuts =  consume_nuts,
+          N_content_nuts =  N_content_nuts,
+          consume_offal =  consume_offal,
+          N_content_offal =  N_content_offal,
+          consume_other_meat =  consume_other_meat,
+          N_content_other_meat =  N_content_other_meat,
+          consume_pork =  consume_pork,
+          N_content_pork =  N_content_pork,
+          consume_potato = consume_potato,
+          N_content_potato = N_content_potato,
+          consume_potato_starch = consume_potato_starch,
+          N_content_potato_starch = N_content_potato_starch,
+          consume_poultry = consume_poultry, 
+          N_content_poultry_meat = N_content_poultry_meat,
+          consume_rice = consume_rice,
+          N_content_rice =  N_content_rice,
+          consume_rye = consume_rye,
+          N_content_rye =  N_content_rye,
+          consume_sheep = consume_sheep,
+          N_content_sheep_meat =  N_content_sheep_meat,
+          consume_sugar = consume_sugar,
+          N_content_sugar =  N_content_sugar,
+          consume_tree_fruits = consume_tree_fruits,
+          N_content_tree_fruits =  N_content_tree_fruits,
+          consume_vegetables = consume_vegetables,
+          N_content_vegetables =  N_content_vegetables,
+          consume_wheat = consume_wheat,
+          N_content_wheat =  N_content_wheat,
+          consume_coffee = consume_coffee,
+          N_content_coffee =  N_content_coffee,
+          convert_coffee =  convert_coffee,
+          consume_black_tea = consume_black_tea,
+          N_content_black_tea =  N_content_black_tea,
+          convert_black_tea =  convert_black_tea,
+          consume_herb_tea = consume_herb_tea,
+          N_content_herb_tea =  N_content_herb_tea,
+          convert_herb_tea =  convert_herb_tea,
+          consume_sparkling_wine = consume_sparkling_wine,
+          N_content_sparkling_wine =  N_content_sparkling_wine,
+          P_content_beef =   P_content_beef,
+          P_content_beer =  P_content_beer,
+          P_content_butter =  P_content_butter,
+          P_content_cheese =  P_content_cheese,
+          P_content_citrus_fruits =  P_content_citrus_fruits,
+          P_content_cocoa = P_content_cocoa,
+          P_content_condensed_milk =  P_content_condensed_milk,
+          P_content_cream =  P_content_cream,
+          P_content_dried_fruit =  P_content_dried_fruit,
+          P_content_egg =  P_content_egg,
+          P_content_fish =  P_content_fish,
+          P_content_honey =  P_content_honey,
+          P_content_legumes =  P_content_legumes,
+          P_content_margarine =  P_content_margarine, 
+          P_content_milk = P_content_milk,
+          P_content_nuts =  P_content_nuts,
+          P_content_offal =  P_content_offal,
+          P_content_other_meat =  P_content_other_meat,
+          P_content_pork =  P_content_pork,
+          P_content_potato = P_content_potato,
+          P_content_potato_starch =  P_content_potato_starch,
+          P_content_poultry_meat = P_content_poultry_meat, 
+          P_content_rice = P_content_rice,
+          P_content_rye = P_content_rye,
+          P_content_sheep_meat =  P_content_sheep_meat,
+          P_content_sugar = P_content_sugar,
+          P_content_tree_fruits =  P_content_tree_fruits,
+          P_content_vegetables = P_content_vegetables,
+          P_content_wheat = P_content_wheat,
+          P_content_coffee = P_content_coffee,
+          P_content_black_tea =  P_content_black_tea,
+          P_content_herb_tea = P_content_herb_tea,
+          P_content_sparkling_wine =  P_content_sparkling_wine,
+          K_content_beef =   K_content_beef, 
+          K_content_beer = K_content_beer,
+          K_content_butter = K_content_butter,
+          K_content_cheese = K_content_cheese,
+          K_content_citrus_fruits =  K_content_citrus_fruits,
+          K_content_cocoa = K_content_cocoa,
+          K_content_condensed_milk =  K_content_condensed_milk,
+          K_content_cream = K_content_cream,
+          K_content_dried_fruit =  K_content_dried_fruit,
+          K_content_egg = K_content_egg,
+          K_content_fish =  K_content_fish,
+          K_content_honey = K_content_honey,
+          K_content_legumes =  K_content_legumes,
+          K_content_margarine = K_content_margarine,
+          K_content_milk =  K_content_milk,
+          K_content_nuts = K_content_nuts,
+          K_content_offal =  K_content_offal,
+          K_content_other_meat = K_content_other_meat,
+          K_content_pork =  K_content_pork,
+          K_content_potato = K_content_potato,
+          K_content_potato_starch =  K_content_potato_starch,
+          K_content_poultry_meat = K_content_poultry_meat,
+          K_content_rice =  K_content_rice,
+          K_content_rye = K_content_rye,
+          K_content_sheep_meat =  K_content_sheep_meat,
+          K_content_sugar = K_content_sugar,
+          K_content_tree_fruits =  K_content_tree_fruits,
+          K_content_vegetables = K_content_vegetables,
+          K_content_wheat = K_content_wheat,
+          K_content_coffee = K_content_coffee,
+          K_content_black_tea =  K_content_black_tea,
+          K_content_herb_tea = K_content_herb_tea, 
+          K_content_sparkling_wine = K_content_sparkling_wine
+        ) 
+      }
 
 
       #-------------------#
@@ -687,7 +892,7 @@ combined_function <- function() {
       #-----------------------------#
       
       if (herd_composition) {
-
+        
         # calculate the current compostion of the animals
         LLU_total <- LLU_cattle_2020 + LLU_pig_2020 + LLU_poultry_2020 + LLU_others_2020
         current_share_cattle <- LLU_cattle_2020 / LLU_total
@@ -784,13 +989,7 @@ combined_function <- function() {
       
       if(scenario == 'back_to_roots'){
         
-        # n_dairy_cow_1962 <- 19884 + 21395
-        # n_other_cattle_1962 <- 47929 + 48610 - n_dairy_cow_1962
-        # n_pig_1962 <- 75977 + 56145
-        # n_chicken_1962 <- 230627 + 212368
-        # n_other_poultry_1962 <- 3746 + 1662 + 5383 + 3812
-        # n_sheep_1962 <- 772 + 1044
-        
+
         #assign number of animals directly after the statistics of 1962
         n_dairy_cow <- n_dairy_cow_1962
         
@@ -822,7 +1021,11 @@ combined_function <- function() {
         n_slaughter_poultry_changed <- n_chicken * animal_output$slaughter_rate_poultry
         n_slaughter_sheep_changed <- n_sheep * animal_output$slaughter_rate_sheep
         
-        # reduce slaughter animals for which we dont have any stock, so there we assume reduction linear to reduction in available feed
+        #calculate rate of reduction
+        n_slaughter_dairy_cattle_changed / animal_output$
+        
+        
+        # 
         n_slaughter_goat_changed <- n_slaughter_goat 
         n_slaughter_horse_changed <- n_slaughter_horse 
         n_slaughter_lamb_changed <- n_slaughter_lamb 
