@@ -117,16 +117,16 @@ combined_function <- function() {
   # Scenario Loop ####
   #---------------------------#
   #for (scenario in c("normal", "all_adjustments", "buffer_no_herdsize", "back_to_roots")) {
-  for (scenario in c("normal", "all_adjustments", "buffer_no_herdsize")) {
+  for (scenario in c("normal", "all_adjustments", "buffer_no_herdsize", 'back_to_roots')) {
     #idea: if herdsize is not adjusted, try to buffer deficiency of feed by crop allocation
     #      if crop allocation is not adjusted, try to buffer deficiency by more drastic hersize adjustment
 
     # scenario
     # temp
-    # scenario <- 'normal'
-    # scenario <- 'all_adjustments'
-    # scenario <- 'buffer_no_herdsize'
-    #scenario <- 'back_to_roots'
+    scenario <- 'normal'
+    scenario <- 'all_adjustments'
+    scenario <- 'buffer_no_herdsize'
+    scenario <- 'back_to_roots'
 
 
     n_stakeholder_answers <- length(all_scenario_allocate_crop_biogas)
@@ -200,9 +200,9 @@ combined_function <- function() {
       #reducing consumption of animal products by x%
       #increasing consumption of vegetal products by x%
       if(consumer_adjustment == TRUE){
-        rf_meat_consumption <- 1 - 0.3
-        rf_dairy_egg_consumption <- 1 - 0.2
-        rf_plant_based_consumption <- 1 + 0.3
+        rf_meat_consumption <- 1 - rf_meat_consumption_1962
+        rf_dairy_egg_consumption <- 1 - rf_dairy_egg_consumption_1962
+        rf_plant_based_consumption <- 1 + rf_plant_based_consumption_1962
         
         #reduction in meet
         consume_beef_changed <- consume_beef * rf_meat_consumption
@@ -945,6 +945,19 @@ combined_function <- function() {
       ##slaughter animals ####
       #----------------------#
       
+      #calculate slaughter rates with initial slaughter to stock relationships
+      slaughter_rate_dairy_cow <- n_slaughter_dairy_cattle / n_dairy_cow
+      slaughter_rate_bull <- n_slaughter_bulls / n_bull
+      slaughter_rate_heifer <- n_slaughter_female_cattle / n_heifer
+      slaughter_rate_younstock_midage <- (n_slaughter_younstock_midage) / n_calf
+      slaughter_rate_younstock_youngage <- (n_slaughter_younstock_youngage) / n_calf
+      slaughter_rate_chicken <- n_slaughter_poultry / n_chicken
+      slaughter_rate_other_poultry <- n_slaughter_poultry / n_other_poultry
+      slaughter_rate_pig <- n_slaughter_pig / n_pig
+      slaughter_rate_sheep <- n_slaughter_sheep / n_sheep
+      
+      
+      
       #scale the slaughter animals according to the changes in the livestock groups
       n_slaughter_dairy_cattle_changed <- n_slaughter_dairy_cattle * cf_cattle_local_feed
       n_slaughter_bulls_changed <- n_slaughter_bulls * cf_cattle_local_feed
@@ -1012,31 +1025,35 @@ combined_function <- function() {
         
         
         #adjust slaughter numbers as well?
-        n_slaughter_dairy_cattle_changed <- n_dairy_cow * animal_output$slaughter_rate_dairy_cow
-        n_slaughter_female_cattle_changed <- n_heifer * animal_output$slaughter_rate_heifer
-        n_slaughter_bulls_changed <- n_bull * animal_output$slaughter_rate_bull
-        n_slaughter_younstock_midage_changed <- n_calf * animal_output$slaughter_rate_younstock_midage
-        n_slaughter_younstock_youngage_changed <- n_calf * animal_output$slaughter_rate_younstock_youngage
-        n_slaughter_pig_changed <- n_pig * animal_output$slaughter_rate_pig
-        n_slaughter_poultry_changed <- n_chicken * animal_output$slaughter_rate_poultry
-        n_slaughter_sheep_changed <- n_sheep * animal_output$slaughter_rate_sheep
+        n_slaughter_dairy_cattle_changed <- n_dairy_cow * slaughter_rate_dairy_cow
+        n_slaughter_female_cattle_changed <- n_heifer * slaughter_rate_heifer
+        n_slaughter_bulls_changed <- n_bull * slaughter_rate_bull
+        n_slaughter_younstock_midage_changed <- n_calf * slaughter_rate_younstock_midage
+        n_slaughter_younstock_youngage_changed <- n_calf * slaughter_rate_younstock_youngage
+        n_slaughter_pig_changed <- n_pig * slaughter_rate_pig
+        n_slaughter_poultry_changed <- n_chicken * slaughter_rate_chicken
+        n_slaughter_sheep_changed <- n_sheep * slaughter_rate_sheep
         
         #calculate rate of reduction
-        n_slaughter_dairy_cattle_changed / animal_output$
+        rf_slaughter <- ((n_slaughter_dairy_cattle_changed / n_slaughter_dairy_cattle) +
+          (n_slaughter_female_cattle_changed / n_slaughter_female_cattle) +
+          (n_slaughter_bulls_changed / n_slaughter_bulls) +
+          (n_slaughter_younstock_midage_changed / n_slaughter_younstock_midage) +
+          (n_slaughter_younstock_youngage_changed / n_slaughter_younstock_youngage) +
+          (n_slaughter_pig_changed / n_slaughter_pig) +
+          (n_slaughter_poultry_changed / n_slaughter_poultry) +
+          (n_slaughter_sheep_changed / n_slaughter_sheep)) / 8
         
         
         # 
-        n_slaughter_goat_changed <- n_slaughter_goat 
-        n_slaughter_horse_changed <- n_slaughter_horse 
-        n_slaughter_lamb_changed <- n_slaughter_lamb 
-        n_slaughter_oxes_changed <- n_slaughter_oxes 
+        n_slaughter_goat_changed <- n_slaughter_goat * rf_slaughter
+        n_slaughter_horse_changed <- n_slaughter_horse * rf_slaughter
+        n_slaughter_lamb_changed <- n_slaughter_lamb  * rf_slaughter
+        n_slaughter_oxes_changed <- n_slaughter_oxes  * rf_slaughter
         
       }
       
  
-
-
-
       # calculate animal output with changed composition, but with same LLU as
       # in normal scenario
       animal_output <- calc_animal(
@@ -2084,7 +2101,7 @@ combined_function <- function() {
         scenario_names <- paste0(scenario_start, "_", scenario_names)
       }
 
-      if (scenario == "normal") {
+      if (scenario %in% c("normal", "back_to_roots")) {
         scenario_names <- scenario
       }
 
