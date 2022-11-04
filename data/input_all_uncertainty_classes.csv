@@ -614,6 +614,9 @@ I guess these scenario specific variables can all be categorized under level 5 u
 ,1,,n_chicken_1962,,438565.05,442995,447424.95,posnorm,animal,,
 ,1,,n_other_poultry_1962,,14456.97,14603,14749.03,posnorm,animal,,
 ,1,,n_sheep_1962,,1797.84,1816,1834.16,posnorm,animal,,
+,,,rf_meat_consumption_1962,,0.2,,0.3,tnorm_0_1,,,still need proper input
+,,,rf_dairy_egg_consumption_1962,,0.15,,0.25,tnorm_0_1,,,still need proper input
+,,,rf_plant_based_consumption_1962,,0.3,,0.35,tnorm_0_1,,,still need proper input
 ,,parameters for skewed distribution,omega_manure_export,,20.904732,,20.904732,const,,,
 ,,parameters for skewed distribution,alpha_manure_export,,1.920745,,1.920745,const,,,
 ,,parameters for skewed distribution,xi_manure_export,,7.427658,,7.427658,const,,,
