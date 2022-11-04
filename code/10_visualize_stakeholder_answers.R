@@ -283,6 +283,10 @@ for(question in unique(answers$var)){
   ggsave(plot = p1,filename = fname, device = 'jpeg', width = 20, height = 15, units = 'cm')
   
   
+  
+  #(sum(dist_df$value[dist_df$type == 'skewed_distribution'] >= 0.67) / 10000) * 100
+  
+  
 }
 
 
