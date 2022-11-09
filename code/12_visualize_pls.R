@@ -103,6 +103,8 @@ write.csv(vip_df, 'data/vip_results.csv', row.names = F)
 write.csv(unique(vip_df$name), 'data/pls_flows_unique.csv', row.names = F)
 #hand eddited the group names of all vasriables
 
+
+vip_df <- read.csv('data/vip_results.csv')
 flow_groups <- read.csv('data/pls_flows_unique.csv')
 
 vip_df <- merge.data.frame(vip_df, flow_groups, by.x = 'name', by.y = 'stream')
@@ -117,18 +119,162 @@ vip_df <- vip_df %>%
   mutate(indicator = gsub('.{1}$', '', indicator)) %>% 
   mutate(group = paste0(g, ': ', group))
 
-pls_plot1 <- vip_df %>% 
+
+vip_df$group <- factor(vip_df$group, levels = c('1: animal_number',
+                                '2: biogas',
+                                '3: consumption',
+                                '4: crop_allocation',
+                                '5: feed',
+                                '6: grassland',
+                                '7: inorganic_fertilizer',
+                                '8: manure_allocation',
+                                '9: manure_excretion',
+                                '10: manure_export',
+                                '11: manure_housinglosses',
+                                '12: manure_import',
+                                '13: slaughtering'))
+
+vip_df$g <- as.factor(vip_df$g)
+#have the same color code and ticks on the y axis
+
+library(RColorBrewer)
+display.brewer.all(colorblindFriendly = TRUE)
+brewer.pal(n = 13, name = "Paired")
+
+p1 <- vip_df %>% 
   filter(indicator == 'total_input') %>% 
   ggplot(aes(x=g, y=vip, fill=group)) +
   geom_boxplot() +
   theme_bw() +
-  coord_polar() +
-  facet_grid(nutrient~scenario, ) +
+    facet_grid(nutrient~scenario) +
   labs(fill='Variable Group') +
   ylab('Variable Importance in Projection (VIP)') +
+  scale_fill_manual(breaks = c(c('1: animal_number',
+                                 '2: biogas',
+                                 '3: consumption',
+                                 '4: crop_allocation',
+                                 '5: feed',
+                                 '6: grassland',
+                                 '7: inorganic_fertilizer',
+                                 '8: manure_allocation',
+                                 '9: manure_excretion',
+                                 '10: manure_export',
+                                 '11: manure_housinglosses',
+                                 '12: manure_import',
+                                 '13: slaughtering')),
+                    values = c(brewer.pal(n = 12, name = "Paired"), 'pink'))+
+  labs(title = 'Total Input')+
   xlab('')
 
-ggsave('figures/pls_plot.jpeg', plot = pls_plot1, device = 'jpeg', width = 25, height = 20, units = 'cm')
+p2 <- vip_df %>% 
+  filter(indicator == 'use_efficiency') %>% 
+  ggplot(aes(x=g, y=vip, fill=group)) +
+  geom_boxplot() +
+  theme_bw() +
+  facet_grid(nutrient~scenario) +
+  labs(fill='Variable Group') +
+  ylab('Variable Importance in Projection (VIP)') +
+  scale_fill_manual(breaks = c(c('1: animal_number',
+                                 '2: biogas',
+                                 '3: consumption',
+                                 '4: crop_allocation',
+                                 '5: feed',
+                                 '6: grassland',
+                                 '7: inorganic_fertilizer',
+                                 '8: manure_allocation',
+                                 '9: manure_excretion',
+                                 '10: manure_export',
+                                 '11: manure_housinglosses',
+                                 '12: manure_import',
+                                 '13: slaughtering')),
+                    values = c(brewer.pal(n = 12, name = "Paired"), 'pink'))+
+  labs(title = 'Use Efficiency') +
+  xlab('')
+
+p3 <- vip_df %>% 
+  filter(indicator == 'recycling_rate') %>% 
+  ggplot(aes(x=g, y=vip, fill=group)) +
+  geom_boxplot() +
+  theme_bw() +
+  facet_grid(nutrient~scenario) +
+  labs(fill='Variable Group') +
+  ylab('Variable Importance in Projection (VIP)') +
+  scale_fill_manual(breaks = c(c('1: animal_number',
+                                 '2: biogas',
+                                 '3: consumption',
+                                 '4: crop_allocation',
+                                 '5: feed',
+                                 '6: grassland',
+                                 '7: inorganic_fertilizer',
+                                 '8: manure_allocation',
+                                 '9: manure_excretion',
+                                 '10: manure_export',
+                                 '11: manure_housinglosses',
+                                 '12: manure_import',
+                                 '13: slaughtering')),
+                    values = c(brewer.pal(n = 12, name = "Paired"), 'pink'))+
+  scale_x_discrete(breaks = as.factor(1:13))+
+  labs(title = 'Recycling Rate') +
+  xlab('')
+
+p4 <- vip_df %>% 
+  filter(indicator == 'share_reuse_to_total_input') %>% 
+  ggplot(aes(x=g, y=vip, fill=group)) +
+  geom_boxplot() +
+  theme_bw() +
+  facet_grid(nutrient~scenario) +
+  labs(fill='Variable Group') +
+  ylab('Variable Importance in Projection (VIP)') +
+  scale_fill_manual(breaks = c(c('1: animal_number',
+                                 '2: biogas',
+                                 '3: consumption',
+                                 '4: crop_allocation',
+                                 '5: feed',
+                                 '6: grassland',
+                                 '7: inorganic_fertilizer',
+                                 '8: manure_allocation',
+                                 '9: manure_excretion',
+                                 '10: manure_export',
+                                 '11: manure_housinglosses',
+                                 '12: manure_import',
+                                 '13: slaughtering')),
+                    values = c(brewer.pal(n = 12, name = "Paired"), 'pink'))+
+  labs(title = 'Share of reuse to total input') +
+  xlab('')
+
+
+
+p5 <- vip_df %>% 
+  filter(indicator == 'losses') %>% 
+  ggplot(aes(x=g, y=vip, fill=group)) +
+  geom_boxplot() +
+  theme_bw() +
+  facet_grid(nutrient~scenario) +
+  labs(fill='Variable Group') +
+  ylab('Variable Importance in Projection (VIP)') +
+  scale_fill_manual(breaks = c(c('1: animal_number',
+                                 '2: biogas',
+                                 '3: consumption',
+                                 '4: crop_allocation',
+                                 '5: feed',
+                                 '6: grassland',
+                                 '7: inorganic_fertilizer',
+                                 '8: manure_allocation',
+                                 '9: manure_excretion',
+                                 '10: manure_export',
+                                 '11: manure_housinglosses',
+                                 '12: manure_import',
+                                 '13: slaughtering')),
+                    values = c(brewer.pal(n = 12, name = "Paired"), 'pink'))+
+  labs(title = 'Nutrient losses') +
+  xlab('')
+
+
+ggsave('figures/pls_plot_total_input.jpeg', plot = p1, device = 'jpeg', width = 25, height = 20, units = 'cm')
+ggsave('figures/pls_plot_use_efficency.jpeg', plot = p2, device = 'jpeg', width = 25, height = 20, units = 'cm')
+ggsave('figures/pls_plot_recycling_rate.jpeg', plot = p3, device = 'jpeg', width = 25, height = 20, units = 'cm')
+ggsave('figures/pls_plot_share_reuse.jpeg', plot = p4, device = 'jpeg', width = 25, height = 20, units = 'cm')
+ggsave('figures/pls_plot_losses.jpeg', plot = p5, device = 'jpeg', width = 25, height = 20, units = 'cm')
 
 levels(as.factor(vip_df$group))
 
