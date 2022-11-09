@@ -120,26 +120,32 @@ vip_df <- vip_df %>%
   mutate(group = paste0(g, ': ', group))
 
 
-vip_df$group <- factor(vip_df$group, levels = c('1: animal_number',
+vip_df$group <- factor(vip_df$group, 
+                       levels = c('1: animal_number',
                                 '2: biogas',
                                 '3: consumption',
                                 '4: crop_allocation',
-                                '5: feed',
-                                '6: grassland',
-                                '7: inorganic_fertilizer',
-                                '8: manure_allocation',
-                                '9: manure_excretion',
-                                '10: manure_export',
-                                '11: manure_housinglosses',
-                                '12: manure_import',
-                                '13: slaughtering'))
+                                '5: inorganic_fertilizer',
+                                '6: local_feed',
+                                '7: manure_allocation',
+                                '8: manure_excretion',
+                                '9: manure_export',
+                                '10: manure_housinglosses',
+                                '11: manure_import',
+                                '12: slaughtering',
+                                '13: wastewater'))
+
+vip_df$nutrient <- factor(vip_df$nutrient, levels = c('N', 'P', 'K'))
+
+vip_df$scenario <- factor(vip_df$scenario, levels = c('PS', 'CBS', 'LBS', 'TA'))
 
 vip_df$g <- as.factor(vip_df$g)
+
 #have the same color code and ticks on the y axis
 
 library(RColorBrewer)
 display.brewer.all(colorblindFriendly = TRUE)
-brewer.pal(n = 13, name = "Paired")
+brewer.pal(n = 12, name = "Paired")
 
 p1 <- vip_df %>% 
   filter(indicator == 'total_input') %>% 
@@ -149,19 +155,19 @@ p1 <- vip_df %>%
     facet_grid(nutrient~scenario) +
   labs(fill='Variable Group') +
   ylab('Variable Importance in Projection (VIP)') +
-  scale_fill_manual(breaks = c(c('1: animal_number',
-                                 '2: biogas',
-                                 '3: consumption',
-                                 '4: crop_allocation',
-                                 '5: feed',
-                                 '6: grassland',
-                                 '7: inorganic_fertilizer',
-                                 '8: manure_allocation',
-                                 '9: manure_excretion',
-                                 '10: manure_export',
-                                 '11: manure_housinglosses',
-                                 '12: manure_import',
-                                 '13: slaughtering')),
+  scale_fill_manual(breaks = c('1: animal_number',
+                               '2: biogas',
+                               '3: consumption',
+                               '4: crop_allocation',
+                               '5: inorganic_fertilizer',
+                               '6: local_feed',
+                               '7: manure_allocation',
+                               '8: manure_excretion',
+                               '9: manure_export',
+                               '10: manure_housinglosses',
+                               '11: manure_import',
+                               '12: slaughtering',
+                               '13: wastewater'),
                     values = c(brewer.pal(n = 12, name = "Paired"), 'pink'))+
   labs(title = 'Total Input')+
   xlab('')
@@ -174,19 +180,19 @@ p2 <- vip_df %>%
   facet_grid(nutrient~scenario) +
   labs(fill='Variable Group') +
   ylab('Variable Importance in Projection (VIP)') +
-  scale_fill_manual(breaks = c(c('1: animal_number',
-                                 '2: biogas',
-                                 '3: consumption',
-                                 '4: crop_allocation',
-                                 '5: feed',
-                                 '6: grassland',
-                                 '7: inorganic_fertilizer',
-                                 '8: manure_allocation',
-                                 '9: manure_excretion',
-                                 '10: manure_export',
-                                 '11: manure_housinglosses',
-                                 '12: manure_import',
-                                 '13: slaughtering')),
+  scale_fill_manual(breaks = c('1: animal_number',
+                               '2: biogas',
+                               '3: consumption',
+                               '4: crop_allocation',
+                               '5: inorganic_fertilizer',
+                               '6: local_feed',
+                               '7: manure_allocation',
+                               '8: manure_excretion',
+                               '9: manure_export',
+                               '10: manure_housinglosses',
+                               '11: manure_import',
+                               '12: slaughtering',
+                               '13: wastewater'),
                     values = c(brewer.pal(n = 12, name = "Paired"), 'pink'))+
   labs(title = 'Use Efficiency') +
   xlab('')
@@ -199,19 +205,19 @@ p3 <- vip_df %>%
   facet_grid(nutrient~scenario) +
   labs(fill='Variable Group') +
   ylab('Variable Importance in Projection (VIP)') +
-  scale_fill_manual(breaks = c(c('1: animal_number',
-                                 '2: biogas',
-                                 '3: consumption',
-                                 '4: crop_allocation',
-                                 '5: feed',
-                                 '6: grassland',
-                                 '7: inorganic_fertilizer',
-                                 '8: manure_allocation',
-                                 '9: manure_excretion',
-                                 '10: manure_export',
-                                 '11: manure_housinglosses',
-                                 '12: manure_import',
-                                 '13: slaughtering')),
+  scale_fill_manual(breaks = c('1: animal_number',
+                               '2: biogas',
+                               '3: consumption',
+                               '4: crop_allocation',
+                               '5: inorganic_fertilizer',
+                               '6: local_feed',
+                               '7: manure_allocation',
+                               '8: manure_excretion',
+                               '9: manure_export',
+                               '10: manure_housinglosses',
+                               '11: manure_import',
+                               '12: slaughtering',
+                               '13: wastewater'),
                     values = c(brewer.pal(n = 12, name = "Paired"), 'pink'))+
   scale_x_discrete(breaks = as.factor(1:13))+
   labs(title = 'Recycling Rate') +
@@ -225,19 +231,19 @@ p4 <- vip_df %>%
   facet_grid(nutrient~scenario) +
   labs(fill='Variable Group') +
   ylab('Variable Importance in Projection (VIP)') +
-  scale_fill_manual(breaks = c(c('1: animal_number',
-                                 '2: biogas',
-                                 '3: consumption',
-                                 '4: crop_allocation',
-                                 '5: feed',
-                                 '6: grassland',
-                                 '7: inorganic_fertilizer',
-                                 '8: manure_allocation',
-                                 '9: manure_excretion',
-                                 '10: manure_export',
-                                 '11: manure_housinglosses',
-                                 '12: manure_import',
-                                 '13: slaughtering')),
+  scale_fill_manual(breaks = c('1: animal_number',
+                               '2: biogas',
+                               '3: consumption',
+                               '4: crop_allocation',
+                               '5: inorganic_fertilizer',
+                               '6: local_feed',
+                               '7: manure_allocation',
+                               '8: manure_excretion',
+                               '9: manure_export',
+                               '10: manure_housinglosses',
+                               '11: manure_import',
+                               '12: slaughtering',
+                               '13: wastewater'),
                     values = c(brewer.pal(n = 12, name = "Paired"), 'pink'))+
   labs(title = 'Share of reuse to total input') +
   xlab('')
@@ -252,19 +258,19 @@ p5 <- vip_df %>%
   facet_grid(nutrient~scenario) +
   labs(fill='Variable Group') +
   ylab('Variable Importance in Projection (VIP)') +
-  scale_fill_manual(breaks = c(c('1: animal_number',
-                                 '2: biogas',
-                                 '3: consumption',
-                                 '4: crop_allocation',
-                                 '5: feed',
-                                 '6: grassland',
-                                 '7: inorganic_fertilizer',
-                                 '8: manure_allocation',
-                                 '9: manure_excretion',
-                                 '10: manure_export',
-                                 '11: manure_housinglosses',
-                                 '12: manure_import',
-                                 '13: slaughtering')),
+  scale_fill_manual(breaks = c('1: animal_number',
+                               '2: biogas',
+                               '3: consumption',
+                               '4: crop_allocation',
+                               '5: inorganic_fertilizer',
+                               '6: local_feed',
+                               '7: manure_allocation',
+                               '8: manure_excretion',
+                               '9: manure_export',
+                               '10: manure_housinglosses',
+                               '11: manure_import',
+                               '12: slaughtering',
+                               '13: wastewater'),
                     values = c(brewer.pal(n = 12, name = "Paired"), 'pink'))+
   labs(title = 'Nutrient losses') +
   xlab('')
