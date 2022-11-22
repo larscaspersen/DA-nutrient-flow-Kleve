@@ -10,24 +10,20 @@ result_indicators <- readRDS('data/model_result_indicators.rds')
 
 diff_flows_df <- rbind.data.frame(result_flows$interventions[-1] - result_flows$reference_year[-1],
                                   result_flows$interventions_animal_adjusted[-1] - result_flows$reference_year[-1],
-                                  result_flows$interventions_crop_adjusted[-1] - result_flows$reference_year[-1],
-                                  result_flows$traditional_agriculture[-1] - result_flows$reference_year[-1])
+                                  result_flows$interventions_crop_adjusted[-1] - result_flows$reference_year[-1])
 diff_indicators_df <- rbind.data.frame(result_indicators$interventions[-1] - result_indicators$reference_year[-1],
                                        result_indicators$interventions_animal_adjusted[-1] - result_indicators$reference_year[-1],
-                                       result_indicators$interventions_crop_adjusted[-1] - result_indicators$reference_year[-1],
-                                       result_indicators$traditional_agriculture[-1] - result_indicators$reference_year[-1])
+                                       result_indicators$interventions_crop_adjusted[-1] - result_indicators$reference_year[-1])
 
 
 diff_flows_df$scenario <- c(result_flows$interventions$scenario, 
                             result_flows$interventions_animal_adjusted$scenario, 
-                            result_flows$interventions_crop_adjusted$scenario,
-                            result_flows$traditional_agriculture$scenario)
+                            result_flows$interventions_crop_adjusted$scenario)
 
 diff_flows_df <- dplyr::relocate(diff_flows_df, scenario)
 diff_indicators_df$scenario <- c(result_indicators$interventions$scenario, 
                                  result_indicators$interventions_animal_adjusted$scenario, 
-                                 result_indicators$interventions_crop_adjusted$scenario,
-                                 result_indicators$traditional_agriculture$scenario)
+                                 result_indicators$interventions_crop_adjusted$scenario)
 diff_indicators_df <- dplyr::relocate(diff_indicators_df, scenario)
 
 
@@ -40,15 +36,15 @@ result_flows <- do.call(rbind, result_flows)
 result_indicators <- do.call(rbind, result_indicators)
 
 #change names of scenarios
-result_flows$scenario <- factor(result_flows$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted", "traditional_agriculture"),
-       labels = c('Ref', 'PS', 'LBS' ,'CBS', "TA"))
-result_indicators$scenario <- factor(result_indicators$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted", "traditional_agriculture"),
-                                labels = c('Ref', 'PS', 'LBS' ,'CBS', "TA"))
+result_flows$scenario <- factor(result_flows$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted"),
+       labels = c('Ref', 'PS', 'LBS' ,'CBS'))
+result_indicators$scenario <- factor(result_indicators$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted"),
+                                labels = c('Ref', 'PS', 'LBS' ,'CBS'))
 
-diff_flows_df$scenario <- factor(diff_flows_df$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted", "traditional_agriculture"),
-       labels = c('Ref', 'PS', 'LBS' ,'CBS', "TA"))
-diff_indicators_df$scenario <- factor(diff_indicators_df$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted", "traditional_agriculture"),
-       labels = c('Ref', 'PS', 'LBS' ,'CBS', "TA"))
+diff_flows_df$scenario <- factor(diff_flows_df$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted"),
+       labels = c('Ref', 'PS', 'LBS' ,'CBS'))
+diff_indicators_df$scenario <- factor(diff_indicators_df$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted"),
+       labels = c('Ref', 'PS', 'LBS' ,'CBS'))
 
 
 #bring results in long format, bring differences in long format
@@ -308,61 +304,176 @@ results_indicators_long <- results_indicators_long %>%
 
 results_indicators_long$variable <- factor(results_indicators_long$variable, 
                                            levels = c("total_input", 'losses', "recycling_rate", "share_reuse_to_total_input", "use_efficiency"),
-                                           labels = c('Total Input', 'Losses', 'Recycling Rate', 'Reuse : Total Input', 'Use Efficiency'))
+                                           labels = c('Total Input', 'Losses', 'Recycling Rate', 'Reuse to Total Input', 'Use Efficiency'))
 
 
+
+
+#indicators: make two seperatre plots with SHARED y axis:
+p1.1 <- results_indicators_long %>% 
+  filter(nutrient == 'N', variable %in% c('Recycling Rate', 'Reuse to Total Input', 'Use Efficiency')) %>%
+  na.omit() %>% 
+  ggplot(aes(x = scenario, y = value, fill = scenario)) +
+  geom_boxplot(outlier.alpha = 0.1) +
+  ylab('Circularity indicator (%)') +
+  xlab('')+
+  ylim(0,100)+
+  facet_wrap(~variable) + 
+  theme_bw(base_size = 15) +
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        legend.position="none")
+
+p1.2 <- results_indicators_long %>% 
+  filter(nutrient == 'N', variable %in% c('Total Input', 'Losses')) %>%
+  na.omit() %>% 
+  mutate(value = value / 1000) %>% 
+  ggplot(aes(x = scenario, y = value, fill = scenario)) +
+  geom_boxplot(outlier.alpha = 0.1) +
+  ylab('Circularity indicator (t N)') +
+  xlab('')+
+  scale_fill_discrete(name = "Modelled Scenario", 
+                      labels = c("Reference Year 2020", "Participatory Scenario", 
+                                 "Crob Buffered Scenario", "Livestock Buffered Scenario")) +
+  scale_y_continuous(labels = scales::comma)+
+  facet_wrap(~variable) + 
+  theme_bw(base_size = 15) +
+  theme(
+    axis.text.x=element_blank(),
+    axis.ticks.x=element_blank()
+    )
+
+library(patchwork)
+design <- "
+112
+333
+"   
+p1 <- p1.2 + guide_area() + p1.1  + plot_layout(design=design, guides = "collect") 
+
+#p1 <- (((p1.2  | plot_spacer()) + plot_layout(widths = c(2,1))) / p1.1) + plot_layout(guides = 'collect')
+
+
+
+
+p2.1 <- results_indicators_long %>% 
+  filter(nutrient == 'P', variable %in% c('Recycling Rate', 'Reuse to Total Input', 'Use Efficiency')) %>%
+  na.omit() %>% 
+  ggplot(aes(x = scenario, y = value, fill = scenario)) +
+  geom_boxplot(outlier.alpha = 0.1) +
+  ylab('Circularity indicator (%)') +
+  xlab('')+
+  ylim(0,100)+
+  facet_wrap(~variable) + 
+  theme_bw(base_size = 15) +
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        legend.position="none")
+
+
+p2.2 <- results_indicators_long %>% 
+  filter(nutrient == 'P', variable %in% c('Total Input', 'Losses')) %>%
+  na.omit() %>% 
+  mutate(value = value / 1000) %>% 
+  ggplot(aes(x = scenario, y = value, fill = scenario)) +
+  geom_boxplot(outlier.alpha = 0.1) +
+  ylab('Circularity indicator (t P)') +
+  xlab('')+
+  scale_fill_discrete(name = "Modelled Scenario", 
+                      labels = c("Reference Year 2020", "Participatory Scenario", 
+                                 "Crob Buffered Scenario", "Livestock Buffered Scenario")) +
+  scale_y_continuous(labels = scales::comma)+
+  facet_wrap(~variable) + 
+  theme_bw(base_size = 15) +
+  theme(    axis.text.x=element_blank(),
+            axis.ticks.x=element_blank()
+  )
+p2 <- p2.2 + guide_area() + p2.1  + plot_layout(design=design, guides = "collect") 
+
+p3.1 <- results_indicators_long %>% 
+  filter(nutrient == 'K', variable %in% c('Recycling Rate', 'Reuse to Total Input', 'Use Efficiency')) %>%
+  na.omit() %>% 
+  ggplot(aes(x = scenario, y = value, fill = scenario)) +
+  geom_boxplot(outlier.alpha = 0.1) +
+  ylab('Circularity indicator (%)') +
+  xlab('')+
+  ylim(0,100)+
+  facet_wrap(~variable) + 
+  theme_bw(base_size = 15) +
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        legend.position="none")
+
+
+p3.2 <- results_indicators_long %>% 
+  filter(nutrient == 'K', variable %in% c('Total Input', 'Losses')) %>%
+  na.omit() %>% 
+  mutate(value = value / 1000) %>% 
+  ggplot(aes(x = scenario, y = value, fill = scenario)) +
+  geom_boxplot(outlier.alpha = 0.1) +
+  ylab('Circularity indicator (t K)') +
+  scale_fill_discrete(name = "Modelled Scenario", 
+                      labels = c("Reference Year 2020", "Participatory Scenario", 
+                                 "Crob Buffered Scenario", "Livestock Buffered Scenario")) +
+  xlab('')+
+  scale_y_continuous(labels = scales::comma)+
+  facet_wrap(~variable) + 
+  theme_bw(base_size = 15) +
+  theme(    axis.text.x=element_blank(),
+            axis.ticks.x=element_blank()
+  )
+p3 <- p3.2 + guide_area() + p3.1  + plot_layout(design=design, guides = "collect") 
 
 
 #make boxplots of indicators
-p1 <- results_indicators_long %>% 
-  filter(nutrient == 'N') %>%
-  ggplot(aes(x = scenario, y = value, fill = scenario)) +
-  geom_boxplot() +
-  ylab('Indicator Value') +
-  xlab('Model Scenario')+
-  facet_wrap(~variable, scales = 'free_y') + 
-  theme_bw(base_size = 15) +
-  theme(
-    legend.position="none",
-    #legend.position = c(0.8, 0.1), # c(0,0) bottom left, c(1,1) top-right.
-    #legend.background = element_rect(fill = "white", colour = NA),
-    #axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)
-  )
+# p1 <- results_indicators_long %>% 
+#   filter(nutrient == 'N') %>%
+#   ggplot(aes(x = scenario, y = value, fill = scenario)) +
+#   geom_boxplot() +
+#   ylab('Indicator Value') +
+#   xlab('Model Scenario')+
+#   facet_wrap(~variable, scales = 'free_y') + 
+#   theme_bw(base_size = 15) +
+#   theme(
+#     legend.position="none",
+#     #legend.position = c(0.8, 0.1), # c(0,0) bottom left, c(1,1) top-right.
+#     #legend.background = element_rect(fill = "white", colour = NA),
+#     #axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)
+#   )
+# 
+# p2 <- results_indicators_long %>% 
+#   filter(nutrient == 'P') %>%
+#   ggplot(aes(x = scenario, y = value, fill = scenario)) +
+#   geom_boxplot() +
+#   ylab('Indicator Value') +
+#   xlab('Model Scenario')+
+#   facet_wrap(~variable, scales = 'free_y') + 
+#   theme_bw(base_size = 15) +
+#   theme(
+#     legend.position="none",
+#     #legend.position = c(0.8, 0.1), # c(0,0) bottom left, c(1,1) top-right.
+#     #legend.background = element_rect(fill = "white", colour = NA),
+#     #axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)
+#   )
+# 
+# p3 <- results_indicators_long %>% 
+#   filter(nutrient == 'K') %>%
+#   ggplot(aes(x = scenario, y = value, fill = scenario)) +
+#   geom_boxplot() +
+#   ylab('Indicator Value') +
+#   xlab('Model Scenario')+
+#   facet_wrap(~variable, scales = 'free_y') + 
+#   theme_bw(base_size = 15) +
+#   theme(
+#     legend.position="none",
+#     #legend.position = c(0.8, 0.1), # c(0,0) bottom left, c(1,1) top-right.
+#     #legend.background = element_rect(fill = "white", colour = NA),
+#     #axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)
+#   )
 
-p2 <- results_indicators_long %>% 
-  filter(nutrient == 'P') %>%
-  ggplot(aes(x = scenario, y = value, fill = scenario)) +
-  geom_boxplot() +
-  ylab('Indicator Value') +
-  xlab('Model Scenario')+
-  facet_wrap(~variable, scales = 'free_y') + 
-  theme_bw(base_size = 15) +
-  theme(
-    legend.position="none",
-    #legend.position = c(0.8, 0.1), # c(0,0) bottom left, c(1,1) top-right.
-    #legend.background = element_rect(fill = "white", colour = NA),
-    #axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)
-  )
 
-p3 <- results_indicators_long %>% 
-  filter(nutrient == 'K') %>%
-  ggplot(aes(x = scenario, y = value, fill = scenario)) +
-  geom_boxplot() +
-  ylab('Indicator Value') +
-  xlab('Model Scenario')+
-  facet_wrap(~variable, scales = 'free_y') + 
-  theme_bw(base_size = 15) +
-  theme(
-    legend.position="none",
-    #legend.position = c(0.8, 0.1), # c(0,0) bottom left, c(1,1) top-right.
-    #legend.background = element_rect(fill = "white", colour = NA),
-    #axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)
-  )
-
-
-ggsave(p1, filename = 'figures/boxplot_indicators_N.jpeg', device = 'jpeg', width = 20, height = 15, units = 'cm')
-ggsave(p2, filename = 'figures/boxplot_indicators_P.jpeg', device = 'jpeg', width = 20, height = 15, units = 'cm')
-ggsave(p3, filename = 'figures/boxplot_indicators_K.jpeg', device = 'jpeg', width = 20, height = 15, units = 'cm')
+ggsave(p1, filename = 'figures/boxplot_indicators_N.jpeg', device = 'jpeg', width = 22, height = 15, units = 'cm')
+ggsave(p2, filename = 'figures/boxplot_indicators_P.jpeg', device = 'jpeg', width = 22, height = 15, units = 'cm')
+ggsave(p3, filename = 'figures/boxplot_indicators_K.jpeg', device = 'jpeg', width = 22, height = 15, units = 'cm')
 
 
 
@@ -392,29 +503,25 @@ result_flows <- purrr::map(result_flows, function(x){
 #calculate change relative to the reference year
 rel_change_flows <- rbind.data.frame(((result_flows$interventions[-1] - result_flows$reference_year[-1]) / result_flows$reference_year[-1]) * 100,
                                   ((result_flows$interventions_animal_adjusted[-1] - result_flows$reference_year[-1]) / result_flows$reference_year[-1])*100,
-                                  ((result_flows$interventions_crop_adjusted[-1] - result_flows$reference_year[-1]) / result_flows$reference_year[-1]) * 100,
-                                  ((result_flows$traditional_agriculture[-1] - result_flows$reference_year[-1]) / result_flows$reference_year[-1]) * 100)
+                                  ((result_flows$interventions_crop_adjusted[-1] - result_flows$reference_year[-1]) / result_flows$reference_year[-1]) * 100)
 rel_change_flows$scenario <- c(result_flows$interventions$scenario, 
                                result_flows$interventions_animal_adjusted$scenario, 
-                               result_flows$interventions_crop_adjusted$scenario,
-                               result_flows$traditional_agriculture$scenario)
+                               result_flows$interventions_crop_adjusted$scenario)
 rel_change_flows <- dplyr::relocate(rel_change_flows, scenario)
 
 rel_change_indicators <- rbind.data.frame(((result_indicators$interventions[-1] - result_indicators$reference_year[-1]) / result_indicators$reference_year[-1]) * 100,
                                      ((result_indicators$interventions_animal_adjusted[-1] - result_indicators$reference_year[-1]) / result_indicators$reference_year[-1]) * 100,
-                                     ((result_indicators$interventions_crop_adjusted[-1] - result_indicators$reference_year[-1]) / result_indicators$reference_year[-1]) * 100,
-                                     ((result_indicators$traditional_agriculture[-1] - result_indicators$reference_year[-1]) / result_indicators$reference_year[-1]) * 100)
+                                     ((result_indicators$interventions_crop_adjusted[-1] - result_indicators$reference_year[-1]) / result_indicators$reference_year[-1]) * 100)
 rel_change_indicators$scenario <- c(result_indicators$interventions$scenario, 
                                     result_indicators$interventions_animal_adjusted$scenario, 
-                                    result_indicators$interventions_crop_adjusted$scenario,
-                                    result_indicators$traditional_agriculture$scenario)
+                                    result_indicators$interventions_crop_adjusted$scenario)
 rel_change_indicators <- dplyr::relocate(rel_change_indicators, scenario)
 
 
-rel_change_indicators$scenario <- factor(rel_change_indicators$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted", "traditional_agriculture"),
-                                 labels = c('Ref', 'PS', 'LBS' ,'CBS', 'TA'))
-rel_change_flows$scenario <- factor(rel_change_flows$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted", "traditional_agriculture"),
-                                      labels = c('Ref', 'PS', 'LBS' ,'CBS', 'TA'))
+rel_change_indicators$scenario <- factor(rel_change_indicators$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted"),
+                                 labels = c('Ref', 'PS', 'LBS' ,'CBS'))
+rel_change_flows$scenario <- factor(rel_change_flows$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted"),
+                                      labels = c('Ref', 'PS', 'LBS' ,'CBS'))
 
 
 
