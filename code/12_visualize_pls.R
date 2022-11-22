@@ -14,14 +14,12 @@ input$median <- NA
 
 diff_indicators_df <- rbind.data.frame(result_indicators$interventions[-1] - result_indicators$reference_year[-1],
                                        result_indicators$interventions_animal_adjusted[-1] - result_indicators$reference_year[-1],
-                                       result_indicators$interventions_crop_adjusted[-1] - result_indicators$reference_year[-1],
-                                       result_indicators$traditional_agriculture[-1] - result_indicators$reference_year[-1])
+                                       result_indicators$interventions_crop_adjusted[-1] - result_indicators$reference_year[-1])
 
 
 diff_indicators_df$scenario <- c(result_indicators$interventions$scenario, 
                                  result_indicators$interventions_animal_adjusted$scenario, 
-                                 result_indicators$interventions_crop_adjusted$scenario,
-                                 result_indicators$traditional_agriculture$scenario)
+                                 result_indicators$interventions_crop_adjusted$scenario)
 diff_indicators_df <- dplyr::relocate(diff_indicators_df, scenario)
 
 
@@ -32,11 +30,11 @@ diff_indicators_df <- dplyr::relocate(diff_indicators_df, scenario)
 result_indicators <- do.call(rbind, result_indicators)
 
 #change names of scenarios
-result_indicators$scenario <- factor(result_indicators$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted", "traditional_agriculture"),
-                                     labels = c('Ref', 'PS', 'LBS' ,'CBS', "TA"))
+result_indicators$scenario <- factor(result_indicators$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted"),
+                                     labels = c('Ref', 'PS', 'LBS' ,'CBS'))
 
-diff_indicators_df$scenario <- factor(diff_indicators_df$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted", "traditional_agriculture"),
-                                      labels = c('Ref', 'PS', 'LBS' ,'CBS', "TA"))
+diff_indicators_df$scenario <- factor(diff_indicators_df$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted"),
+                                      labels = c('Ref', 'PS', 'LBS' ,'CBS'))
 
 #melt combined outputs
 results_indicators_long <- reshape2::melt(result_indicators, id.var = 'scenario')
@@ -107,7 +105,15 @@ write.csv(unique(vip_df$name), 'data/pls_flows_unique.csv', row.names = F)
 vip_df <- read.csv('data/vip_results.csv')
 flow_groups <- read.csv('data/pls_flows_unique.csv')
 
-vip_df <- merge.data.frame(vip_df, flow_groups, by.x = 'name', by.y = 'stream')
+
+#remove the stuff belonging to ta
+vip_df <- filter(vip_df, scenario != 'TA')
+
+#filter out flows from flow groups
+
+
+
+vip_df <- merge.data.frame(vip_df, flow_groups, by.x = 'name', by.y = 'stream', all.x = TRUE)
 
 vip_df$g <- as.factor(as.numeric(as.factor(vip_df$group)))
 
@@ -123,23 +129,34 @@ vip_df <- vip_df %>%
 vip_df$group <- factor(vip_df$group, 
                        levels = c('1: animal_number',
                                 '2: biogas',
-                                '3: consumption',
-                                '4: crop_allocation',
-                                '5: inorganic_fertilizer',
-                                '6: local_feed',
-                                '7: manure_allocation',
-                                '8: manure_excretion',
-                                '9: manure_export',
-                                '10: manure_housinglosses',
-                                '11: manure_import',
-                                '12: slaughtering',
-                                '13: wastewater'))
+                                '3: crop_allocation',
+                                '4: inorganic_fertilizer',
+                                '5: local_feed',
+                                '6: manure_allocation',
+                                '7: manure_excretion',
+                                '8: manure_export',
+                                '9: manure_housinglosses',
+                                '10: manure_import',
+                                '11: slaughtering',
+                                '12: wastewater'))
 
 vip_df$nutrient <- factor(vip_df$nutrient, levels = c('N', 'P', 'K'))
 
-vip_df$scenario <- factor(vip_df$scenario, levels = c('PS', 'CBS', 'LBS', 'TA'))
+vip_df$scenario <- factor(vip_df$scenario, levels = c('PS', 'CBS', 'LBS'))
 
 vip_df$g <- as.factor(vip_df$g)
+vip_df$group <- as.factor(vip_df$group)
+
+
+#maybe add empty labels for the data.frame to force each tick to be shown
+test <-  data.frame(name = NA, 
+           vip = NA, 
+           indicator = rep(unique(vip_df$indicator), each = 12 * 3), 
+           nutrient = rep(c('N', 'P', 'K'),each = 5 * 12 * 3),
+           scenario = unique(vip_df$scenario),
+           group = rep(unique(vip_df$group), 5 * 3),
+           g = rep(unique(vip_df$g), 5*3))
+vip_df <- rbind(vip_df, test)
 
 #have the same color code and ticks on the y axis
 
@@ -157,18 +174,17 @@ p1 <- vip_df %>%
   ylab('Variable Importance in Projection (VIP)') +
   scale_fill_manual(breaks = c('1: animal_number',
                                '2: biogas',
-                               '3: consumption',
-                               '4: crop_allocation',
-                               '5: inorganic_fertilizer',
-                               '6: local_feed',
-                               '7: manure_allocation',
-                               '8: manure_excretion',
-                               '9: manure_export',
-                               '10: manure_housinglosses',
-                               '11: manure_import',
-                               '12: slaughtering',
-                               '13: wastewater'),
-                    values = c(brewer.pal(n = 12, name = "Paired"), 'pink'))+
+                               '3: crop_allocation',
+                               '4: inorganic_fertilizer',
+                               '5: local_feed',
+                               '6: manure_allocation',
+                               '7: manure_excretion',
+                               '8: manure_export',
+                               '9: manure_housinglosses',
+                               '10: manure_import',
+                               '11: slaughtering',
+                               '12: wastewater'),
+                    values = c(brewer.pal(n = 12, name = "Paired"), 'pink'), drop = FALSE)+
   labs(title = 'Total Input')+
   xlab('')
 
@@ -182,18 +198,17 @@ p2 <- vip_df %>%
   ylab('Variable Importance in Projection (VIP)') +
   scale_fill_manual(breaks = c('1: animal_number',
                                '2: biogas',
-                               '3: consumption',
-                               '4: crop_allocation',
-                               '5: inorganic_fertilizer',
-                               '6: local_feed',
-                               '7: manure_allocation',
-                               '8: manure_excretion',
-                               '9: manure_export',
-                               '10: manure_housinglosses',
-                               '11: manure_import',
-                               '12: slaughtering',
-                               '13: wastewater'),
-                    values = c(brewer.pal(n = 12, name = "Paired"), 'pink'))+
+                               '3: crop_allocation',
+                               '4: inorganic_fertilizer',
+                               '5: local_feed',
+                               '6: manure_allocation',
+                               '7: manure_excretion',
+                               '8: manure_export',
+                               '9: manure_housinglosses',
+                               '10: manure_import',
+                               '11: slaughtering',
+                               '12: wastewater'),
+                    values = c(brewer.pal(n = 12, name = "Paired"), 'pink'), drop = FALSE)+
   labs(title = 'Use Efficiency') +
   xlab('')
 
@@ -207,18 +222,17 @@ p3 <- vip_df %>%
   ylab('Variable Importance in Projection (VIP)') +
   scale_fill_manual(breaks = c('1: animal_number',
                                '2: biogas',
-                               '3: consumption',
-                               '4: crop_allocation',
-                               '5: inorganic_fertilizer',
-                               '6: local_feed',
-                               '7: manure_allocation',
-                               '8: manure_excretion',
-                               '9: manure_export',
-                               '10: manure_housinglosses',
-                               '11: manure_import',
-                               '12: slaughtering',
-                               '13: wastewater'),
-                    values = c(brewer.pal(n = 12, name = "Paired"), 'pink'))+
+                               '3: crop_allocation',
+                               '4: inorganic_fertilizer',
+                               '5: local_feed',
+                               '6: manure_allocation',
+                               '7: manure_excretion',
+                               '8: manure_export',
+                               '9: manure_housinglosses',
+                               '10: manure_import',
+                               '11: slaughtering',
+                               '12: wastewater'),
+                    values = c(brewer.pal(n = 12, name = "Paired"), 'pink'), drop = FALSE)+
   scale_x_discrete(breaks = as.factor(1:13))+
   labs(title = 'Recycling Rate') +
   xlab('')
@@ -233,18 +247,17 @@ p4 <- vip_df %>%
   ylab('Variable Importance in Projection (VIP)') +
   scale_fill_manual(breaks = c('1: animal_number',
                                '2: biogas',
-                               '3: consumption',
-                               '4: crop_allocation',
-                               '5: inorganic_fertilizer',
-                               '6: local_feed',
-                               '7: manure_allocation',
-                               '8: manure_excretion',
-                               '9: manure_export',
-                               '10: manure_housinglosses',
-                               '11: manure_import',
-                               '12: slaughtering',
-                               '13: wastewater'),
-                    values = c(brewer.pal(n = 12, name = "Paired"), 'pink'))+
+                               '3: crop_allocation',
+                               '4: inorganic_fertilizer',
+                               '5: local_feed',
+                               '6: manure_allocation',
+                               '7: manure_excretion',
+                               '8: manure_export',
+                               '9: manure_housinglosses',
+                               '10: manure_import',
+                               '11: slaughtering',
+                               '12: wastewater'),
+                    values = c(brewer.pal(n = 12, name = "Paired"), 'pink'), drop = FALSE)+
   labs(title = 'Share of reuse to total input') +
   xlab('')
 
@@ -260,18 +273,17 @@ p5 <- vip_df %>%
   ylab('Variable Importance in Projection (VIP)') +
   scale_fill_manual(breaks = c('1: animal_number',
                                '2: biogas',
-                               '3: consumption',
-                               '4: crop_allocation',
-                               '5: inorganic_fertilizer',
-                               '6: local_feed',
-                               '7: manure_allocation',
-                               '8: manure_excretion',
-                               '9: manure_export',
-                               '10: manure_housinglosses',
-                               '11: manure_import',
-                               '12: slaughtering',
-                               '13: wastewater'),
-                    values = c(brewer.pal(n = 12, name = "Paired"), 'pink'))+
+                               '3: crop_allocation',
+                               '4: inorganic_fertilizer',
+                               '5: local_feed',
+                               '6: manure_allocation',
+                               '7: manure_excretion',
+                               '8: manure_export',
+                               '9: manure_housinglosses',
+                               '10: manure_import',
+                               '11: slaughtering',
+                               '12: wastewater'),
+                    values = c(brewer.pal(n = 12, name = "Paired"), 'pink'), drop = FALSE)+
   labs(title = 'Nutrient losses') +
   xlab('')
 
