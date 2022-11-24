@@ -814,7 +814,7 @@ combined_function <- function() {
         crop_output$N_crop_animal_feeding_processed <- crop_to_feed_N - crop_output$N_crop_animal_feeding_unprocessed
         #(it can happen that there is so little allocated to animals, that the processed feed becomes negative)
         #--> cap the N_crop_animal_feeding_processed at 0
-        ifelse(crop_output$N_crop_animal_feeding_processed < 0, 0, crop_output$N_crop_animal_feeding_processed)
+        crop_output$N_crop_animal_feeding_processed <- ifelse(crop_output$N_crop_animal_feeding_processed < 0, 0, crop_output$N_crop_animal_feeding_processed)
         
         
         #maintain stochiometry of K and P stream
