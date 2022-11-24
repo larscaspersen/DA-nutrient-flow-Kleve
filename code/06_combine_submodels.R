@@ -812,6 +812,11 @@ combined_function <- function() {
         
         #the change will be attributed to processed feed, so subtract the unprocessed one
         crop_output$N_crop_animal_feeding_processed <- crop_to_feed_N - crop_output$N_crop_animal_feeding_unprocessed
+        #(it can happen that there is so little allocated to animals, that the processed feed becomes negative)
+        #--> cap the N_crop_animal_feeding_processed at 0
+        ifelse(crop_output$N_crop_animal_feeding_processed < 0, 0, crop_output$N_crop_animal_feeding_processed)
+        
+        
         #maintain stochiometry of K and P stream
         crop_output$P_crop_animal_feeding_processed <- crop_output$N_crop_animal_feeding_processed * (combined_output$feed_from_processed_crops_P[1] / combined_output$feed_from_processed_crops_N[1])
         crop_output$K_crop_animal_feeding_processed <- crop_output$N_crop_animal_feeding_processed * (combined_output$feed_from_processed_crops_K[1] / combined_output$feed_from_processed_crops_N[1])
@@ -1587,7 +1592,7 @@ combined_function <- function() {
         #Apply changed streams by buffering
         #----------------------------------#
         
-        # crop to feed --> channed changes to unprocessed feed because better buffer capacity
+        # crop to feed --> channel changes to unprocessed feed because better buffer capacity
         crop_output$N_crop_animal_feeding_processed <- buffered_crop_feed_N - crop_output$N_crop_animal_feeding_unprocessed
         crop_output$P_crop_animal_feeding_processed <- buffered_crop_feed_P - crop_output$P_crop_animal_feeding_unprocessed
         crop_output$K_crop_animal_feeding_processed <- buffered_crop_feed_K - crop_output$K_crop_animal_feeding_unprocessed
