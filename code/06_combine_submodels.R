@@ -2045,15 +2045,16 @@ combined_function <- function() {
 
 
       # N BALANCE----
+      #added manure import to the inputs of animal balance (because the exports are mainly driven by the imports)
       N_animal_in <- N_feed_import + (crop_output$N_straw + crop_output$N_grassland +
                                         crop_output$N_crop_animal_feeding_processed +
-                                        crop_output$N_crop_animal_feeding_unprocessed)
+                                        crop_output$N_crop_animal_feeding_unprocessed) + import_organic_N_can_change
       P_animal_in <- P_feed_import + (crop_output$P_straw + crop_output$P_grassland +
                                         crop_output$P_crop_animal_feeding_processed +
-                                        crop_output$P_crop_animal_feeding_unprocessed)
+                                        crop_output$P_crop_animal_feeding_unprocessed) + import_organic_P_can_change
       K_animal_in <- K_feed_import + (crop_output$K_straw + crop_output$K_grassland +
                                         crop_output$K_crop_animal_feeding_processed +
-                                        crop_output$K_crop_animal_feeding_unprocessed)
+                                        crop_output$K_crop_animal_feeding_unprocessed) + import_organic_K_can_change
 
       N_animal_out <-  animal_output$N_milk_available +
                           animal_output$N_egg_available +
