@@ -812,18 +812,48 @@ combined_function <- function() {
         
         #the change will be attributed to processed feed, so subtract the unprocessed one
         crop_output$N_crop_animal_feeding_processed <- crop_to_feed_N - crop_output$N_crop_animal_feeding_unprocessed
-        #(it can happen that there is so little allocated to animals, that the processed feed becomes negative)
-        #--> cap the N_crop_animal_feeding_processed at 0
-        crop_output$N_crop_animal_feeding_processed <- ifelse(crop_output$N_crop_animal_feeding_processed < 0, 0, crop_output$N_crop_animal_feeding_processed)
-        
+
         
         #maintain stochiometry of K and P stream
         crop_output$P_crop_animal_feeding_processed <- crop_output$N_crop_animal_feeding_processed * (combined_output$feed_from_processed_crops_P[1] / combined_output$feed_from_processed_crops_N[1])
         crop_output$K_crop_animal_feeding_processed <- crop_output$N_crop_animal_feeding_processed * (combined_output$feed_from_processed_crops_K[1] / combined_output$feed_from_processed_crops_N[1])
         
+        
         #recalculate total feed P and K
         crop_to_feed_P <- crop_output$P_crop_animal_feeding_processed + crop_output$P_crop_animal_feeding_unprocessed
         crop_to_feed_K <- crop_output$K_crop_animal_feeding_processed + crop_output$K_crop_animal_feeding_unprocessed
+        
+        
+        #(it can happen that there is so little allocated to animals, that the processed feed becomes negative)
+        #--> cap the N_crop_animal_feeding_processed at 0
+        
+        #in case the reduction in allocation of crop to feed is so intense, that the
+        #total pool ends up being smaller than the unprocessed feed: 
+        if(any(crop_output$N_crop_animal_feeding_processed)){
+          
+          crop_output$N_crop_animal_feeding_unprocessed <- ifelse(crop_output$N_crop_animal_feeding_processed < 0, 
+                                                                  yes = crop_to_feed_N,
+                                                                  no = crop_output$N_crop_animal_feeding_unprocessed)
+          
+          #in case of P and K, sutract the 
+          crop_output$P_crop_animal_feeding_unprocessed <- ifelse(crop_output$P_crop_animal_feeding_processed < 0, 
+                                                                  yes = crop_to_feed_P,
+                                                                  no = crop_output$P_crop_animal_feeding_unprocessed)
+          
+          crop_output$K_crop_animal_feeding_unprocessed <- ifelse(crop_output$P_crop_animal_feeding_processed < 0, 
+                                                                  yes = crop_to_feed_K,
+                                                                  no = crop_output$K_crop_animal_feeding_unprocessed)
+          
+          #we have to deal with processed_feed P and K in this case
+          #--> make the adjustment afterwards!
+          
+          #set processed feed to zero in these cases
+          crop_output$N_crop_animal_feeding_processed <- ifelse(crop_output$N_crop_animal_feeding_processed < 0, 0, crop_output$N_crop_animal_feeding_processed)
+          crop_output$P_crop_animal_feeding_processed <- ifelse(crop_output$P_crop_animal_feeding_processed < 0, 0, crop_output$P_crop_animal_feeding_processed)
+          crop_output$K_crop_animal_feeding_processed <- ifelse(crop_output$K_crop_animal_feeding_processed < 0, 0, crop_output$K_crop_animal_feeding_processed)
+          
+        }
+        
         
         #-----#
         #biogas and food get the rest, even if that means negative flows of P and K
@@ -1776,6 +1806,11 @@ combined_function <- function() {
         #use import of inorganic fertilizer to buffer changes in manure to crops in both directions
         #if somehow there is more manure now then less inorganic fertilizer is needed
         #if there is less manure (regular case), then more inorganic fertilizer should be imported
+        
+        #it can also happen that so much more nutrients are allocated
+        #to animal cropping, that we end up with negative imports of fertilizer
+        #(this is especially true for P and K)
+        
         
         #use a fertilizer efficiency factor for the buffering, in general less inorganic fertilizer
         #is needed for the same amount of manure N
