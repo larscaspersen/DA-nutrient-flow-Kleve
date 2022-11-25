@@ -1,6 +1,7 @@
 #setwd('../DA-job/DA-nutrient-flow-Kleve/')
 library(tidyverse)
 library(ggridges)
+library(scales) #to have non-scientific numbers for the x and y axis
 
 plot_flows <- TRUE
 
@@ -55,6 +56,10 @@ diff_flows_long <- reshape::melt(diff_flows_df, id.var = 'scenario')
 results_indicators_long <- reshape2::melt(result_indicators, id.var = 'scenario')
 diff_indicators_long <- reshape::melt(diff_indicators_df, id.var = 'scenario')
 
+#only keep stuff which us part of the valid scenarios
+results_indicators_long <- na.omit(results_indicators_long)
+diff_indicators_long <- na.omit(diff_indicators_long)
+
 
 
 
@@ -92,6 +97,7 @@ if(plot_flows){
       xlab(paste0(flow, ' [t per year]'))+
       ylab('')+
       theme_bw() +
+      scale_x_continuous(labels = label_comma())+
       theme(legend.position = "none")
     
     if(flow %in% boring_streams){
@@ -112,6 +118,7 @@ if(plot_flows){
       xlab(paste0(flow, ' [t per year]'))+
       ylab('')+
       theme_bw() +
+      scale_x_continuous(labels = label_comma())+
       theme(legend.position = "none")
     
     if(flow %in% boring_streams){
@@ -209,6 +216,7 @@ if(plot_flows){
       xlab(paste0(flow, ' [t per year]'))+
       ylab('')+
       theme_bw() +
+      scale_x_continuous(labels = label_comma())+
       theme(legend.position = "none")
     
     pic_path <- 'figures/circularity_metrics/raw/'
@@ -252,6 +260,7 @@ if(plot_flows){
       xlab(paste0(flow, ' [t per year]'))+
       ylab('')+
       theme_bw() +
+      scale_x_continuous(labels = label_comma())+
       theme(legend.position = "none")
     
     pic_path <- 'figures/circularity_metrics/difference_to_baseline/'
