@@ -832,9 +832,9 @@ combined_function <- function() {
         #total pool ends up being smaller than the unprocessed feed: 
         if(crop_output$N_crop_animal_feeding_processed < 0){
           
-          crop_output$N_crop_animal_feeding_unprocessed <- crop_to_feed_N
-          crop_output$P_crop_animal_feeding_unprocessed <- crop_to_feed_P
-          crop_output$K_crop_animal_feeding_unprocessed <- crop_to_feed_K
+          crop_output$N_crop_animal_feeding_unprocessed <- max(crop_to_feed_N,0)
+          crop_output$P_crop_animal_feeding_unprocessed <- max(crop_to_feed_P,0)
+          crop_output$K_crop_animal_feeding_unprocessed <- max(crop_to_feed_K,0)
           
           #we have to deal with processed_feed P and K in this case
           #--> make the adjustment afterwards!
@@ -1574,20 +1574,20 @@ combined_function <- function() {
         #----------------------------------#
         
         # crop to feed --> channel changes to unprocessed feed because better buffer capacity
-        crop_output$N_crop_animal_feeding_processed <- buffered_crop_feed_N - crop_output$N_crop_animal_feeding_unprocessed
-        crop_output$P_crop_animal_feeding_processed <- buffered_crop_feed_P - crop_output$P_crop_animal_feeding_unprocessed
-        crop_output$K_crop_animal_feeding_processed <- buffered_crop_feed_K - crop_output$K_crop_animal_feeding_unprocessed
+        crop_output$N_crop_animal_feeding_processed <- max(buffered_crop_feed_N - crop_output$N_crop_animal_feeding_unprocessed,0)
+        crop_output$P_crop_animal_feeding_processed <- max(buffered_crop_feed_P - crop_output$P_crop_animal_feeding_unprocessed,0)
+        crop_output$K_crop_animal_feeding_processed <- max(buffered_crop_feed_K - crop_output$K_crop_animal_feeding_unprocessed,0)
         
         
         # crop to local human consumption
-        crop_output$N_crop_human_consumption_processed <- buffered_crop_food_N
-        crop_output$P_crop_human_consumption_processed <- buffered_crop_food_P
-        crop_output$K_crop_human_consumption_processed <- buffered_crop_food_K
+        crop_output$N_crop_human_consumption_processed <- max(buffered_crop_food_N,0)
+        crop_output$P_crop_human_consumption_processed <- max(buffered_crop_food_P,0)
+        crop_output$K_crop_human_consumption_processed <- max(buffered_crop_food_K,0)
         
         #crop to biogas
-        crop_output$N_crop_biogas <- buffered_crop_biogas_N
-        crop_output$P_crop_biogas <- buffered_crop_biogas_P
-        crop_output$K_crop_biogas <- buffered_crop_biogas_K
+        crop_output$N_crop_biogas <- max(buffered_crop_biogas_N,0)
+        crop_output$P_crop_biogas <- max(buffered_crop_biogas_P,0)
+        crop_output$K_crop_biogas <- max(buffered_crop_biogas_K,0)
         
       }
       
@@ -1657,11 +1657,11 @@ combined_function <- function() {
         manure_export_extra_K <- (pool_manure_K - animal_output$K_manure_crop - ideal_manure_biogas_K - ideal_manure_export_K) * (scenario_allocate_manure_export_corrected / (scenario_allocate_manure_biogas_corrected + scenario_allocate_manure_export_corrected))
         
         
-        animal_output$P_manure_biogas <- ideal_manure_biogas_P + manure_biogas_extra_P
-        animal_output$K_manure_biogas <- ideal_manure_biogas_K + manure_biogas_extra_K
+        animal_output$P_manure_biogas <- max(ideal_manure_biogas_P + manure_biogas_extra_P,0)
+        animal_output$K_manure_biogas <- max(ideal_manure_biogas_K + manure_biogas_extra_K,0)
         
-        animal_output$export_manure_P_kg <- ideal_manure_export_P + manure_biogas_extra_P
-        animal_output$export_manure_K_kg <- ideal_manure_export_K + manure_biogas_extra_K
+        animal_output$export_manure_P_kg <- max(ideal_manure_export_P + manure_biogas_extra_P,0)
+        animal_output$export_manure_K_kg <- max(ideal_manure_export_K + manure_biogas_extra_K,0)
 
         
         
@@ -1984,13 +1984,13 @@ combined_function <- function() {
       )
 
       N_vegetable_export <- ifelse((crop_output$N_crop_human_consumption_processed + crop_output$total_N_horticulture - consumption_output$consumed_N_vegetable) > 0,
-        (crop_output$N_crop_human_consumption_processed - consumption_output$consumed_N_vegetable), 0
+        (crop_output$N_crop_human_consumption_processed + crop_output$total_N_horticulture  - consumption_output$consumed_N_vegetable), 0
       )
       P_vegetable_export <- ifelse((crop_output$P_crop_human_consumption_processed + crop_output$total_P_horticulture - consumption_output$consumed_P_vegetable) > 0,
-        (crop_output$P_crop_human_consumption_processed - consumption_output$consumed_P_vegetable), 0
+        (crop_output$P_crop_human_consumption_processed + crop_output$total_P_horticulture  - consumption_output$consumed_P_vegetable), 0
       )
       K_vegetable_export <- ifelse((crop_output$K_crop_human_consumption_processed + crop_output$total_K_horticulture - consumption_output$consumed_K_vegetable) > 0,
-        (crop_output$K_crop_human_consumption_processed - consumption_output$consumed_K_vegetable), 0
+        (crop_output$K_crop_human_consumption_processed + crop_output$total_K_horticulture  - consumption_output$consumed_K_vegetable), 0
       )
 
 
