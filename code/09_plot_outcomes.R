@@ -7,14 +7,11 @@ plot_flows <- TRUE
 
 #read saved runs for flows and for indicators
 result_flows <- readRDS('data/model_result_flows.rds')
-result_indicators <- readRDS('data/model_result_indicators.rds')
+#result_indicators <- readRDS('data/model_result_indicators.rds')
 
 diff_flows_df <- rbind.data.frame(result_flows$interventions[-1] - result_flows$reference_year[-1],
                                   result_flows$interventions_animal_adjusted[-1] - result_flows$reference_year[-1],
                                   result_flows$interventions_crop_adjusted[-1] - result_flows$reference_year[-1])
-diff_indicators_df <- rbind.data.frame(result_indicators$interventions[-1] - result_indicators$reference_year[-1],
-                                       result_indicators$interventions_animal_adjusted[-1] - result_indicators$reference_year[-1],
-                                       result_indicators$interventions_crop_adjusted[-1] - result_indicators$reference_year[-1])
 
 
 diff_flows_df$scenario <- c(result_flows$interventions$scenario, 
@@ -22,11 +19,6 @@ diff_flows_df$scenario <- c(result_flows$interventions$scenario,
                             result_flows$interventions_crop_adjusted$scenario)
 
 diff_flows_df <- dplyr::relocate(diff_flows_df, scenario)
-diff_indicators_df$scenario <- c(result_indicators$interventions$scenario, 
-                                 result_indicators$interventions_animal_adjusted$scenario, 
-                                 result_indicators$interventions_crop_adjusted$scenario)
-diff_indicators_df <- dplyr::relocate(diff_indicators_df, scenario)
-
 
 
 #--> list contains model results split by the scenarios
@@ -34,34 +26,23 @@ diff_indicators_df <- dplyr::relocate(diff_indicators_df, scenario)
 #check the distributions
 
 result_flows <- do.call(rbind, result_flows)
-result_indicators <- do.call(rbind, result_indicators)
 
 #change names of scenarios
 result_flows$scenario <- factor(result_flows$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted"),
        labels = c('Ref', 'PS', 'LBS' ,'CBS'))
-result_indicators$scenario <- factor(result_indicators$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted"),
-                                labels = c('Ref', 'PS', 'LBS' ,'CBS'))
 
 diff_flows_df$scenario <- factor(diff_flows_df$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted"),
        labels = c('Ref', 'PS', 'LBS' ,'CBS'))
-diff_indicators_df$scenario <- factor(diff_indicators_df$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted"),
-       labels = c('Ref', 'PS', 'LBS' ,'CBS'))
+
 
 
 #bring results in long format, bring differences in long format
 result_flows_long <- reshape2::melt(result_flows, id.var = 'scenario')
 diff_flows_long <- reshape::melt(diff_flows_df, id.var = 'scenario')
 
-#melt combined outputs
-results_indicators_long <- reshape2::melt(result_indicators, id.var = 'scenario')
-diff_indicators_long <- reshape::melt(diff_indicators_df, id.var = 'scenario')
 
-#only keep stuff which us part of the valid scenarios
-results_indicators_long <- na.omit(results_indicators_long)
-diff_indicators_long <- na.omit(diff_indicators_long)
-
-
-
+result_flows_long <- na.omit(result_flows_long)
+diff_flows_long <- na.omit(diff_flows_long)
 
 
 
@@ -87,6 +68,13 @@ if(plot_flows){
                       'straw_N', 'straw_P', 'straw_K',
                       'wastewater_direct_discharge_N', 'wastewater_direct_discharge_P', 'wastewater_direct_discharge_K',
                       'wastewater_effluent_gaseous_losses_N', 'wastewater_effluent_gaseous_losses_P', 'wastewater_effluent_gaseous_losses_K')
+  
+  indicators <- c('total_input_N', 'total_input_P', 'total_input_K', 
+                  'losses_N', 'losses_P', 'losses_K',
+                  'use_efficiency_N', 'use_efficiency_P', 'use_efficiency_K',
+                  'share_reuse_to_total_input_N', 'share_reuse_to_total_input_P', 'share_reuse_to_total_input_K',
+                  'recycling_rate_N', 'recycling_rate_P', 'recycling_rate_K')
+  
   for(flow in unique(result_flows_long$variable)){
     
     #density for all flows
@@ -102,6 +90,8 @@ if(plot_flows){
     
     if(flow %in% boring_streams){
       pic_path <- 'figures/flows/distributions/boring_streams/'
+    } else if(flow %in% indicators){
+      pic_path <- 'figures/circularity_metrics/raw/'
     } else {
       pic_path <- 'figures/flows/distributions'
     }
@@ -123,7 +113,9 @@ if(plot_flows){
     
     if(flow %in% boring_streams){
       pic_path <- 'figures/flows/distribution_difference_baseline/boring_streams/'
-    } else {
+    } else if(flow %in% indicators){
+      pic_path <- 'figures/circularity_metrics/difference_to_baseline/'
+    }else {
       pic_path <- 'figures/flows/distribution_difference_baseline/'
     }
     
@@ -201,115 +193,20 @@ if(plot_flows){
     
   } #end for loop for individual streams  
   
-  
-  
-  #visualization for circularity metrics
-  
-  for(flow in unique(results_indicators_long$variable)){
-    
-    #density plot off all scenarios
-    
-    p1 <- results_indicators_long %>%
-      filter(variable == flow) %>%
-      ggplot(aes(x=as.numeric(value) ,y = scenario, fill = scenario)) +
-      geom_density_ridges_gradient(scale=2) +
-      xlab(paste0(flow, ' [t per year]'))+
-      ylab('')+
-      theme_bw() +
-      scale_x_continuous(labels = label_comma())+
-      theme(legend.position = "none")
-    
-    pic_path <- 'figures/circularity_metrics/raw/'
-    
-    fname <- paste0(flow,'.jpg')
-    ggsave(p1,  filename = fname, path = pic_path,  device = 'jpeg', width = 10, height = 7, units = 'cm')
-    
-    
-    # #pls analysis
-    # 
-    # for(scenario in levels(result_indicators$scenario)){
-    #   
-    #   #put only the corresponding scenario values to the simulation output, drop the scenario column
-    #   nitrogen_mc_simulation$y <- result_indicators[result_indicators$scenario == scenario, -1]
-    #   
-    #   #do pls
-    #   pls_result <- plsr.mcSimulation(
-    #     object = nitrogen_mc_simulation,
-    #     resultName = names(nitrogen_mc_simulation$y[flow]), ncomp = 1
-    #   )
-    #   
-    #   pls_plot <- plot_pls(pls_result, input_table = input, threshold = 0.9)
-    #   
-    #   pic_path <- 'figures/circularity_metrics/pls_raw/'
-    #   
-    #   fname <- paste0(flow,'_', scenario, '_pls.jpg')
-    #   ggsave(pls_plot,  filename = fname, path = pic_path,  device = 'jpeg', width = 12, height = 10, units = 'cm')
-    # }
-    
-    
-    
-    
-    
-    
-    #desnity plots of difference to baseline
-    p2 <-  diff_indicators_long %>%
-      filter(variable == flow) %>%
-      ggplot(aes(x=as.numeric(value) ,y = scenario, fill = scenario)) +
-      geom_density_ridges_gradient(scale=2) +
-      geom_vline(xintercept = 0, linetype = 'dashed')+
-      xlab(paste0(flow, ' [t per year]'))+
-      ylab('')+
-      theme_bw() +
-      scale_x_continuous(labels = label_comma())+
-      theme(legend.position = "none")
-    
-    pic_path <- 'figures/circularity_metrics/difference_to_baseline/'
-    
-    fname <- paste0(flow,'diff_to_baseline.jpg')
-    ggsave(p2,  filename = fname, path = pic_path,  device = 'jpeg', width = 12, height = 10, units = 'cm')
-    
-    
-    # #pls analysis
-    # 
-    # for(scenario in unique(diff_df$scenario)){
-    #   
-    #   #put only the corresponding scenario values to the simulation output, drop the scenario column
-    #   nitrogen_mc_simulation$y <- diff_df[diff_df$scenario == scenario, -1]
-    #   
-    #   #do pls
-    #   pls_result <- plsr.mcSimulation(
-    #     object = nitrogen_mc_simulation,
-    #     resultName = names(nitrogen_mc_simulation$y[flow]), ncomp = 1
-    #   )
-    #   
-    #   pls_plot <- plot_pls(pls_result, input_table = input, threshold = 0.9)
-    #   
-    #   pic_path <- 'figures/circularity_metrics/pls_difference_baseline/'
-    #   
-    #   fname <- paste0(flow,'_', scenario, '_difference_baseline_pls.jpg')
-    #   try(ggsave(pls_plot,  filename = fname, path = pic_path,  device = 'jpeg', width = 10, height = 10, units = 'cm'))
-    # }
-  } #end for loop for indicators
-  
-  
-  
 } #end plotting individual flows / indicator distributions
 
 #split variable name into variable and nutrient
 diff_flows_long <- tidyr::separate(data = diff_flows_long, col = variable, sep = -1, convert = TRUE, into = c('variable', 'nutrient'))
-diff_indicators_long <- tidyr::separate(data = diff_indicators_long, col = variable, sep = -1, convert = TRUE, into = c('variable', 'nutrient'))
 result_flows_long <- tidyr::separate(data = result_flows_long, col = variable, sep = -1, convert = TRUE, into = c('variable', 'nutrient'))
-results_indicators_long <- tidyr::separate(data = results_indicators_long, col = variable, sep = -1, convert = TRUE, into = c('variable', 'nutrient'))
 
 #remove the trailing _ in variable
 diff_flows_long <- diff_flows_long %>% 
   mutate(variable = substring(variable, 1, nchar(variable)-1))
-diff_indicators_long <- diff_indicators_long %>% 
-  mutate(variable = substring(variable, 1, nchar(variable)-1))
 result_flows_long <- result_flows_long %>% 
   mutate(variable = substring(variable, 1, nchar(variable)-1))
-results_indicators_long <- results_indicators_long %>% 
-  mutate(variable = substring(variable, 1, nchar(variable)-1))
+
+results_indicators_long <- result_flows_long %>% 
+  filter(variable %in% c("total_input", 'losses', "recycling_rate", "share_reuse_to_total_input", "use_efficiency"))
 
 results_indicators_long$variable <- factor(results_indicators_long$variable, 
                                            levels = c("total_input", 'losses', "recycling_rate", "share_reuse_to_total_input", "use_efficiency"),
@@ -491,7 +388,6 @@ rm(diff_flows_df, diff_flows_long, diff_indicators_df, diff_indicators_long, p1,
 
 #read model outputs again
 result_flows <- readRDS('data/model_result_flows.rds')
-result_indicators <- readRDS('data/model_result_indicators.rds')
 
 
 #combine meat and dairy stuff
@@ -518,17 +414,7 @@ rel_change_flows$scenario <- c(result_flows$interventions$scenario,
                                result_flows$interventions_crop_adjusted$scenario)
 rel_change_flows <- dplyr::relocate(rel_change_flows, scenario)
 
-rel_change_indicators <- rbind.data.frame(((result_indicators$interventions[-1] - result_indicators$reference_year[-1]) / result_indicators$reference_year[-1]) * 100,
-                                     ((result_indicators$interventions_animal_adjusted[-1] - result_indicators$reference_year[-1]) / result_indicators$reference_year[-1]) * 100,
-                                     ((result_indicators$interventions_crop_adjusted[-1] - result_indicators$reference_year[-1]) / result_indicators$reference_year[-1]) * 100)
-rel_change_indicators$scenario <- c(result_indicators$interventions$scenario, 
-                                    result_indicators$interventions_animal_adjusted$scenario, 
-                                    result_indicators$interventions_crop_adjusted$scenario)
-rel_change_indicators <- dplyr::relocate(rel_change_indicators, scenario)
 
-
-rel_change_indicators$scenario <- factor(rel_change_indicators$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted"),
-                                 labels = c('Ref', 'PS', 'LBS' ,'CBS'))
 rel_change_flows$scenario <- factor(rel_change_flows$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted"),
                                       labels = c('Ref', 'PS', 'LBS' ,'CBS'))
 
@@ -538,38 +424,27 @@ rel_change_flows$scenario <- factor(rel_change_flows$scenario, levels = c("refer
 #--> calculate median and iqr
 
 rel_change_flows_long <- reshape2::melt(rel_change_flows, id.vars = 'scenario')
-rel_change_indicators_long <- reshape2::melt(rel_change_indicators, id.vars = 'scenario')
 
 
 #zero devided by zero gives nan, so make it 0 again
 rel_change_flows_long$value <- ifelse(is.nan(rel_change_flows_long$value), yes = 0, no = rel_change_flows_long$value)
-rel_change_indicators_long$value <- ifelse(is.nan(rel_change_indicators_long$value), yes = 0, no = rel_change_indicators_long$value)
-
 
 summarised_flows <- rel_change_flows_long %>%
   group_by(scenario, variable) %>%
   summarise(median = median(value, na.rm = T),
             iqr = IQR(value, na.rm = T))
 
-summarised_indicators <- rel_change_indicators_long %>%
-  group_by(scenario, variable) %>%
-  summarise(median = median(value, na.rm = T),
-            iqr = IQR(value, na.rm = T))
-
-
 
 
 #split by nutrients; 
 summarised_flows <- tidyr::separate(data = summarised_flows, col = variable, sep = -1, convert = TRUE, into = c('variable', 'nutrient'))
-summarised_indicators <- tidyr::separate(data = summarised_indicators, col = variable, sep = -1, convert = TRUE, into = c('variable', 'nutrient'))
 
 #remove trailing _
 summarised_flows <- summarised_flows %>% 
   mutate(variable = substring(variable, 1, nchar(variable)-1))
-summarised_indicators <- summarised_indicators %>% 
-  mutate(variable = substring(variable, 1, nchar(variable)-1))
 
-unique(summarised_flows$variable)
+summarised_indicators <- summarised_flows %>% 
+  filter(variable %in% c("total_input", 'losses', "recycling_rate", "share_reuse_to_total_input", "use_efficiency"))
 
 #only take flows Bernou wants to see
 summarised_flows <- summarised_flows %>%
@@ -640,7 +515,7 @@ summarised_flows$median_adjusted <- ifelse(summarised_flows$median_adjusted < -1
 
 #install.packages("ggnewscale")
 library(ggnewscale)
-RColorBrewer::brewer.pal(7, 'PuOr')
+#RColorBrewer::brewer.pal(7, 'PuOr')
 
 p1 <- summarised_flows %>%
   filter(nutrient == 'N', median_adjusted >= 0) %>%
@@ -737,7 +612,6 @@ ggsave(p3, filename = 'flow_changes_K.jpg', path = 'figures/', device = 'jpeg', 
 
 #indicators
 
-
 #split value into two columns, one for increase, one for decrease?
 summarised_indicators$increase <- ifelse(summarised_indicators$median >= 100,yes = summarised_indicators$median, no = NA)
 summarised_indicators$decrease <- ifelse(summarised_indicators$median < 100,yes = summarised_indicators$median, no = NA)
@@ -748,10 +622,6 @@ summarised_indicators$iqr_adusted <- ifelse(summarised_indicators$iqr > 200, yes
 summarised_indicators$median_adjusted <- ifelse(summarised_indicators$median > 200, yes = 200, no = summarised_indicators$median)
 summarised_indicators$median_adjusted <- ifelse(summarised_indicators$median_adjusted < -100, yes = -100, no = summarised_indicators$median_adjusted)
 
-
-#install.packages("ggnewscale")
-library(ggnewscale)
-RColorBrewer::brewer.pal(7, 'PuOr')
 
 summarised_indicators$variable <- factor(summarised_indicators$variable, 
                                            levels = c("total_input", 'losses', "recycling_rate", "share_reuse_to_total_input", "use_efficiency"),
