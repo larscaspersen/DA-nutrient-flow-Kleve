@@ -103,7 +103,9 @@ calc_animal <- function(n_slaughter_dairy_cattle, n_slaughter_female_cattle,
                         import_organic_P_kg,
                         import_organic_K_kg,
                         P_reduction_manure = 0,
-                        K_reduction_manure = 0){
+                        K_reduction_manure = 0,
+                        P_increase_manure = 0,
+                        K_increase_manure = 0){
   
   #slaughtering -----
   
@@ -397,8 +399,8 @@ calc_animal <- function(n_slaughter_dairy_cattle, n_slaughter_female_cattle,
   #actually reducing amount of P, K from the total manure because we assume that 
   #less excess feeding translates to less nutrients excreted
   N_remaining_manure <- sum(manure_df$N_manure_remaining)
-  P_remaining_manure <- sum(manure_df$P_manure_remaining) - P_reduction_manure
-  K_remaining_manure <- sum(manure_df$K_manure_remaining) - K_reduction_manure
+  P_remaining_manure <- sum(manure_df$P_manure_remaining) - P_reduction_manure + P_increase_manure
+  K_remaining_manure <- sum(manure_df$K_manure_remaining) - K_reduction_manure + K_increase_manure
   
 
 
@@ -462,9 +464,9 @@ calc_animal <- function(n_slaughter_dairy_cattle, n_slaughter_female_cattle,
               K_housing_loss = sum(manure_df$K_housing_loss),
               
 
-              N_remaining_manure = sum(manure_df$N_manure_remaining),
-              P_remaining_manure = sum(manure_df$P_manure_remaining),
-              K_remaining_manure = sum(manure_df$K_manure_remaining),
+              N_remaining_manure = N_remaining_manure,
+              P_remaining_manure = P_remaining_manure,
+              K_remaining_manure = K_remaining_manure,
               
               N_manure_biogas = N_manure_biogas,
               P_manure_biogas = P_manure_biogas,
