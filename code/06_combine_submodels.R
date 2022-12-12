@@ -877,12 +877,12 @@ combined_function <- function() {
         
         #add extra to ideal stochiometry
         #biogas
-        crop_output$P_crop_biogas <- ideal_crop_biogas_P + crop_biogas_extra_P
-        crop_output$K_crop_biogas <- ideal_crop_biogas_K + crop_biogas_extra_K
+        crop_output$P_crop_biogas <- max(ideal_crop_biogas_P + crop_biogas_extra_P,0)
+        crop_output$K_crop_biogas <- max(ideal_crop_biogas_K + crop_biogas_extra_K,0)
         
         #food
-        crop_food_not_exported_P <- ideal_crop_food_P + crop_food_extra_P + crop_food_exported_P
-        crop_food_not_exported_K <- ideal_crop_food_K + crop_food_extra_K + crop_food_exported_K
+        crop_food_not_exported_P <- max(ideal_crop_food_P + crop_food_extra_P + crop_food_exported_P,0)
+        crop_food_not_exported_K <- max(ideal_crop_food_K + crop_food_extra_K + crop_food_exported_K,0)
         
         
         #old allocation approach
