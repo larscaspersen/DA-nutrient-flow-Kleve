@@ -264,7 +264,7 @@ crop_function <- function(arable_land,
                           new_share_summer_wheat,
                           new_share_triticale, 
                           new_share_winter_barley, 
-                          ew_share_winter_wheat),
+                          new_share_winter_wheat),
                         yield = c(yield_beans, 
                                   yield_corn, 
                                   yield_fodder_peas,
@@ -415,12 +415,12 @@ crop_function <- function(arable_land,
   crop_df$N_main <- crop_df$yield_total * crop_df$yield_share * crop_df$N_yield #yield is in kg N/dt FM total yield
   crop_df$P_main <- crop_df$yield_total * crop_df$yield_share * crop_df$P_yield #yield is in kg P/dt FM total yield
   #K is expressed as share of DM total yield; yield total is in dt, so multiply by 100 in the end
-  crop_df$K_main_min <- crop_df$yield_total * crop_df$yield_share * crop_df$dm * crop_df$K_yield * 100
+  crop_df$K_main <- crop_df$yield_total * crop_df$yield_share * crop_df$dm * crop_df$K_yield * 100
   
-  #there is a big gap in potato and sugar beet estimated K
-  #--> follow Bernous approach and simply take the mean of the two approaches
-  crop_df$K_main_max <- crop_df$yield_total * crop_df$dm * crop_df$K_yield * 100
-  crop_df$K_main <- (crop_df$K_main_max + crop_df$K_main_min) / 2
+  # #there is a big gap in potato and sugar beet estimated K
+  # #--> follow Bernous approach and simply take the mean of the two approaches
+  # crop_df$K_main_max <- crop_df$yield_total * crop_df$dm * crop_df$K_yield * 100
+  # crop_df$K_main <- (crop_df$K_main_max + crop_df$K_main_min) / 2
   
   
   #distributute main N by animal and human consumption and by with or without processing ----

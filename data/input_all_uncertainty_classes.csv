@@ -2,12 +2,12 @@ comment,uncertainty.level,description,variable,unit,lower,median,upper,distribut
 ,1,total waste water,waste_water,m3,27083430,27357000,27630570,posnorm,waste,,unchanged
 ,1,direct discharge of wastewater to ground and surface water,wastewater_direct_discharge,m3,12727440,12856000,12984560,posnorm,consumption,,unchanged
 ,2,taken from Nährstoffreport,import_organic_N_kg,kg import / FM dt,6015400,6332000,6648600,posnorm,crop,no,2020
-,2,taken from Nährstoffreport,export_manure_N_kg,kg export / FM dt,7434700,7826000,8217300,posnorm,crop,,2020
+,2,taken from Nährstoffreport,export_manure_N_kg,kg export / FM dt,5367500,5650000,5932500,posnorm,crop,,2020
 is this manure,3,,N_biogas_input,kg N,2560662,2845180,3129698,posnorm,animal,,2020
 ,5,calculated from total export - animal derived export,export_other_organic_N_kg,kg export / FM dt,1632360.75,2176481,2720601.25,posnorm,crop,,2020
 ,2,taken from Nährstoffreport,import_organic_P_kg,kg P import,1310072.8,1379024,1447975.2,posnorm,crop,no,2020
 ,3,,K_biogas_input,kg K,1046079.9,1162311,1278542.1,posnorm,animal,,2020
-,2,"taken from Nährstoffreport 2020, p.130, converted to P",export_manure_P_kg,kg export,1670342.82,1758255.6,1846168.38,posnorm,crop,,2020
+,2,"taken from Nährstoffreport 2020, p.130, converted to P",export_manure_P_kg,kg export,1205550,1269000,1332450,posnorm,crop,,2020
 ,2,amount of waste water remaining in channel,wastewater_remain_canal,m3,1045950,1101000,1156050,posnorm,consumption,,unchanged
 ,3,,n_slaughter_poultry,individuals,827415.9,919351,1011286.1,posnorm,animal,no,2020
 ,3,,n_slaughter_pig,individuals,774240.3,860267,946293.7,posnorm,animal,no,2020
@@ -143,7 +143,7 @@ when data from N�hrstoffbericht,1,Nährstoffbericht said only larger than 160,fe
 ,1,Summer barley,yield_summer_barley,dt / ha,58.014,58.6,59.186,posnorm,crop,no,2020
 ,3,,consume_potato,kg / person / year,52.11,57.9,63.69,posnorm,consumption,,unchanged
 ,1,strawberry,land_strawberry_ha,kg land / FM dt,54.45,55,55.55,posnorm,crop,no,unchanged
-"this is a guess, I am not sure what the convert stands for ",3,,convert_coffee,g per liter,49.5,55,60.5,posnorm,consumption,,unchanged
+converstion from liter per person to kg per person,3,,convert_coffee,g per liter,55,55,55,const,consumption,,unchanged
 ,1,Summer wheat (weizen),yield_summer_wheat,dt / ha,53.064,53.6,54.136,posnorm,crop,no,2020
 ,3,,consume_herb_tea,l / person,48.06,53.4,58.74,posnorm,consumption,,unchanged
 ,3,pork meat,consume_pork,kg / person / year,45.09,50.1,55.11,posnorm,consumption,,unchanged
@@ -184,8 +184,8 @@ when data from N�hrstoffbericht,1,Nährstoffbericht said only larger than 160,fe
 ,3,,n_slaughter_goat,individuals,18.9,21,23.1,posnorm,animal,no,2020
 ,3,poultry,consume_poultry,kg / person / year,18.81,20.9,22.99,posnorm,consumption,,unchanged
 ,1,stone_fruit,land_stone_fruit_ha,kg land / FM dt,19.8,20,20.2,posnorm,crop,no,unchanged
-conversion of per litre to per g nutrient concentration,3,,convert_black_tea,g per liter,18,20,22,posnorm,consumption,,unchanged
-conversion of per litre to per g nutrient concentration,3,,convert_herb_tea,g per liter,18,20,22,posnorm,consumption,,unchanged
+conversion of per litre to per g nutrient concentration,3,,convert_black_tea,g per liter,20,20,20,const,consumption,,unchanged
+conversion of per litre to per g nutrient concentration,3,,convert_herb_tea,g per liter,20,20,20,const,consumption,,unchanged
 ,3,digestate per produced kwel,Kwel_to_digestate,m3 per Kwel,18,20,22,posnorm,waste,,
 ,1,assumed energy produced by biogas per agricultural used area,lf_to_kwel,KWel per 100 LF,20.79,21,21.21,posnorm,waste,,
 ,3,,n_slaughter_horse,individuals,16.2,18,19.8,posnorm,animal,no,2020
@@ -398,7 +398,7 @@ is this variable used?,3,dry matter content green waste,dm_green_waste,share,0.4
 ,1,Mais silage 5,share_mais_silage,share of total agricultural area,0.35838,0.362,0.36562,tnorm_0_1,crop,no,2020
 "N�hrstoffbericht 2017, Table 1, p.25",4,calulcated from Nährstoffbericht 2017 p. 25,manure_N_to_PtwoOfive_bull,share,0.28936,0.3617,0.43404,tnorm_0_1,animal,no,
 ,3,,K_yield_mais_silage,share K in dm,0.003195,0.00355,0.003905,tnorm_0_1,crop,no,unchanged
-,3,,K_content_vegetables,g K / 100 gram product,0.318,0.354,0.39,posnorm,consumption,yes,unchanged
+,3,,K_content_vegetables,g K / 100 gram product,0.2952,0.328,0.3608,posnorm,consumption,yes,unchanged
 ,3,Winter wheat,P_yield_winter_weat,kg P / FM dt,0.315,0.35,0.385,posnorm,crop,no,unchanged
 ,3,,P_yield_summer_weat,kg P / FM dt,0.315,0.35,0.385,posnorm,crop,no,unchanged
 ,3,,P_yield_rye,kg P / FM dt,0.315,0.35,0.385,posnorm,crop,no,unchanged
@@ -568,7 +568,7 @@ is this variable used?,1,calculated based on total milk,share_milk_other_use,sha
 ,1,,P_content_green_bean_gr_100gr,mg P / 100 g product,0,0,0,const,crop,no,unchanged
 ,1,,K_content_green_bean_gr_100gr,mg K / 100 g product,0,0,0,const,crop,no,unchanged
 ,1,,import_inorganic_P2O5_kg_LF,kg per LF,8.73,9.7,10.67,posnorm,crop,yes,2020
-,3,"ranges calculated from 2017 K:N, K:P and with 2020 reports on N and P",import_organic_K_kg,kg K import,3036168,3373520,3710872,posnorm,crop,,
+,3,"ranges calculated from 2017 K:N, K:P and with 2020 reports on N and P",import_organic_K_kg,kg K import,4868100,5409000,5949900,posnorm,crop,,
 ,3,"calculated range using the rate of K:N, K:N of 2017 and exports of N, P",export_other_organic_K_kg,kg export / FM dt,1611000,1790000,1969000,posnorm,crop,,2020
 ,3,,n_slaughter_lamb,individuals,0,0,0,const,animal,no,2020
 ,3,,n_slaughter_import_oxes,individuals,0,0,0,const,animal,no,2020
@@ -632,3 +632,4 @@ I guess these scenario specific variables can all be categorized under level 5 u
 ,,parameters for skewed distribution,omega_crop_food,,24.782757,,24.782757,const,,,
 ,,parameters for skewed distribution,alpha_crop_food,,34.907637,,34.907637,const,,,
 ,,parameters for skewed distribution,xi_crop_food,,2.067663,,2.067663,const,,,
+,,newly added,export_manure_K_kg,,4414650,4647000,4879350,posnorm,animal,,

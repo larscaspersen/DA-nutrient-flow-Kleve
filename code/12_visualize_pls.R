@@ -4,8 +4,8 @@ library(decisionSupport)
 
 
 #read saved runs for flows and for indicators
-result_indicators <- readRDS('data/model_result_indicators.rds')
-nitrogen_mc_simulation <- readRDS('data/model_output_indicators.rds')
+result_indicators <- readRDS('data/model_result_flows.rds')
+nitrogen_mc_simulation <- readRDS('data/model_output_flows.rds')
 
 #read input file
 input <- read.csv("data/input_all_uncertainty_classes.csv")
@@ -58,6 +58,35 @@ VIP <- function(object) {
   sqrt(nrow(SSW) * apply(SSW, 1, cumsum)/cumsum(SS))
 }
 
+indicators <- c('total_input', 'use_efficiency', 'share_reuse_to_total_input', 'recycling_rate', 'losses')
+
+
+results_indicators_long <- results_indicators_long %>% 
+  filter(variable %in% c(paste(indicators,'N', sep = '_'),
+                         paste(indicators, 'P', sep = '_'),
+                         paste(indicators, 'K', sep = '_')))
+
+results_indicators_long$variable <- factor(results_indicators_long$variable, 
+                                           levels = c(paste(indicators,'N', sep = '_'),
+                                                      paste(indicators, 'P', sep = '_'),
+                                                      paste(indicators, 'K', sep = '_')))
+
+diff_indicators_long <- diff_indicators_long %>% 
+  filter(variable %in% c(paste(indicators,'N', sep = '_'),
+                                     paste(indicators, 'P', sep = '_'),
+                                     paste(indicators, 'K', sep = '_')))
+diff_indicators_long$variable <- factor(diff_indicators_long$variable, 
+                                           levels = c(paste(indicators,'N', sep = '_'),
+                                                      paste(indicators, 'P', sep = '_'),
+                                                      paste(indicators, 'K', sep = '_')))
+
+#add column saying run number
+diff_indicators_long$run <- rep(1:10000, 45)
+
+diff_indicators_df <- reshape2::dcast(data = diff_indicators_long, formula = scenario + run ~ variable, value.var = 'value')
+diff_indicators_df <- diff_indicators_df[,-2]
+
+vip_df <- data.frame()
 #make plots of PLS / append PLS results to data.frame
 for(indicator in unique(results_indicators_long$variable)){
   
@@ -94,12 +123,17 @@ for(indicator in unique(results_indicators_long$variable)){
 }
 
 #drop entries with VIP < 1
-vip_df <- filter(vip_df, vip > 1)
+vip_df <- filter(vip_df, vip > 2)
 
 #save results
 write.csv(vip_df, 'data/vip_results.csv', row.names = F)
 write.csv(unique(vip_df$name), 'data/pls_flows_unique.csv', row.names = F)
 #hand eddited the group names of all vasriables
+
+vip_summarised <- vip_df %>% 
+  group_by(name) %>% 
+  summarise(median_vip = median(vip),
+            n = n())
 
 
 vip_df <- read.csv('data/vip_results.csv')
@@ -122,12 +156,12 @@ vip_df$group <- factor(vip_df$group,
                                   'manure_production', 'animal_housinglosses', 'import_organic_matter',
                                   'export_organic_matter', 'grass_maize_production',
                                   'inorganic_fertilizer', 'biogas',
-                                  'slaughtering', 'wastewater'),
+                                  'slaughtering'),
                        labels = c('Lever 1', 'Lever 2', 'Lever 3', 'Lever 4', 
                                   'Initial Livestock Population',
                                   'Manure Production', 'Manure Storage Losses', 'Import organic matter',
                                   'Export Organic Matter', 'Local Feed Production', 'Import Inorganic Fertilizer',
-                                  'Biogas', 'Slaughtering', 'Wastewater'))
+                                  'Biogas', 'Slaughtering'))
 
 
 
@@ -153,13 +187,15 @@ vip_df$scenario <- factor(vip_df$scenario, levels = c('PS', 'CBS', 'LBS'))
 vip_df$g <- as.factor(vip_df$g)
 vip_df$group <- as.factor(vip_df$group)
 
+n_group <- length(levels(vip_df$group))
+
 
 #maybe add empty labels for the data.frame to force each tick to be shown
 test <-  data.frame(name = NA, 
            vip = NA, 
-           indicator = rep(unique(vip_df$indicator), each = 14 * 3 * 3), 
-           nutrient = rep(c('N', 'P', 'K'),each = 5 * 14 * 3),
-           scenario = rep(unique(vip_df$scenario), each = 5 * 14 * 3) ,
+           indicator = rep(unique(vip_df$indicator), each = n_group * 3 * 3), 
+           nutrient = rep(c('N', 'P', 'K'),each = 5 * n_group * 3),
+           scenario = rep(unique(vip_df$scenario), each = 5 * n_group * 3) ,
            group = rep(unique(vip_df$group), 5 * 3 * 3),
            g = rep(unique(vip_df$g), 5*3 * 3))
 vip_df <- rbind(vip_df, test)
@@ -182,8 +218,7 @@ groups <- c('1: Lever 1',
             '10: Local Feed Production', 
             '11: Import Inorganic Fertilizer',
             '12: Biogas', 
-            '13: Slaughtering', 
-            '14: Wastewater')
+            '13: Slaughtering')
 
 p1 <- vip_df %>% 
   filter(indicator == 'total_input') %>% 
