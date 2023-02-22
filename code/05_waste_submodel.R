@@ -104,15 +104,15 @@ waste_function <- function( waste_water,
   ######
   
   N_compost_crop <- compost_to_horticulture * dm_compost_horticulture * N_content_compost_horticulture
-  P_compost_crop <- compost_to_horticulture * dm_compost_horticulture * P_content_compost_horticulture
+  P_compost_crop <- compost_to_horticulture * dm_compost_horticulture * P_content_compost_horticulture * convert_phosphorous_pentoxide_to_p
   K_compost_crop <- compost_to_horticulture * dm_compost_horticulture * K_content_compost_horticulture * convert_potassium_oxide_to_k
   
   N_compost_export <- compost_to_export * dm_compost_horticulture * N_content_compost_horticulture
-  P_compost_export <- compost_to_export * dm_compost_horticulture * P_content_compost_horticulture
+  P_compost_export <- compost_to_export * dm_compost_horticulture * P_content_compost_horticulture * convert_phosphorous_pentoxide_to_p
   K_compost_export <- compost_to_export * dm_compost_horticulture * K_content_compost_horticulture * convert_potassium_oxide_to_k
   
   N_compost_consumption <- compost_to_consumption * dm_compost_consumption * N_content_compost_consumption
-  P_compost_consumption <- compost_to_consumption * dm_compost_consumption * P_content_compost_consumption
+  P_compost_consumption <- compost_to_consumption * dm_compost_consumption * P_content_compost_consumption * convert_phosphorous_pentoxide_to_p
   K_compost_consumption <- compost_to_consumption * dm_compost_consumption * K_content_compost_consumption * convert_potassium_oxide_to_k
   
   
