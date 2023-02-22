@@ -149,7 +149,7 @@ waste_function <- function( waste_water,
   P_grey_bin_garden_waste <- grey_bin_garden_waste * dm_green_waste * P_content_green_waste
   K_grey_bin_garden_waste <- grey_bin_garden_waste * dm_green_waste * K_content_green_waste
   
-  
+
   return(list(N_sewage_in = N_sewage_in,
               P_sewage_in = P_sewage_in,
               K_sewage_in = K_sewage_in,
@@ -166,41 +166,42 @@ waste_function <- function( waste_water,
               P_sewage_exported = P_sewage_exported,
               K_sewage_exported = K_sewage_exported,
               
-              N_compost_crop = N_compost_crop,
-              P_compost_crop = P_compost_crop,
-              K_compost_crop = K_compost_crop,
+              #output should be in kg and not in tons
+              N_compost_crop = N_compost_crop * 1000,
+              P_compost_crop = P_compost_crop * 1000,
+              K_compost_crop = K_compost_crop * 1000,
               
-              N_compost_consumption = N_compost_consumption,
-              P_compost_consumption = P_compost_consumption,
-              K_compost_consumption = K_compost_consumption,
+              N_compost_consumption = N_compost_consumption * 1000,
+              P_compost_consumption = P_compost_consumption * 1000,
+              K_compost_consumption = K_compost_consumption * 1000,
               
-              N_compost_export = N_compost_export,
-              P_compost_export = P_compost_export,
-              K_compost_export = K_compost_export,
+              N_compost_export = N_compost_export * 1000,
+              P_compost_export = P_compost_export * 1000,
+              K_compost_export = K_compost_export * 1000,
               
-              N_ofmsw_local = N_ofmsw_local,
-              P_ofmsw_local = P_ofmsw_local,
-              K_ofmsw_local = K_ofmsw_local,
+              N_ofmsw_local = N_ofmsw_local * 1000,
+              P_ofmsw_local = P_ofmsw_local * 1000,
+              K_ofmsw_local = K_ofmsw_local * 1000,
               
-              N_ofmsw_import = N_ofmsw_import,
-              P_ofmsw_import = P_ofmsw_import,
-              K_ofmsw_import = K_ofmsw_import,
+              N_ofmsw_import = N_ofmsw_import * 1000,
+              P_ofmsw_import = P_ofmsw_import * 1000,
+              K_ofmsw_import = K_ofmsw_import * 1000,
               
-              N_green_waste_import = N_green_waste_import,
-              P_green_waste_import = P_green_waste_import,
-              K_green_waste_import = K_green_waste_import,
+              N_green_waste_import = N_green_waste_import * 1000,
+              P_green_waste_import = P_green_waste_import * 1000,
+              K_green_waste_import = K_green_waste_import * 1000,
               
-              N_green_waste_local = N_green_waste_local,
-              P_green_waste_local = P_green_waste_local,
-              K_green_waste_local = K_green_waste_local,
+              N_green_waste_local = N_green_waste_local * 1000,
+              P_green_waste_local = P_green_waste_local * 1000,
+              K_green_waste_local = K_green_waste_local * 1000,
               
-              N_grey_bin_garden_waste = N_grey_bin_garden_waste,
-              P_grey_bin_garden_waste = P_grey_bin_garden_waste,
-              K_grey_bin_garden_waste = K_grey_bin_garden_waste,
+              N_grey_bin_garden_waste = N_grey_bin_garden_waste * 1000,
+              P_grey_bin_garden_waste = P_grey_bin_garden_waste * 1000,
+              K_grey_bin_garden_waste = K_grey_bin_garden_waste * 1000,
               
-              N_grey_bin_food_waste = N_grey_bin_food_waste,
-              P_grey_bin_food_waste = P_grey_bin_food_waste,
-              K_grey_bin_food_waste = K_grey_bin_food_waste))
+              N_grey_bin_food_waste = N_grey_bin_food_waste * 1000,
+              P_grey_bin_food_waste = P_grey_bin_food_waste * 1000,
+              K_grey_bin_food_waste = K_grey_bin_food_waste * 1000))
   
   
 }
