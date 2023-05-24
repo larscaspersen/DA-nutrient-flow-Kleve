@@ -36,6 +36,8 @@ input <- read.csv("data/input_all_uncertainty_classes.csv")
 #remove median values
 input$median <- NA
 
+
+return_alt_output <- FALSE
 #make_variables(as.estimate(input))
 
 
@@ -46,7 +48,7 @@ combined_function <- function() {
   # model_evaluation <- list()
 
   combined_output <- list()
-  
+  alt_output <- list()
   
   #draw values for manure_biogas, manure_export, manure_crop, crop_feed and crop_food
   scenario_allocate_crop_feed_a <- as.numeric(sn::rsn(n = 1, xi = xi_crop_feed, omega = omega_crop_feed, alpha = alpha_crop_feed) / 100)
@@ -764,19 +766,18 @@ combined_function <- function() {
       #----------------------------#
       ## LEVER: crop allocation ####
       #----------------------------#
+      
+      # see if the stakeholder crop allocation adds up to 1, otherwise correct
+      stakeholder_crop_allocation_total <- scenario_allocate_crop_biogas +
+        scenario_allocate_crop_feed + scenario_allocate_crop_food
+      
+      correction_factor <- 1 / stakeholder_crop_allocation_total
+      
+      scenario_allocate_crop_biogas_corrected <- scenario_allocate_crop_biogas * correction_factor
+      scenario_allocate_crop_feed_corrected <- scenario_allocate_crop_feed * correction_factor
+      scenario_allocate_crop_food_corrected <- scenario_allocate_crop_food * correction_factor
 
       if (crop_adjustment) {
-
-
-        # see if the stakeholder crop allocation adds up to 1, otherwise correct
-        stakeholder_crop_allocation_total <- scenario_allocate_crop_biogas +
-          scenario_allocate_crop_feed + scenario_allocate_crop_food
-
-        correction_factor <- 1 / stakeholder_crop_allocation_total
-
-        scenario_allocate_crop_biogas_corrected <- scenario_allocate_crop_biogas * correction_factor
-        scenario_allocate_crop_feed_corrected <- scenario_allocate_crop_feed * correction_factor
-        scenario_allocate_crop_food_corrected <- scenario_allocate_crop_food * correction_factor
 
 
         # in case of food and feed, these streams get later split, so calculate
@@ -925,16 +926,15 @@ combined_function <- function() {
       ## LEVER: herd composition ====
       #-----------------------------#
       
+      # calculate the current compostion of the animals
+      LLU_total <- LLU_cattle_2020 + LLU_pig_2020 + LLU_poultry_2020 + LLU_others_2020
+      current_share_cattle <- LLU_cattle_2020 / LLU_total
+      current_share_pig <- LLU_pig_2020 / LLU_total
+      current_share_poultry <- LLU_poultry_2020 / LLU_total
+      current_share_others <- LLU_others_2020 / LLU_total
+      
       if (herd_composition) {
         
-        # calculate the current compostion of the animals
-        LLU_total <- LLU_cattle_2020 + LLU_pig_2020 + LLU_poultry_2020 + LLU_others_2020
-        current_share_cattle <- LLU_cattle_2020 / LLU_total
-        current_share_pig <- LLU_pig_2020 / LLU_total
-        current_share_poultry <- LLU_poultry_2020 / LLU_total
-        current_share_others <- LLU_others_2020 / LLU_total
-
-
         # change the compostion of animals by percentage changes reported by farmers under local feed scenario
         # this needs to be done before local feed calculations, so that I don't have to redo them
         # for changed compostion
@@ -949,6 +949,11 @@ combined_function <- function() {
         scenario_share_pig_corrected <- scenario_share_pig * correction_factor
         scenario_share_poultry_corrected <- scenario_share_poultry * correction_factor
         scenario_share_others_corrected <- scenario_share_others * correction_factor
+        
+        current_share_cattle <- scenario_share_cattle_corrected
+        current_share_pig <- scenario_share_pig_corrected
+        current_share_poultry <- scenario_share_poultry_corrected
+        current_share_others <- scenario_share_others_corrected
 
         # change factor for local feed
         cf_cattle_local_feed <- scenario_share_cattle_corrected / current_share_cattle
@@ -1309,7 +1314,7 @@ combined_function <- function() {
           K_reduction_manure <- 0
         }
         
-        if (any(rf_local_feed < c(rf_local_feed_P, rf_local_feed_K))) {
+        if (any(rf_local_feed > c(rf_local_feed_P, rf_local_feed_K))) {
           
           # calculate how much less P or K the animals would excrete
           # make sure the reduction is not lower than 0
@@ -1619,20 +1624,20 @@ combined_function <- function() {
         K_feed_import <- 0
       }
       
+      # check if allocation of manure adds up to 1, otherwise correct like
+      # in crop land or animal composition
+      sum_scenario_manure_allocation <- scenario_allocate_manure_biogas + scenario_allocate_manure_crop + scenario_allocate_manure_export
+      correction_factor <- 1 / sum_scenario_manure_allocation
+      
+      # correct manure allocation values
+      scenario_allocate_manure_biogas_corrected <- scenario_allocate_manure_biogas * correction_factor
+      scenario_allocate_manure_crop_corrected <- scenario_allocate_manure_crop * correction_factor
+      scenario_allocate_manure_export_corrected <- scenario_allocate_manure_export * correction_factor
+      
       if (manure_adjustment) {
         #-------------------------------------------------#
         ## LEVER: Manure allocation ====
         #-------------------------------------------------#
-
-        # check if allocation of manure adds up to 1, otherwise correct like
-        # in crop land or animal composition
-        sum_scenario_manure_allocation <- scenario_allocate_manure_biogas + scenario_allocate_manure_crop + scenario_allocate_manure_export
-        correction_factor <- 1 / sum_scenario_manure_allocation
-
-        # correct manure allocation values
-        scenario_allocate_manure_biogas_corrected <- scenario_allocate_manure_biogas * correction_factor
-        scenario_allocate_manure_crop_corrected <- scenario_allocate_manure_crop * correction_factor
-        scenario_allocate_manure_export_corrected <- scenario_allocate_manure_export * correction_factor
 
         # take the manure after housing losses + manure import and calculate the streams directly
         
@@ -1834,7 +1839,8 @@ combined_function <- function() {
         lossrate_N_wastewater,
         lossrate_P_wastewater,
         lossrate_K_wastewater,
-        convert_potassium_oxide_to_k
+        convert_potassium_oxide_to_k,
+        convert_phosphorous_pentoxide_to_p
       )
       
       #-----------------#
@@ -1975,7 +1981,13 @@ combined_function <- function() {
       P_total_food_import <- P_dairy_and_egg_import + P_meat_import + P_vegetable_import
       K_total_food_import <- K_dairy_and_egg_import + K_meat_import + K_vegetable_import
 
-
+      
+      #import of animal products
+      N_animal_product_import <- N_dairy_and_egg_import + N_meat_import + consumption_output$consumed_N_fish
+      P_animal_product_import <- P_dairy_and_egg_import + P_meat_import + consumption_output$consumed_P_fish
+      K_animal_product_import <- K_dairy_and_egg_import + K_meat_import + consumption_output$consumed_K_fish
+      
+      
       # food exports (prevent negative exports if consumption exceeds the production)
 
       N_dairy_and_egg_export <- ifelse(((animal_output$N_egg_available - consumption_output$consumed_N_egg) + 
@@ -2249,18 +2261,45 @@ combined_function <- function() {
         scenario_allocate_crop_food_a = c(combined_output$scenario_allocate_crop_food_a, scenario_allocate_crop_food_a),
         scenario_allocate_manure_export_a = c(combined_output$scenario_allocate_manure_export_a, scenario_allocate_manure_export_a),
         scenario_allocate_manure_crop_a = c(combined_output$scenario_allocate_manure_crop_a, scenario_allocate_manure_crop_a),
-        scenario_allocate_manure_biogas_a = c(combined_output$scenario_allocate_manure_biogas_a, scenario_allocate_manure_biogas_a)
+        scenario_allocate_manure_biogas_a = c(combined_output$scenario_allocate_manure_biogas_a, scenario_allocate_manure_biogas_a),
+        import_animal_products_N = c(combined_output$import_animal_products_N, N_animal_product_import),
+        import_animal_products_P = c(combined_output$import_animal_products_P, P_animal_product_import),
+        import_animal_products_K = c(combined_output$import_animal_products_K, K_animal_product_import)
+      )
+      
+      
+      alt_output <- list(current_share_cattle = c(alt_output$current_share_cattle, current_share_cattle),
+                         current_share_pig = c(alt_output$current_share_pig, current_share_pig),
+                         current_share_poultry = c(alt_output$current_share_poultry, current_share_poultry),
+                         current_share_others = c(alt_output$current_share_others, current_share_others),
+                         reduction_LLU = c(alt_output$reduction_LLU, 1- rf_local_feed),
+                         manure_crop = c(alt_output$manure_crop, animal_output$N_manure_crop),
+                         manure_biogas = c(alt_output$manure_biogas, animal_output$N_manure_biogas),
+                         manure_export = c(alt_output$manure_export, animal_output$export_manure_N_kg),
+                         crop_biogas = c(alt_output$crop_biogas, crop_output$N_crop_biogas),
+                         local_crop_human = c(alt_output$local_crop_human, N_local_vegetal_products_consumed),
+                         crop_processed_feed = c(alt_output$crop_processed_feed, crop_output$N_crop_animal_feeding_processed),
+                         crop_unprocessed_feed = c(alt_output$crop_unprocessed_feed, crop_output$N_crop_animal_feeding_unprocessed),
+                         scenario_allocate_crop_biogas_corrected = c(alt_output$scenario_allocate_crop_biogas_corrected, scenario_allocate_crop_biogas_corrected),
+                         scenario_allocate_crop_feed_corrected = c(alt_output$scenario_allocate_crop_feed_corrected, scenario_allocate_crop_feed_corrected),
+                         scenario_allocate_crop_food_corrected = c(alt_output$scenario_allocate_crop_food_corrected, scenario_allocate_crop_food_corrected),
+                         scenario_allocate_manure_biogas_corrected = c(alt_output$scenario_allocate_manure_biogas_corrected, scenario_allocate_manure_biogas_corrected),
+                         scenario_allocate_manure_crop_corrected = c(alt_output$scenario_allocate_manure_crop_corrected, scenario_allocate_manure_crop_corrected),
+                         scenario_allocate_manure_export_corrected = c(alt_output$scenario_allocate_manure_export_corrected, scenario_allocate_manure_export_corrected),
+                         N_vegetable_export = c(alt_output$N_vegetable_export, N_vegetable_export)
+                         
+        
       )
     } # end of loop for different stakeholders answers
   } # end of the loop for the different scenarios   
   
-  combined_output$vegetal_biogas_substrate_N
-  combined_output$vegetal_biogas_substrate_P
-  combined_output$vegetal_biogas_substrate_K
-  
-  combined_output$local_vegetal_products_consumed_N
-  combined_output$local_vegetal_products_consumed_P
-  combined_output$local_vegetal_products_consumed_K
+  # combined_output$vegetal_biogas_substrate_N
+  # combined_output$vegetal_biogas_substrate_P
+  # combined_output$vegetal_biogas_substrate_K
+  # 
+  # combined_output$local_vegetal_products_consumed_N
+  # combined_output$local_vegetal_products_consumed_P
+  # combined_output$local_vegetal_products_consumed_K
 
   # amount of nutrients imported to the system
 
@@ -2557,7 +2596,12 @@ combined_function <- function() {
   #   scenario_allocate_manure_biogas_a = c(model_evaluation$scenario_allocate_manure_biogas_a, scenario_allocate_manure_biogas_a)
   # )
   
-  return(combined_output)
+  if(return_alt_output == FALSE){
+    return(combined_output)
+  } else{
+    return(alt_output)
+  }
+
 
 
   # if (return_flows) {
