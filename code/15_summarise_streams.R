@@ -50,11 +50,12 @@ diff_flows_long <- diff_flows_long %>%
 result_flows_long <- result_flows_long %>% 
   mutate(variable = substring(variable, 1, nchar(variable)-1))
 
-result_flows_long <- result_flows_long %>% 
-  filter(!variable %in% c("total_input", 'losses', "recycling_rate", "share_reuse_to_total_input", "use_efficiency"))
-
 results_indicators_long <- result_flows_long %>% 
   filter(variable %in% c("total_input", 'losses', "recycling_rate", "share_reuse_to_total_input", "use_efficiency"))
+
+
+result_flows_long <- result_flows_long %>% 
+  filter(!variable %in% c("total_input", 'losses', "recycling_rate", "share_reuse_to_total_input", "use_efficiency"))
 
 results_indicators_long$variable <- factor(results_indicators_long$variable, 
                                            levels = c("total_input", 'losses', "recycling_rate", "share_reuse_to_total_input", "use_efficiency"),
@@ -69,6 +70,16 @@ flow_sum <-  result_flows_long %>%
            share_neg = sum(value < 0) / n(),
            share_zero = sum(value == 0) / n())
 
+indicator_sum <- results_indicators_long %>% 
+  mutate(value = round (value / 1000, digits = 3)) %>% 
+  group_by(scenario, variable, nutrient) %>% 
+  summarise(quan_25 = quantile(value, probs = 0.25),
+            median = median(value),
+            quan_75 = quantile(value, probs = 0.75),
+            share_neg = sum(value < 0) / n(),
+            share_zero = sum(value == 0) / n())
+
+write.csv(indicator_sum, file = 'data/result_indicator_summarized.csv', row.names = F)
 write.csv(flow_sum, file = 'data/result_flow_summarized.csv', row.names = F)
 
 #remove the import egg and dairy and import meat
