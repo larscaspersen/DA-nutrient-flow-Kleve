@@ -62,6 +62,71 @@ ggplot(answers, aes(x = var, y = middle)) +
 #ggsave(filename = 'figures/stakeholder_answers.jpeg', device = 'jpeg', width = 20, height = 15, units = 'cm')
 
 
+answers <- read.csv('data/stakeholder_answers.csv')
+
+
+answers$stakeholder_group <- factor(answers$stakeholder_group,
+                                    levels = c('nature', 'waste', 'farming',
+                                               'science', 'food processing'),
+                                    labels = c('Nature Conservation',
+                                               'Waste Management',
+                                               'Farming',
+                                               'Research',
+                                               'Food Processing'))
+
+answers$var <- factor(answers$var, 
+                      levels = c('crop_biogas',
+                                  'crop_feed',
+                                  'crop_food',
+                                  'animal_reduction',
+                                  'cattle',
+                                  'pig',
+                                  'poultry',
+                                  'other',
+                                  'manure_biogas',
+                                  'manure_crop',
+                                 'manure_export'),
+                      labels = c('Biogas',
+                                 'Animal Feeding',
+                                 'Human Consumption',
+                                 'Total LLU',
+                                 'Cattle',
+                                 'Pig',
+                                 'Poultry',
+                                 'Other',
+                                 'Biogas',
+                                 'Field Application',
+                                 'Export'))
+
+answers$category <- factor(answers$category,
+                           levels = c('crop',
+                                      'manure',
+                                      'livestock_reduction',
+                                      'livestock_compostion'),
+                           labels = c('Allocation of crops to:',
+                                      'Allocation of manure to:',
+                                      'Reduction in Livestock Units (LLU)',
+                                      'Composition of Livestock Units'))
+
+unique(answers$category)
+
+unique(answers$var)
+
+library(ggtext)
+
+ggplot(answers, aes(x = var, y = middle)) + 
+  facet_wrap(~category, scales = 'free') +
+  geom_point(size = 0.001, col = 'white')+
+  geom_point(position=position_dodge(width=0.5), size = 1.5, aes(col = stakeholder_group)) +
+  geom_errorbar(aes(ymin=lower, ymax=upper, col = stakeholder_group), width=.2,
+                position=position_dodge(0.5))+
+  ylab('Stakeholder answers (%)') +
+  xlab('') +
+  theme_bw() +
+  labs(colour='Stakeholder Group')+
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1), 
+        axis.text = element_textbox_simple())
+
 
 
 #summarise stakeholder inpu median
@@ -105,8 +170,7 @@ ggplot(answers, aes(x = var, y = middle)) +
   labs(colour='Stakeholder Group')+
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
 
-
-#ggsave(filename = 'figures/stakeholder_answers_V2.jpeg', device = 'jpeg', width = 20, height = 15, units = 'cm')
+ggsave(filename = 'figures/stakeholder_answers_V2.jpeg', device = 'jpeg', width = 20, height = 15, units = 'cm')
 
 
 #----------------------------#
