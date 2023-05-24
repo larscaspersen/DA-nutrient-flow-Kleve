@@ -52,7 +52,8 @@ waste_function <- function( waste_water,
                             lossrate_N_wastewater,
                             lossrate_P_wastewater,
                             lossrate_K_wastewater,
-                            convert_potassium_oxide_to_k
+                            convert_potassium_oxide_to_k,
+                            convert_phosphorous_pentoxide_to_p
   
 ){
   
