@@ -3,7 +3,7 @@ library(tidyverse)
 library(ggridges)
 library(scales) #to have non-scientific numbers for the x and y axis
 
-plot_flows <- TRUE
+plot_flows <- FALSE
 
 #read saved runs for flows and for indicators
 result_flows <- readRDS('data/model_result_flows.rds')
@@ -31,13 +31,17 @@ result_flows <- do.call(rbind, result_flows)
 result_flows$scenario <- factor(result_flows$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted"),
        labels = c('Ref', 'PS', 'LBS' ,'CBS'))
 
+result_flows <- na.omit(result_flows)
+
+result_flows$run <- rep(rep(1:10000), length(unique(result_flows$scenario)))
+
 diff_flows_df$scenario <- factor(diff_flows_df$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted"),
        labels = c('Ref', 'PS', 'LBS' ,'CBS'))
 
 
 
 #bring results in long format, bring differences in long format
-result_flows_long <- reshape2::melt(result_flows, id.var = 'scenario')
+result_flows_long <- reshape2::melt(result_flows, id.var = c('scenario', 'run'))
 diff_flows_long <- reshape::melt(diff_flows_df, id.var = 'scenario')
 
 
@@ -46,10 +50,32 @@ diff_flows_long <- na.omit(diff_flows_long)
 
 
 
+result_flows_long <- result_flows_long %>% 
+  mutate(variable = recode(variable, 
+                           import_organic_N_nonanimal = 'import_organic_nonanimal_N',
+                           import_organic_P_nonanimal = 'import_organic_nonanimal_P',
+                           import_organic_K_nonanimal = 'import_organic_nonanimal_K'))
+#--> have to bring them into the right format
+
+
+
+write.csv(result_flows, 'data/result_flows_new.csv', row.names = FALSE)
+
+
+
+
 if(plot_flows){
   #visualisation for individual flows
   
   #melt combined outputs
+  
+  #remove old files
+  # unlink('figures/flows/distributions/boring_streams/')
+  f1 <- list.files('figures/flows/distributions/', full.names = TRUE)
+  f2 <- list.files('figures/flows/distributions/boring_streams/', full.names = TRUE)
+  f3 <- list.files('figures/flows/distribution_difference_baseline/', full.names = TRUE)
+  f4 <- list.files('figures/flows/distribution_difference_baseline/boring_streams/', full.names = TRUE)
+  unlink(c(f1,f2,f3,f4)) 
 
   
   boring_streams <- c('animal_housing_and_storage_losses_K','animal_housing_and_storage_losses_P',
@@ -205,6 +231,23 @@ diff_flows_long <- diff_flows_long %>%
 result_flows_long <- result_flows_long %>% 
   mutate(variable = substring(variable, 1, nchar(variable)-1))
 
+
+
+
+result_flow_reshaped <- reshape2::dcast(result_flows_long, variable + run ~ scenario + nutrient, value.var = 'value')
+result_flow_reshaped_list <- split(result_flow_reshaped, result_flow_reshaped$variable)
+
+for(i in 1:length(result_flow_reshaped_list)){
+  fname <- paste0('data/individual_flows/', names(result_flow_reshaped_list)[i],'.csv')
+  write.csv(result_flow_reshaped_list[[i]], file = fname, row.names = FALSE)
+}
+
+
+
+
+
+
+
 results_indicators_long <- result_flows_long %>% 
   filter(variable %in% c("total_input", 'losses', "recycling_rate", "share_reuse_to_total_input", "use_efficiency"))
 
@@ -212,15 +255,29 @@ results_indicators_long$variable <- factor(results_indicators_long$variable,
                                            levels = c("total_input", 'losses', "recycling_rate", "share_reuse_to_total_input", "use_efficiency"),
                                            labels = c('Total Input', 'Losses', 'Recycling Rate', 'Reuse to Total Input', 'Use Efficiency'))
 
+library(patchwork)
+design <- "
+112
+333
+"   
 
+
+#color palette for color blind people
+cbp1 <- c("#999999", "#E69F00", "#56B4E9", "#009E73",
+          "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
 
 
 #indicators: make two seperatre plots with SHARED y axis:
 p1.1 <- results_indicators_long %>% 
   filter(nutrient == 'N', variable %in% c('Recycling Rate', 'Reuse to Total Input', 'Use Efficiency')) %>%
+  filter(value >= 0) %>% 
   na.omit() %>% 
   ggplot(aes(x = scenario, y = value, fill = scenario)) +
   geom_boxplot(outlier.alpha = 0.1) +
+  scale_fill_manual(name = "Modelled Scenario", 
+                    labels = c("Reference Year 2020", "Participatory Scenario", 
+                               "Crop Buffered Scenario", "Livestock Buffered Scenario"),
+                    values=cbp1) +
   ylab('Circularity indicator (%)') +
   xlab('')+
   ylim(0,100)+
@@ -232,16 +289,19 @@ p1.1 <- results_indicators_long %>%
 
 p1.2 <- results_indicators_long %>% 
   filter(nutrient == 'N', variable %in% c('Total Input', 'Losses')) %>%
+  filter(value >= 0) %>% 
+  mutate(value = floor(value / 1000)) %>% 
   na.omit() %>% 
-  mutate(value = value / 1000) %>% 
   ggplot(aes(x = scenario, y = value, fill = scenario)) +
   geom_boxplot(outlier.alpha = 0.1) +
-  ylab('Circularity indicator (t N)') +
+  ylab(bquote('Circularity indicator (t N'~year^-1*')')) +
   xlab('')+
-  scale_fill_discrete(name = "Modelled Scenario", 
+  scale_fill_manual(name = "Modelled Scenario", 
                       labels = c("Reference Year 2020", "Participatory Scenario", 
-                                 "Crob Buffered Scenario", "Livestock Buffered Scenario")) +
+                                 "Crop Buffered Scenario", "Livestock Buffered Scenario"),
+                      values=cbp1) +
   scale_y_continuous(labels = scales::comma)+
+  expand_limits(y=0)+
   facet_wrap(~variable) + 
   theme_bw(base_size = 15) +
   theme(
@@ -249,11 +309,7 @@ p1.2 <- results_indicators_long %>%
     axis.ticks.x=element_blank()
     )
 
-library(patchwork)
-design <- "
-112
-333
-"   
+
 p1 <- p1.2 + guide_area() + p1.1  + plot_layout(design=design, guides = "collect") 
 
 #p1 <- (((p1.2  | plot_spacer()) + plot_layout(widths = c(2,1))) / p1.1) + plot_layout(guides = 'collect')
@@ -263,9 +319,14 @@ p1 <- p1.2 + guide_area() + p1.1  + plot_layout(design=design, guides = "collect
 
 p2.1 <- results_indicators_long %>% 
   filter(nutrient == 'P', variable %in% c('Recycling Rate', 'Reuse to Total Input', 'Use Efficiency')) %>%
+  filter(value >= 0) %>% 
   na.omit() %>% 
   ggplot(aes(x = scenario, y = value, fill = scenario)) +
   geom_boxplot(outlier.alpha = 0.1) +
+  scale_fill_manual(name = "Modelled Scenario", 
+                    labels = c("Reference Year 2020", "Participatory Scenario", 
+                               "Crop Buffered Scenario", "Livestock Buffered Scenario"),
+                    values=cbp1) +
   ylab('Circularity indicator (%)') +
   xlab('')+
   ylim(0,100)+
@@ -278,15 +339,18 @@ p2.1 <- results_indicators_long %>%
 
 p2.2 <- results_indicators_long %>% 
   filter(nutrient == 'P', variable %in% c('Total Input', 'Losses')) %>%
+  filter(value >= 0) %>% 
   na.omit() %>% 
   mutate(value = value / 1000) %>% 
   ggplot(aes(x = scenario, y = value, fill = scenario)) +
   geom_boxplot(outlier.alpha = 0.1) +
-  ylab('Circularity indicator (t P)') +
+  ylab(bquote('Circularity indicator (t P'~year^-1*')')) +
   xlab('')+
-  scale_fill_discrete(name = "Modelled Scenario", 
+  expand_limits(y=0)+
+  scale_fill_manual(name = "Modelled Scenario", 
                       labels = c("Reference Year 2020", "Participatory Scenario", 
-                                 "Crob Buffered Scenario", "Livestock Buffered Scenario")) +
+                                 "Crop Buffered Scenario", "Livestock Buffered Scenario"),
+                      values=cbp1) +
   scale_y_continuous(labels = scales::comma)+
   facet_wrap(~variable) + 
   theme_bw(base_size = 15) +
@@ -297,9 +361,14 @@ p2 <- p2.2 + guide_area() + p2.1  + plot_layout(design=design, guides = "collect
 
 p3.1 <- results_indicators_long %>% 
   filter(nutrient == 'K', variable %in% c('Recycling Rate', 'Reuse to Total Input', 'Use Efficiency')) %>%
+  filter(value >= 0) %>% 
   na.omit() %>% 
   ggplot(aes(x = scenario, y = value, fill = scenario)) +
   geom_boxplot(outlier.alpha = 0.1) +
+  scale_fill_manual(name = "Modelled Scenario", 
+                    labels = c("Reference Year 2020", "Participatory Scenario", 
+                               "Crop Buffered Scenario", "Livestock Buffered Scenario"),
+                    values=cbp1) +
   ylab('Circularity indicator (%)') +
   xlab('')+
   ylim(0,100)+
@@ -312,15 +381,18 @@ p3.1 <- results_indicators_long %>%
 
 p3.2 <- results_indicators_long %>% 
   filter(nutrient == 'K', variable %in% c('Total Input', 'Losses')) %>%
-  na.omit() %>% 
+  filter(value >= 0) %>% 
   mutate(value = value / 1000) %>% 
+  na.omit() %>% 
   ggplot(aes(x = scenario, y = value, fill = scenario)) +
   geom_boxplot(outlier.alpha = 0.1) +
-  ylab('Circularity indicator (t K)') +
-  scale_fill_discrete(name = "Modelled Scenario", 
+  ylab(bquote('Circularity indicator (t K'~year^-1*')')) +
+  scale_fill_manual(name = "Modelled Scenario", 
                       labels = c("Reference Year 2020", "Participatory Scenario", 
-                                 "Crob Buffered Scenario", "Livestock Buffered Scenario")) +
+                                 "Crop Buffered Scenario", "Livestock Buffered Scenario"),
+                      values=cbp1) +
   xlab('')+
+  expand_limits(y=0)+
   scale_y_continuous(labels = scales::comma)+
   facet_wrap(~variable) + 
   theme_bw(base_size = 15) +
@@ -328,6 +400,582 @@ p3.2 <- results_indicators_long %>%
             axis.ticks.x=element_blank()
   )
 p3 <- p3.2 + guide_area() + p3.1  + plot_layout(design=design, guides = "collect") 
+
+
+ggsave(p1, filename = 'figures/boxplot_indicators_N.jpeg', device = 'jpeg', width = 22, height = 17, units = 'cm')
+ggsave(p2, filename = 'figures/boxplot_indicators_P.jpeg', device = 'jpeg', width = 22, height = 17, units = 'cm')
+ggsave(p3, filename = 'figures/boxplot_indicators_K.jpeg', device = 'jpeg', width = 22, height = 17, units = 'cm')
+
+
+
+#same boxplot with patterns
+library(ggpattern)
+
+pattern_choice <- c('gray100', 'left30',
+                    'rightshingle', 'gray50')
+
+p1.1 <- results_indicators_long %>% 
+  filter(nutrient == 'N', variable %in% c('Recycling Rate', 'Reuse to Total Input', 'Use Efficiency')) %>%
+  filter(value >= 0) %>% 
+  na.omit() %>% 
+  ggplot(aes(x = scenario, y = value, fill = scenario)) +
+  geom_boxplot_pattern(aes(pattern_type = scenario),
+                       pattern              = 'magick',
+                       pattern_fill         = 'black',
+                       pattern_aspect_ratio = 1.75,
+                       fill                 = 'white',
+                       colour               = 'black',
+                       outlier.alpha = 0.1) +
+  ylab('Circularity indicator (%)') +
+  xlab('')+
+  ylim(0,100)+
+  facet_wrap(~variable) + 
+  scale_pattern_type_discrete(choices = pattern_choice) +
+  theme_bw(base_size = 15) +
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        legend.position="none")
+
+p1.2 <- results_indicators_long %>% 
+  filter(nutrient == 'N', variable %in% c('Total Input', 'Losses')) %>%
+  filter(value >= 0) %>% 
+  mutate(value = floor(value / 1000)) %>% 
+  na.omit() %>% 
+  ggplot(aes(x = scenario, y = value, fill = scenario)) +
+  geom_boxplot_pattern(aes(pattern_type = scenario),
+                       pattern              = 'magick',
+                       pattern_fill         = 'black',
+                       pattern_aspect_ratio = 1.75,
+                       fill                 = 'white',
+                       colour               = 'black',
+                       outlier.alpha = 0.1) +
+  ylab(bquote('Circularity indicator (t N'~year^-1*')')) +
+  xlab('')+
+  scale_pattern_type_discrete(choices = pattern_choice,
+                              name = "Modelled Scenario", 
+                              labels = c("Reference Year 2020", "Participatory Scenario", 
+                                         "Crop Buffered Scenario", "Livestock Buffered Scenario")) +
+  scale_y_continuous(labels = scales::comma)+
+  expand_limits(y=0)+
+  facet_wrap(~variable) + 
+  theme_bw(base_size = 15) +
+  theme(
+    axis.text.x=element_blank(),
+    axis.ticks.x=element_blank()
+  )
+
+
+p1 <- p1.2 + guide_area() + p1.1  + plot_layout(design=design, guides = "collect") 
+
+#p1 <- (((p1.2  | plot_spacer()) + plot_layout(widths = c(2,1))) / p1.1) + plot_layout(guides = 'collect')
+
+
+
+
+p2.1 <- results_indicators_long %>% 
+  filter(nutrient == 'P', variable %in% c('Recycling Rate', 'Reuse to Total Input', 'Use Efficiency')) %>%
+  filter(value >= 0) %>% 
+  na.omit() %>% 
+  ggplot(aes(x = scenario, y = value, fill = scenario)) +
+  geom_boxplot_pattern(aes(pattern_type = scenario),
+                       pattern              = 'magick',
+                       pattern_fill         = 'black',
+                       pattern_aspect_ratio = 1.75,
+                       fill                 = 'white',
+                       colour               = 'black',
+                       outlier.alpha = 0.1) +
+  scale_pattern_type_discrete(choices = pattern_choice,
+                              name = "Modelled Scenario", 
+                              labels = c("Reference Year 2020", "Participatory Scenario", 
+                                         "Crop Buffered Scenario", "Livestock Buffered Scenario")) +
+  ylab('Circularity indicator (%)') +
+  xlab('')+
+  ylim(0,100)+
+  facet_wrap(~variable) + 
+  theme_bw(base_size = 15) +
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        legend.position="none")
+
+
+p2.2 <- results_indicators_long %>% 
+  filter(nutrient == 'P', variable %in% c('Total Input', 'Losses')) %>%
+  filter(value >= 0) %>% 
+  na.omit() %>% 
+  mutate(value = value / 1000) %>% 
+  ggplot(aes(x = scenario, y = value, fill = scenario)) +
+  geom_boxplot_pattern(aes(pattern_type = scenario),
+                       pattern              = 'magick',
+                       pattern_fill         = 'black',
+                       pattern_aspect_ratio = 1.75,
+                       fill                 = 'white',
+                       colour               = 'black',
+                       outlier.alpha = 0.1) +
+  ylab(bquote('Circularity indicator (t P'~year^-1*')')) +
+  xlab('')+
+  expand_limits(y=0)+
+  scale_pattern_type_discrete(choices = pattern_choice,
+                              name = "Modelled Scenario", 
+                              labels = c("Reference Year 2020", "Participatory Scenario", 
+                                         "Crop Buffered Scenario", "Livestock Buffered Scenario")) +
+  scale_y_continuous(labels = scales::comma)+
+  facet_wrap(~variable) + 
+  theme_bw(base_size = 15) +
+  theme(    axis.text.x=element_blank(),
+            axis.ticks.x=element_blank()
+  )
+p2 <- p2.2 + guide_area() + p2.1  + plot_layout(design=design, guides = "collect") 
+
+p3.1 <- results_indicators_long %>% 
+  filter(nutrient == 'K', variable %in% c('Recycling Rate', 'Reuse to Total Input', 'Use Efficiency')) %>%
+  filter(value >= 0) %>% 
+  na.omit() %>% 
+  ggplot(aes(x = scenario, y = value, fill = scenario)) +
+  geom_boxplot_pattern(aes(pattern_type = scenario),
+                       pattern              = 'magick',
+                       pattern_fill         = 'black',
+                       pattern_aspect_ratio = 1.75,
+                       fill                 = 'white',
+                       colour               = 'black',
+                       outlier.alpha = 0.1) +
+  scale_pattern_type_discrete(choices = pattern_choice,
+                              name = "Modelled Scenario", 
+                              labels = c("Reference Year 2020", "Participatory Scenario", 
+                                         "Crop Buffered Scenario", "Livestock Buffered Scenario")) +
+  ylab('Circularity indicator (%)') +
+  xlab('')+
+  ylim(0,100)+
+  facet_wrap(~variable) + 
+  theme_bw(base_size = 15) +
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        legend.position="none")
+
+
+p3.2 <- results_indicators_long %>% 
+  filter(nutrient == 'K', variable %in% c('Total Input', 'Losses')) %>%
+  filter(value >= 0) %>% 
+  mutate(value = value / 1000) %>% 
+  na.omit() %>% 
+  ggplot(aes(x = scenario, y = value, fill = scenario)) +
+  geom_boxplot_pattern(aes(pattern_type = scenario),
+                       pattern              = 'magick',
+                       pattern_fill         = 'black',
+                       pattern_aspect_ratio = 1.75,
+                       fill                 = 'white',
+                       colour               = 'black',
+                       outlier.alpha = 0.1) +
+  ylab(bquote('Circularity indicator (t K'~year^-1*')')) +
+  scale_pattern_type_discrete(choices = pattern_choice,
+                              name = "Modelled Scenario", 
+                              labels = c("Reference Year 2020", "Participatory Scenario", 
+                                         "Crop Buffered Scenario", "Livestock Buffered Scenario")) +
+  xlab('')+
+  expand_limits(y=0)+
+  scale_y_continuous(labels = scales::comma)+
+  facet_wrap(~variable) + 
+  theme_bw(base_size = 15) +
+  theme(    axis.text.x=element_blank(),
+            axis.ticks.x=element_blank()
+  )
+p3 <- p3.2 + guide_area() + p3.1  + plot_layout(design=design, guides = "collect") 
+
+
+ggsave(p1, filename = 'figures/boxplot_indicators_N_pattern.jpeg', device = 'jpeg', width = 22, height = 17, units = 'cm')
+ggsave(p2, filename = 'figures/boxplot_indicators_P_pattern.jpeg', device = 'jpeg', width = 22, height = 17, units = 'cm')
+ggsave(p3, filename = 'figures/boxplot_indicators_K_pattern.jpeg', device = 'jpeg', width = 22, height = 17, units = 'cm')
+
+
+
+
+
+
+#now make barplots
+p1.1 <- results_indicators_long %>% 
+  filter(nutrient == 'N', variable %in% c('Recycling Rate', 'Reuse to Total Input', 'Use Efficiency')) %>%
+  filter(value >= 0) %>% 
+  group_by(scenario, variable) %>% 
+  summarise(median = median(value),
+            q_16 = quantile(value, probs = 0.16),
+            q_84 = quantile(value, probs = 0.84)) %>% 
+  na.omit() %>% 
+  ggplot(aes(x = scenario, y = median, fill = scenario)) +
+  geom_bar_pattern(aes(pattern_type = scenario),
+                       pattern              = 'magick',
+                       pattern_fill         = 'black',
+                       pattern_aspect_ratio = 1.75,
+                       fill                 = 'white',
+                       colour               = 'black',
+                   stat = 'identity') +
+  geom_errorbar(aes(ymin = q_16, ymax = q_84),
+                width = 0.5)+
+  ylab('Circularity indicator (%)') +
+  xlab('')+
+  ylim(0,100)+
+  facet_wrap(~variable) + 
+  scale_pattern_type_discrete(choices = pattern_choice) +
+  theme_bw(base_size = 15) +
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        legend.position="none")
+
+p1.2 <- results_indicators_long %>% 
+  filter(nutrient == 'N', variable %in% c('Total Input', 'Losses')) %>%
+  filter(value >= 0) %>% 
+  mutate(value = floor(value / 1000)) %>% 
+  group_by(scenario, variable) %>% 
+  summarise(median = median(value),
+            q_16 = quantile(value, probs = 0.16),
+            q_84 = quantile(value, probs = 0.84)) %>% 
+  na.omit() %>% 
+  ggplot(aes(x = scenario, y = median, fill = scenario)) +
+  geom_bar_pattern(aes(pattern_type = scenario),
+                   pattern              = 'magick',
+                   pattern_fill         = 'black',
+                   pattern_aspect_ratio = 1.75,
+                   fill                 = 'white',
+                   colour               = 'black',
+                   stat = 'identity') +
+  geom_errorbar(aes(ymin = q_16, ymax = q_84),
+                width = 0.5)+
+  ylab(bquote('Circularity indicator (t N'~year^-1*')')) +
+  xlab('')+
+  scale_pattern_type_discrete(choices = pattern_choice,
+                              name = "Modelled Scenario", 
+                              labels = c("Reference Year 2020", "Participatory Scenario", 
+                                         "Crop Buffered Scenario", "Livestock Buffered Scenario")) +
+  scale_y_continuous(labels = scales::comma)+
+  expand_limits(y=0)+
+  facet_wrap(~variable) + 
+  theme_bw(base_size = 15) +
+  theme(
+    axis.text.x=element_blank(),
+    axis.ticks.x=element_blank()
+  )
+
+
+p1 <- p1.2 + guide_area() + p1.1  + plot_layout(design=design, guides = "collect")
+
+
+p2.1 <- results_indicators_long %>% 
+  filter(nutrient == 'P', variable %in% c('Recycling Rate', 'Reuse to Total Input', 'Use Efficiency')) %>%
+  filter(value >= 0) %>% 
+  group_by(scenario, variable) %>% 
+  summarise(median = median(value),
+            q_16 = quantile(value, probs = 0.16),
+            q_84 = quantile(value, probs = 0.84)) %>% 
+  na.omit() %>% 
+  ggplot(aes(x = scenario, y = median, fill = scenario)) +
+  geom_bar_pattern(aes(pattern_type = scenario),
+                   pattern              = 'magick',
+                   pattern_fill         = 'black',
+                   pattern_aspect_ratio = 1.75,
+                   fill                 = 'white',
+                   colour               = 'black',
+                   stat = 'identity') +
+  geom_errorbar(aes(ymin = q_16, ymax = q_84),
+                width = 0.5)+
+  ylab('Circularity indicator (%)') +
+  xlab('')+
+  ylim(0,100)+
+  facet_wrap(~variable) + 
+  scale_pattern_type_discrete(choices = pattern_choice) +
+  theme_bw(base_size = 15) +
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        legend.position="none")
+
+p2.2 <- results_indicators_long %>% 
+  filter(nutrient == 'P', variable %in% c('Total Input', 'Losses')) %>%
+  filter(value >= 0) %>% 
+  mutate(value = floor(value / 1000)) %>% 
+  group_by(scenario, variable) %>% 
+  summarise(median = median(value),
+            q_16 = quantile(value, probs = 0.16),
+            q_84 = quantile(value, probs = 0.84)) %>% 
+  na.omit() %>% 
+  ggplot(aes(x = scenario, y = median, fill = scenario)) +
+  geom_bar_pattern(aes(pattern_type = scenario),
+                   pattern              = 'magick',
+                   pattern_fill         = 'black',
+                   pattern_aspect_ratio = 1.75,
+                   fill                 = 'white',
+                   colour               = 'black',
+                   stat = 'identity') +
+  geom_errorbar(aes(ymin = q_16, ymax = q_84),
+                width = 0.5)+
+  ylab(bquote('Circularity indicator (t P'~year^-1*')')) +
+  xlab('')+
+  scale_pattern_type_discrete(choices = pattern_choice,
+                              name = "Modelled Scenario", 
+                              labels = c("Reference Year 2020", "Participatory Scenario", 
+                                         "Crop Buffered Scenario", "Livestock Buffered Scenario")) +
+  scale_y_continuous(labels = scales::comma)+
+  expand_limits(y=0)+
+  facet_wrap(~variable) + 
+  theme_bw(base_size = 15) +
+  theme(
+    axis.text.x=element_blank(),
+    axis.ticks.x=element_blank()
+  )
+
+
+p2 <- p2.2 + guide_area() + p2.1  + plot_layout(design=design, guides = "collect")
+
+
+p3.1 <- results_indicators_long %>% 
+  filter(nutrient == 'K', variable %in% c('Recycling Rate', 'Reuse to Total Input', 'Use Efficiency')) %>%
+  filter(value >= 0) %>% 
+  group_by(scenario, variable) %>% 
+  summarise(median = median(value),
+            q_16 = quantile(value, probs = 0.16),
+            q_84 = quantile(value, probs = 0.84)) %>% 
+  na.omit() %>% 
+  ggplot(aes(x = scenario, y = median, fill = scenario)) +
+  geom_bar_pattern(aes(pattern_type = scenario),
+                   pattern              = 'magick',
+                   pattern_fill         = 'black',
+                   pattern_aspect_ratio = 1.75,
+                   fill                 = 'white',
+                   colour               = 'black',
+                   stat = 'identity') +
+  geom_errorbar(aes(ymin = q_16, ymax = q_84),
+                width = 0.5)+
+  ylab('Circularity indicator (%)') +
+  xlab('')+
+  ylim(0,100)+
+  facet_wrap(~variable) + 
+  scale_pattern_type_discrete(choices = pattern_choice) +
+  theme_bw(base_size = 15) +
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        legend.position="none")
+
+p3.2 <- results_indicators_long %>% 
+  filter(nutrient == 'K', variable %in% c('Total Input', 'Losses')) %>%
+  filter(value >= 0) %>% 
+  mutate(value = floor(value / 1000)) %>% 
+  group_by(scenario, variable) %>% 
+  summarise(median = median(value),
+            q_16 = quantile(value, probs = 0.16),
+            q_84 = quantile(value, probs = 0.84)) %>% 
+  na.omit() %>% 
+  ggplot(aes(x = scenario, y = median, fill = scenario)) +
+  geom_bar_pattern(aes(pattern_type = scenario),
+                   pattern              = 'magick',
+                   pattern_fill         = 'black',
+                   pattern_aspect_ratio = 1.75,
+                   fill                 = 'white',
+                   colour               = 'black',
+                   stat = 'identity') +
+  geom_errorbar(aes(ymin = q_16, ymax = q_84),
+                width = 0.5)+
+  ylab(bquote('Circularity indicator (t K'~year^-1*')')) +
+  xlab('')+
+  scale_pattern_type_discrete(choices = pattern_choice,
+                              name = "Modelled Scenario", 
+                              labels = c("Reference Year 2020", "Participatory Scenario", 
+                                         "Crop Buffered Scenario", "Livestock Buffered Scenario")) +
+  scale_y_continuous(labels = scales::comma)+
+  expand_limits(y=0)+
+  facet_wrap(~variable) + 
+  theme_bw(base_size = 15) +
+  theme(
+    axis.text.x=element_blank(),
+    axis.ticks.x=element_blank()
+  )
+
+
+p3 <- p3.2 + guide_area() + p3.1  + plot_layout(design=design, guides = "collect")
+
+ggsave(p1, filename = 'figures/barplot_indicators_N_pattern.jpeg', device = 'jpeg', width = 22, height = 17, units = 'cm')
+ggsave(p2, filename = 'figures/barplot_indicators_P_pattern.jpeg', device = 'jpeg', width = 22, height = 17, units = 'cm')
+ggsave(p3, filename = 'figures/barplot_indicators_K_pattern.jpeg', device = 'jpeg', width = 22, height = 17, units = 'cm')
+
+
+
+
+p1.1 <- results_indicators_long %>% 
+  filter(nutrient == 'N', variable %in% c('Recycling Rate', 'Reuse to Total Input', 'Use Efficiency')) %>%
+  filter(value >= 0) %>% 
+  group_by(scenario, variable) %>% 
+  summarise(median = median(value),
+            q_16 = quantile(value, probs = 0.16),
+            q_84 = quantile(value, probs = 0.84)) %>% 
+  na.omit() %>% 
+  ggplot(aes(x = scenario, y = median, fill = scenario)) +
+  geom_bar(aes(fill = scenario),
+                   stat = 'identity', col = 'black') +
+  geom_errorbar(aes(ymin = q_16, ymax = q_84),
+                width = 0.5)+
+  ylab('Circularity indicator (%)') +
+  xlab('')+
+  ylim(0,100)+
+  facet_wrap(~variable) + 
+  scale_fill_manual(name = "Modelled Scenario", 
+                    labels = c("Reference Year 2020", "Participatory Scenario", 
+                               "Crop Buffered Scenario", "Livestock Buffered Scenario"),
+                    values=cbp1) +
+  theme_bw(base_size = 15) +
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        legend.position="none")
+
+p1.2 <- results_indicators_long %>% 
+  filter(nutrient == 'N', variable %in% c('Total Input', 'Losses')) %>%
+  filter(value >= 0) %>% 
+  mutate(value = floor(value / 1000)) %>% 
+  group_by(scenario, variable) %>% 
+  summarise(median = median(value),
+            q_16 = quantile(value, probs = 0.16),
+            q_84 = quantile(value, probs = 0.84)) %>% 
+  na.omit() %>% 
+  ggplot(aes(x = scenario, y = median, fill = scenario)) +
+  geom_bar(aes(fill = scenario),
+           stat = 'identity', col = 'black') +
+  geom_errorbar(aes(ymin = q_16, ymax = q_84),
+                width = 0.5)+
+  ylab(bquote('Circularity indicator (t N'~year^-1*')')) +
+  xlab('')+
+  scale_fill_manual(name = "Modelled Scenario", 
+                    labels = c("Reference Year 2020", "Participatory Scenario", 
+                               "Crop Buffered Scenario", "Livestock Buffered Scenario"),
+                    values=cbp1) +
+  scale_y_continuous(labels = scales::comma)+
+  expand_limits(y=0)+
+  facet_wrap(~variable) + 
+  theme_bw(base_size = 15) +
+  theme(
+    axis.text.x=element_blank(),
+    axis.ticks.x=element_blank()
+  )
+
+
+p1 <- p1.2 + guide_area() + p1.1  + plot_layout(design=design, guides = "collect")
+
+
+p2.1 <- results_indicators_long %>% 
+  filter(nutrient == 'P', variable %in% c('Recycling Rate', 'Reuse to Total Input', 'Use Efficiency')) %>%
+  filter(value >= 0) %>% 
+  group_by(scenario, variable) %>% 
+  summarise(median = median(value),
+            q_16 = quantile(value, probs = 0.16),
+            q_84 = quantile(value, probs = 0.84)) %>% 
+  na.omit() %>% 
+  ggplot(aes(x = scenario, y = median, fill = scenario)) +
+  geom_bar(aes(fill = scenario),
+           stat = 'identity', col = 'black') +
+  geom_errorbar(aes(ymin = q_16, ymax = q_84),
+                width = 0.5)+
+  ylab('Circularity indicator (%)') +
+  xlab('')+
+  ylim(0,100)+
+  facet_wrap(~variable) + 
+  scale_fill_manual(name = "Modelled Scenario", 
+                    labels = c("Reference Year 2020", "Participatory Scenario", 
+                               "Crop Buffered Scenario", "Livestock Buffered Scenario"),
+                    values=cbp1) +
+  theme_bw(base_size = 15) +
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        legend.position="none")
+
+p2.2 <- results_indicators_long %>% 
+  filter(nutrient == 'P', variable %in% c('Total Input', 'Losses')) %>%
+  filter(value >= 0) %>% 
+  mutate(value = floor(value / 1000)) %>% 
+  group_by(scenario, variable) %>% 
+  summarise(median = median(value),
+            q_16 = quantile(value, probs = 0.16),
+            q_84 = quantile(value, probs = 0.84)) %>% 
+  na.omit() %>% 
+  ggplot(aes(x = scenario, y = median, fill = scenario)) +
+  geom_bar(aes(fill = scenario),
+           stat = 'identity', col = 'black') +
+  geom_errorbar(aes(ymin = q_16, ymax = q_84),
+                width = 0.5)+
+  ylab(bquote('Circularity indicator (t P'~year^-1*')')) +
+  xlab('')+
+  scale_fill_manual(name = "Modelled Scenario", 
+                    labels = c("Reference Year 2020", "Participatory Scenario", 
+                               "Crop Buffered Scenario", "Livestock Buffered Scenario"),
+                    values=cbp1) +
+  scale_y_continuous(labels = scales::comma)+
+  expand_limits(y=0)+
+  facet_wrap(~variable) + 
+  theme_bw(base_size = 15) +
+  theme(
+    axis.text.x=element_blank(),
+    axis.ticks.x=element_blank()
+  )
+
+
+p2 <- p2.2 + guide_area() + p2.1  + plot_layout(design=design, guides = "collect")
+
+
+p3.1 <- results_indicators_long %>% 
+  filter(nutrient == 'K', variable %in% c('Recycling Rate', 'Reuse to Total Input', 'Use Efficiency')) %>%
+  filter(value >= 0) %>% 
+  group_by(scenario, variable) %>% 
+  summarise(median = median(value),
+            q_16 = quantile(value, probs = 0.16),
+            q_84 = quantile(value, probs = 0.84)) %>% 
+  na.omit() %>% 
+  ggplot(aes(x = scenario, y = median, fill = scenario)) +
+  geom_bar(aes(fill = scenario),
+           stat = 'identity', col = 'black') +
+  geom_errorbar(aes(ymin = q_16, ymax = q_84),
+                width = 0.5)+
+  ylab('Circularity indicator (%)') +
+  xlab('')+
+  ylim(0,100)+
+  facet_wrap(~variable) + 
+  scale_fill_manual(name = "Modelled Scenario", 
+                    labels = c("Reference Year 2020", "Participatory Scenario", 
+                               "Crop Buffered Scenario", "Livestock Buffered Scenario"),
+                    values=cbp1) +
+  theme_bw(base_size = 15) +
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        legend.position="none")
+
+p3.2 <- results_indicators_long %>% 
+  filter(nutrient == 'K', variable %in% c('Total Input', 'Losses')) %>%
+  filter(value >= 0) %>% 
+  mutate(value = floor(value / 1000)) %>% 
+  group_by(scenario, variable) %>% 
+  summarise(median = median(value),
+            q_16 = quantile(value, probs = 0.16),
+            q_84 = quantile(value, probs = 0.84)) %>% 
+  na.omit() %>% 
+  ggplot(aes(x = scenario, y = median, fill = scenario)) +
+  geom_bar(aes(fill = scenario),
+           stat = 'identity', col = 'black') +
+  geom_errorbar(aes(ymin = q_16, ymax = q_84),
+                width = 0.5)+
+  ylab(bquote('Circularity indicator (t K'~year^-1*')')) +
+  xlab('')+
+  scale_fill_manual(name = "Modelled Scenario", 
+                    labels = c("Reference Year 2020", "Participatory Scenario", 
+                               "Crop Buffered Scenario", "Livestock Buffered Scenario"),
+                    values=cbp1) +
+  scale_y_continuous(labels = scales::comma)+
+  expand_limits(y=0)+
+  facet_wrap(~variable) + 
+  theme_bw(base_size = 15) +
+  theme(
+    axis.text.x=element_blank(),
+    axis.ticks.x=element_blank()
+  )
+
+
+p3 <- p3.2 + guide_area() + p3.1  + plot_layout(design=design, guides = "collect")
+
+ggsave(p1, filename = 'figures/barplot_indicators_N.jpeg', device = 'jpeg', width = 22, height = 17, units = 'cm')
+ggsave(p2, filename = 'figures/barplot_indicators_P.jpeg', device = 'jpeg', width = 22, height = 17, units = 'cm')
+ggsave(p3, filename = 'figures/barplot_indicators_K.jpeg', device = 'jpeg', width = 22, height = 17, units = 'cm')
+
+
 
 
 #make boxplots of indicators
@@ -377,9 +1025,6 @@ p3 <- p3.2 + guide_area() + p3.1  + plot_layout(design=design, guides = "collect
 #   )
 
 
-ggsave(p1, filename = 'figures/boxplot_indicators_N.jpeg', device = 'jpeg', width = 22, height = 15, units = 'cm')
-ggsave(p2, filename = 'figures/boxplot_indicators_P.jpeg', device = 'jpeg', width = 22, height = 15, units = 'cm')
-ggsave(p3, filename = 'figures/boxplot_indicators_K.jpeg', device = 'jpeg', width = 22, height = 15, units = 'cm')
 
 
 
@@ -392,13 +1037,13 @@ result_flows <- readRDS('data/model_result_flows.rds')
 
 #combine meat and dairy stuff
 result_flows <- purrr::map(result_flows, function(x){
-  x$import_animal_products_N <- x$import_dairy_egg_N + x$import_meat_N
+  #x$import_animal_products_N <- x$import_dairy_egg_N + x$import_meat_N
   x$export_animal_products_N <- x$export_dairy_egg_N + x$export_meat_N
   
-  x$import_animal_products_P <- x$import_dairy_egg_P + x$import_meat_P
+  #x$import_animal_products_P <- x$import_dairy_egg_P + x$import_meat_P
   x$export_animal_products_P <- x$export_dairy_egg_P + x$export_meat_P
   
-  x$import_animal_products_K <- x$import_dairy_egg_K + x$import_meat_K
+  #x$import_animal_products_K <- x$import_dairy_egg_K + x$import_meat_K
   x$export_animal_products_K <- x$export_dairy_egg_K + x$export_meat_K
   return(x)
 })
@@ -413,41 +1058,68 @@ rel_change_flows$scenario <- c(result_flows$interventions$scenario,
                                result_flows$interventions_animal_adjusted$scenario, 
                                result_flows$interventions_crop_adjusted$scenario)
 rel_change_flows <- dplyr::relocate(rel_change_flows, scenario)
+rel_change_flows
+
+abs_change_flows <- rbind.data.frame((result_flows$interventions[-1] - result_flows$reference_year[-1]),
+                                     (result_flows$interventions_animal_adjusted[-1] - result_flows$reference_year[-1]),
+                                     (result_flows$interventions_crop_adjusted[-1] - result_flows$reference_year[-1]))
+
+abs_change_flows$scenario <- c(result_flows$interventions$scenario, 
+                               result_flows$interventions_animal_adjusted$scenario, 
+                               result_flows$interventions_crop_adjusted$scenario)
+abs_change_flows <- dplyr::relocate(abs_change_flows, scenario)
+abs_change_flows$run <- rel_change_flows$run <- rep(1:10000, 3)
+
 
 
 rel_change_flows$scenario <- factor(rel_change_flows$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted"),
                                       labels = c('Ref', 'PS', 'LBS' ,'CBS'))
-
+abs_change_flows$scenario <- factor(abs_change_flows$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted"),
+                                    labels = c('Ref', 'PS', 'LBS' ,'CBS'))
 
 
 #summarise results similar to eduardos banana paper
 #--> calculate median and iqr
 
-rel_change_flows_long <- reshape2::melt(rel_change_flows, id.vars = 'scenario')
-
+rel_change_flows_long <- reshape2::melt(rel_change_flows, id.vars = c('scenario', 'run'))
+abs_change_flows_long <- reshape2::melt(abs_change_flows, id.vars = c('scenario', 'run'), value.name = 'abs_change')
 
 #zero devided by zero gives nan, so make it 0 again
 rel_change_flows_long$value <- ifelse(is.nan(rel_change_flows_long$value), yes = 0, no = rel_change_flows_long$value)
 
 summarised_flows <- rel_change_flows_long %>%
+  merge.data.frame(abs_change_flows_long, by = c("scenario",   "variable", "run"), all.x = TRUE) %>% 
   group_by(scenario, variable) %>%
   summarise(median = median(value, na.rm = T),
-            iqr = IQR(value, na.rm = T))
+            iqr = IQR(value, na.rm = T),
+            median_abs = median(abs_change),
+            iqr_abs = IQR(abs_change))
+
+#percent increase with zero as starting point does not make sense
+#also value very close to zero, so changes are not meaningfull
+summarised_flows$median <- ifelse(summarised_flows$scenario %in% c('CBS', 'LBS') &
+                                    summarised_flows$variable %in% c('animal_balance_N', 'animal_balance_K', 'animal_balance_P'),
+                                  yes = 0, no = summarised_flows$median)
+
+#changes in animal balance K and P are close to zero, so calculating % change is misleaing
+summarised_flows$median <- ifelse(summarised_flows$scenario %in% c('PS') &
+                                    summarised_flows$variable %in% c('animal_balance_K', 'animal_balance_P'),
+                                  yes = 0, no = summarised_flows$median)
 
 
 
 #split by nutrients; 
-summarised_flows <- tidyr::separate(data = summarised_flows, col = variable, sep = -1, convert = TRUE, into = c('variable', 'nutrient'))
+rel_summarised_flows <- tidyr::separate(data = summarised_flows, col = variable, sep = -1, convert = TRUE, into = c('variable', 'nutrient'))
 
 #remove trailing _
-summarised_flows <- summarised_flows %>% 
+rel_summarised_flows <- rel_summarised_flows %>% 
   mutate(variable = substring(variable, 1, nchar(variable)-1))
 
-summarised_indicators <- summarised_flows %>% 
+rel_summarised_indicators <- rel_summarised_flows %>% 
   filter(variable %in% c("total_input", 'losses', "recycling_rate", "share_reuse_to_total_input", "use_efficiency"))
 
 #only take flows Bernou wants to see
-summarised_flows <- summarised_flows %>%
+rel_summarised_flows <- rel_summarised_flows %>%
   filter(variable %in% c('manure_to_crop', 'manure_export', 'manure_as_biogas_substrate',
                          'import_inorganic_fertilizer', 'vegetal_biogas_substrate',
                          'feed_from_processed_crops', 
@@ -456,7 +1128,7 @@ summarised_flows <- summarised_flows %>%
                          'animal_housing_and_storage_losses', 'animal_balance'))
 
 
-summarised_flows$variable <- factor(summarised_flows$variable, 
+rel_summarised_flows$variable <- factor(rel_summarised_flows$variable, 
        levels = c('manure_to_crop',
                   'manure_export',
                   'manure_as_biogas_substrate',
@@ -484,7 +1156,7 @@ summarised_flows$variable <- factor(summarised_flows$variable,
                   'Stock balance animal subsystem'
                   ))
 
-factor(summarised_flows$variable, levels = c('Manure to crops',
+factor(rel_summarised_flows$variable, levels = c('Manure to crops',
                                              'Manure export',
                                              'Manure biogas substrate',
                                              'Import inorganic fertilizers',
@@ -501,34 +1173,157 @@ factor(summarised_flows$variable, levels = c('Manure to crops',
 
 
 #split value into two columns, one for increase, one for decrease?
-summarised_flows$increase <- ifelse(summarised_flows$median >= 100,yes = summarised_flows$median, no = NA)
-summarised_flows$decrease <- ifelse(summarised_flows$median < 100,yes = summarised_flows$median, no = NA)
+rel_summarised_flows$increase <- ifelse(rel_summarised_flows$median >= 100,yes = rel_summarised_flows$median, no = NA)
+rel_summarised_flows$decrease <- ifelse(rel_summarised_flows$median < 100,yes = rel_summarised_flows$median, no = NA)
 
 #iqr for some parameters complete out of range, set to 2
-summarised_flows$iqr_adusted <- ifelse(summarised_flows$iqr > 200, yes = 200, no = summarised_flows$iqr)
+rel_summarised_flows$iqr_adusted <- ifelse(rel_summarised_flows$iqr > 200, yes = 200, no = rel_summarised_flows$iqr)
 #also have 2 as a limit for median, otherwise the scale is completely off
-summarised_flows$median_adjusted <- ifelse(summarised_flows$median > 200, yes = 200, no = summarised_flows$median)
-summarised_flows$median_adjusted <- ifelse(summarised_flows$median_adjusted < -100, yes = -100, no = summarised_flows$median_adjusted)
+rel_summarised_flows$median_adjusted <- ifelse(rel_summarised_flows$median > 200, yes = 200, no = rel_summarised_flows$median)
+rel_summarised_flows$median_adjusted <- ifelse(rel_summarised_flows$median_adjusted < -100, yes = -100, no = rel_summarised_flows$median_adjusted)
 
+#if the iqr is zero, then the reference value is zero and the change is certain???
+rel_summarised_flows$iqr_adusted <- ifelse(is.na(rel_summarised_flows$iqr_adusted), 0, rel_summarised_flows$iqr_adusted)
+rel_summarised_flows$iqr_adusted <- ifelse(rel_summarised_flows$variable == 'Stock balance animal subsystem', yes = 0, no = rel_summarised_flows$iqr_adusted)
 
+#animal stock: iqr is 
 
 
 #install.packages("ggnewscale")
 library(ggnewscale)
 #RColorBrewer::brewer.pal(7, 'PuOr')
 
-p1 <- summarised_flows %>%
+rel_summarised_flows <- rel_summarised_flows %>%
+  mutate(scenario = factor(scenario, levels = c('Ref', 'PS', 'CBS', 'LBS')))
+
+#animal balance values are missleading, because the reference is zero
+rel_summarised_flows %>% 
+  filter(variable == 'Stock balance animal subsystem')
+
+
+#########
+#add reference year flows
+##########
+
+#add another column with the reference year
+result_flows$reference_year$run <- 1:10000
+
+test_long <- reshape2::melt(result_flows$reference_year, id.vars = c('scenario', 'run'))
+
+summarised_flows_reference <- test_long %>%
+  group_by(scenario, variable) %>%
+  summarise(median = median(value, na.rm = T),
+            iqr = IQR(value, na.rm = T)) %>% 
+  mutate(iqr = (iqr / median) * 100,
+         median_adjusted = 0,
+         median_abs = median)
+
+#if relative iqr is na, change it to zero instead
+#(is caused by having reference value (median) equals zero)
+#summarised_flows_reference$iqr_adusted <- ifelse(is.na(summarised_flows_reference$iqr), yes = 0, no = summarised_flows_reference$iqr)
+summarised_flows_reference$iqr_adusted <- NaN
+
+
+#split nutrient from variable name
+summarised_flows_reference <- tidyr::separate(data = summarised_flows_reference, col = variable, sep = -1, convert = TRUE, into = c('variable', 'nutrient'))
+
+#remove trailing _
+summarised_flows_reference <- summarised_flows_reference %>% 
+  mutate(variable = substring(variable, 1, nchar(variable)-1))
+
+#only take flows Bernou wants to see
+summarised_flows_reference <- summarised_flows_reference %>%
+  filter(variable %in% c('manure_to_crop', 'manure_export', 'manure_as_biogas_substrate',
+                         'import_inorganic_fertilizer', 'vegetal_biogas_substrate',
+                         'feed_from_processed_crops', 
+                         'net_food_import', 'crop_cultivation_losses', 'import_animal_products', 
+                         'export_animal_products',
+                         'animal_housing_and_storage_losses', 'animal_balance'))
+
+
+summarised_flows_reference$variable <- factor(summarised_flows_reference$variable, 
+                                        levels = c('manure_to_crop',
+                                                   'manure_export',
+                                                   'manure_as_biogas_substrate',
+                                                   'import_inorganic_fertilizer',
+                                                   'vegetal_biogas_substrate',
+                                                   'feed_from_processed_crops',
+                                                   'import_animal_products',
+                                                   'export_animal_products',
+                                                   'net_food_import',
+                                                   'crop_cultivation_losses',
+                                                   'animal_housing_and_storage_losses',
+                                                   'animal_balance'), 
+                                        
+                                        labels = c('Manure to crops',
+                                                   'Manure export',
+                                                   'Manure biogas substrate',
+                                                   'Import inorganic fertilizers',
+                                                   'Vegetal biogas substrate',
+                                                   'Feed from processed crops',
+                                                   'Animal products import',
+                                                   'Animal products export',
+                                                   'Net food import',
+                                                   'Cultivation losses',
+                                                   'Animal housing and storage losses',
+                                                   'Stock balance animal subsystem'
+                                        ))
+
+factor(summarised_flows_reference$variable, levels = c('Manure to crops',
+                                                 'Manure export',
+                                                 'Manure biogas substrate',
+                                                 'Import inorganic fertilizers',
+                                                 'Vegetal biogas substrate',
+                                                 'Feed from processed crops',
+                                                 'Animal products import',
+                                                 'Animal products export',
+                                                 'Net food import',
+                                                 'Cultivation losses',
+                                                 'Animal housing and storage losses',
+                                                 'Stock balance animal subsystem'
+))
+
+
+
+
+
+
+
+#add 
+summarised_flows_reference$iqr_abs <- summarised_flows_reference$increase <- summarised_flows_reference$decrease <- NA
+colnames(rel_summarised_flows)
+colnames(summarised_flows_reference)
+
+summarised_flows_reference$scenario <- 'Ref'
+summarised_flows_reference$scenario <- factor(summarised_flows_reference$scenario, 
+                                              levels = c('Ref', 'PS', 'CBS', 'LBS'))
+
+
+
+p1 <- rel_summarised_flows %>%
+  rbind(summarised_flows_reference) %>% 
   filter(nutrient == 'N', median_adjusted >= 0) %>%
   ggplot(aes(x = scenario, y = variable)) +
-  geom_tile(aes(fill = median_adjusted), data = summarised_flows[summarised_flows$nutrient == 'N' & summarised_flows$median_adjusted < 0,],
+  geom_tile(aes(fill = median_adjusted, x = factor(scenario, levels = c('Ref', 'PS', 'CBS', 'LBS'))),
+            data = rel_summarised_flows[rel_summarised_flows$nutrient == 'N' & rel_summarised_flows$median_adjusted < 0,],
             colour="white", size=2) +
-  scale_fill_gradient2("Decrease (%)", limits = c(-100, -0), 
-                       low = "#542788", mid = "grey95") +
+  scale_fill_gradient2("Median reduction (%)", limits = c(-100, -0), 
+                       low = "#a6611a", mid = "grey95") +
   new_scale("fill") +
   geom_tile(aes(fill = median_adjusted), colour="white", size=2) +
   scale_fill_gradient2("Increase (%)", limits = c(0, 200), 
-                       mid = "grey95", high = "#B35806") +
-  geom_point(aes(size = iqr_adusted), data = summarised_flows[summarised_flows$nutrient == 'N',], col = 'grey50') + 
+                       mid = "grey95", high = "#018571") +
+  geom_point(aes(size = iqr_adusted, x = factor(scenario, levels = c('Ref', 'PS', 'CBS', 'LBS'))), 
+             data = rel_summarised_flows[rel_summarised_flows$nutrient == 'N',], 
+             col = 'grey50') + 
+  geom_point(aes(size = iqr_adusted), 
+             data = summarised_flows_reference[summarised_flows_reference$nutrient == 'N',], col = 'grey50') + 
+  geom_text(data = rel_summarised_flows[rel_summarised_flows$nutrient == 'N' & rel_summarised_flows$median_adjusted >= 0,],
+            aes(label = paste0('+', floor(abs(median_abs)/1000))), nudge_y = -0.3)+
+  geom_text(data = rel_summarised_flows[rel_summarised_flows$nutrient == 'N' & rel_summarised_flows$median_adjusted < 0,],
+            aes(label = paste0('-', floor(abs(median_abs)/1000))), nudge_y = -0.3)+
+  geom_text(data = summarised_flows_reference[summarised_flows_reference$nutrient == 'N',],
+            aes(label =  floor(abs(median_abs)/1000)), nudge_y = -0.3)+
   scale_size(range = c(.1, 7), name="IQR (%)") +
   theme_bw() + ylab('Nitrogen flow') + xlab('Scenario')+
   scale_y_discrete(limits=rev(c('Manure to crops',
@@ -544,24 +1339,43 @@ p1 <- summarised_flows %>%
                             'Animal housing and storage losses',
                             'Stock balance animal subsystem')))
 
-ggsave(p1, filename = 'flow_changes_N.jpg', path = 'figures/', device = 'jpeg', height = 20, width = 15, units = 'cm')
+p1
+
+label <- paste0('Numbers indicate median\nnutrient flow (N t ',
+                as.character(expression("year"^-{1})),
+                ")\nfor reference year and\nchanges in median\nfor the scenarios")
+
+label <- as.character('Numbers in panels\nindicate median nutrient\nflow (N t / year) for\nreference scenario (Ref)\nand changes in median\nfor the other scenarios')
 
 
-p2 <- summarised_flows %>%
-  filter(nutrient == 'P', median_adjusted >= 0) %>%
+p1 <- rel_summarised_flows %>%
+  rbind(summarised_flows_reference) %>% 
+  filter(nutrient == 'N') %>%
   ggplot(aes(x = scenario, y = variable)) +
-  geom_tile(aes(fill = median_adjusted), data = summarised_flows[summarised_flows$nutrient == 'P' & summarised_flows$median_adjusted < 0,],
+  geom_tile(fill = 'grey95', color = 'white', size=2)+
+  geom_tile(aes(fill = median_adjusted, x = factor(scenario, levels = c('Ref', 'PS', 'CBS', 'LBS'))),
+            data = rel_summarised_flows[rel_summarised_flows$nutrient == 'N' & rel_summarised_flows$median_adjusted < 0,],
             colour="white", size=2) +
-  scale_fill_gradient2("Decrease (%)", limits = c(-100, -0), 
-                       low = "#542788", mid = "grey95") +
+  scale_fill_gradient2("Median reduction (%)\ncompared to\nreference scenario", limits = c(-100, -0), 
+                       low = "#a6611a", mid = "grey95") +
   new_scale("fill") +
-  geom_tile(aes(fill = median_adjusted), colour="white", size=2) +
-  scale_fill_gradient2("Increase (%)", limits = c(0, 200), 
-                       mid = "grey95", high = "#B35806") +
-  geom_point(aes(size = iqr_adusted), data = summarised_flows[summarised_flows$nutrient == 'P',], col = 'grey50') + 
-  scale_size(range = c(.1, 7), name="IQR (%)") +
-  theme_bw() +
-  ylab('Phosporous flow') + xlab('Scenario')+
+  geom_tile(data = rel_summarised_flows[rel_summarised_flows$nutrient == 'N' & rel_summarised_flows$median_adjusted >= 0,],
+            aes(fill = median_adjusted), colour="white", size=2) +
+  scale_fill_gradient2("Median increase (%)\ncompared to\nreference scenario", limits = c(0, 200), 
+                       mid = "grey95", high = "#018571") +
+  geom_point(aes(size = iqr_adusted, x = factor(scenario, levels = c('Ref', 'PS', 'CBS', 'LBS'))), 
+             data = rel_summarised_flows[rel_summarised_flows$nutrient == 'N',], 
+             col = 'grey50') + 
+  geom_point(aes(size = iqr_adusted), 
+             data = summarised_flows_reference[summarised_flows_reference$nutrient == 'N',], col = 'grey50') + 
+  geom_text(data = rel_summarised_flows[rel_summarised_flows$nutrient == 'N' & rel_summarised_flows$median_adjusted >= 0,],
+            aes(label = paste0('+', floor(abs(median_abs)/1000))), nudge_y = -0.3)+
+  geom_text(data = rel_summarised_flows[rel_summarised_flows$nutrient == 'N' & rel_summarised_flows$median_adjusted < 0,],
+            aes(label = paste0('-', floor(abs(median_abs)/1000))), nudge_y = -0.3)+
+  geom_text(data = summarised_flows_reference[summarised_flows_reference$nutrient == 'N',],
+            aes(label =  floor(abs(median_abs)/1000)), nudge_y = -0.3)+
+  scale_size(range = c(.1, 7), name="Interquartile range (%)") +
+  theme_bw() + ylab('Nitrogen flow') + xlab('Scenario')+
   scale_y_discrete(limits=rev(c('Manure to crops',
                                 'Manure export',
                                 'Manure biogas substrate',
@@ -575,23 +1389,64 @@ p2 <- summarised_flows %>%
                                 'Animal housing and storage losses',
                                 'Stock balance animal subsystem')))
 
-ggsave(p2, filename = 'flow_changes_P.jpg', path = 'figures/', device = 'jpeg', height = 20, width = 15, units = 'cm')
+p1_annotated <- p1 +
+  geom_text(x = Inf, y = 1,
+           #label = bquote('Numbers median nutrient flow [N t year'~(year^-1)~'] for 
+            #              reference year and median absolute changes for the scenarios'),
+           label = label,
+           hjust = -0.05, size = 4, 
+           #parse=TRUE) 
+  )
+
+library(grid)
+library(gtable)
+
+# Turn off clipping to the plot panel
+g = ggplotGrob(p1_annotated)
+g$layout$clip[g$layout$name == "panel"] = "off"
+grid.draw(g)
+
+ggsave(g, filename = 'flow_changes_N_test.jpg', path = 'figures/', device = 'jpeg',
+       height = 22, width = 22, units = 'cm')
 
 
-p3 <- summarised_flows %>%
-  filter(nutrient == 'K', median_adjusted >= 0) %>%
+
+
+
+
+
+label <- as.character('Numbers in panels\nindicate median nutrient\nflow (P t / year) for\nreference scenario (Ref)\nand changes in median\nfor the other scenarios')
+
+nutrient <- 'P'
+
+p2 <- rel_summarised_flows %>%
+  rbind(summarised_flows_reference) %>% 
+  filter(nutrient == nutrient) %>%
   ggplot(aes(x = scenario, y = variable)) +
-  geom_tile(aes(fill = median_adjusted), data = summarised_flows[summarised_flows$nutrient == 'K' & summarised_flows$median_adjusted < 0,],
+  geom_tile(fill = 'grey95', color = 'white', size=2)+
+  geom_tile(aes(fill = median_adjusted, x = factor(scenario, levels = c('Ref', 'PS', 'CBS', 'LBS'))),
+            data = rel_summarised_flows[rel_summarised_flows$nutrient == nutrient & rel_summarised_flows$median_adjusted < 0,],
             colour="white", size=2) +
-  scale_fill_gradient2("Decrease (%)", limits = c(-100, -0), 
-                       low = "#542788", mid = "grey95") +
+  scale_fill_gradient2("Median reduction (%)\ncompared to\nreference scenario", limits = c(-100, -0), 
+                       low = "#a6611a", mid = "grey95") +
   new_scale("fill") +
-  geom_tile(aes(fill = median_adjusted), colour="white", size=2) +
-  scale_fill_gradient2("Increase (%)", limits = c(0, 200), 
-                       mid = "grey95", high = "#B35806") +
-  geom_point(aes(size = iqr_adusted), data = summarised_flows[summarised_flows$nutrient == 'K',], col = 'grey50') + 
-  scale_size(range = c(.1, 7), name="IQR (%)") +
-  theme_bw() +  ylab('Potassium flow') + xlab('Scenario')+
+  geom_tile(data = rel_summarised_flows[rel_summarised_flows$nutrient == nutrient & rel_summarised_flows$median_adjusted >= 0,],
+            aes(fill = median_adjusted), colour="white", size=2) +
+  scale_fill_gradient2("Median increase (%)\ncompared to\nreference scenario", limits = c(0, 200), 
+                       mid = "grey95", high = "#018571") +
+  geom_point(aes(size = iqr_adusted, x = factor(scenario, levels = c('Ref', 'PS', 'CBS', 'LBS'))), 
+             data = rel_summarised_flows[rel_summarised_flows$nutrient == nutrient,], 
+             col = 'grey50') + 
+  geom_point(aes(size = iqr_adusted), 
+             data = summarised_flows_reference[summarised_flows_reference$nutrient == nutrient,], col = 'grey50') + 
+  geom_text(data = rel_summarised_flows[rel_summarised_flows$nutrient == nutrient & rel_summarised_flows$median_adjusted >= 0,],
+            aes(label = paste0('+', floor(abs(median_abs)/1000))), nudge_y = -0.3)+
+  geom_text(data = rel_summarised_flows[rel_summarised_flows$nutrient == nutrient & rel_summarised_flows$median_adjusted < 0,],
+            aes(label = paste0('-', floor(abs(median_abs)/1000))), nudge_y = -0.3)+
+  geom_text(data = summarised_flows_reference[summarised_flows_reference$nutrient == nutrient,],
+            aes(label =  floor(abs(median_abs)/1000)), nudge_y = -0.3)+
+  scale_size(range = c(.1, 7), name="Interquartile range (%)") +
+  theme_bw() + ylab('Phosphorous flow') + xlab('Scenario')+
   scale_y_discrete(limits=rev(c('Manure to crops',
                                 'Manure export',
                                 'Manure biogas substrate',
@@ -605,27 +1460,234 @@ p3 <- summarised_flows %>%
                                 'Animal housing and storage losses',
                                 'Stock balance animal subsystem')))
 
-ggsave(p3, filename = 'flow_changes_K.jpg', path = 'figures/', device = 'jpeg', height = 20, width = 15, units = 'cm')
+p2_annotated <- p2 +
+  geom_text(x = Inf, y = 1,
+            #label = bquote('Numbers median nutrient flow [N t year'~(year^-1)~'] for 
+            #              reference year and median absolute changes for the scenarios'),
+            label = label,
+            hjust = -0.05, size = 4, 
+            #parse=TRUE) 
+  )
+
+# Turn off clipping to the plot panel
+g = ggplotGrob(p2_annotated)
+g$layout$clip[g$layout$name == "panel"] = "off"
+grid.draw(g)
+
+ggsave(g, filename = 'flow_changes_P_test.jpg', path = 'figures/', device = 'jpeg',
+       height = 22, width = 22, units = 'cm')
+
+
+
+# p2 <- summarised_flows %>%
+#   filter(nutrient == 'P', median_adjusted >= 0) %>%
+#   ggplot(aes(x = scenario, y = variable)) +
+#   geom_tile(aes(fill = median_adjusted), data = summarised_flows[summarised_flows$nutrient == 'P' & summarised_flows$median_adjusted < 0,],
+#             colour="white", size=2) +
+#   scale_fill_gradient2("Decrease (%)", limits = c(-100, -0), 
+#                        low = "#542788", mid = "grey95") +
+#   new_scale("fill") +
+#   geom_tile(aes(fill = median_adjusted), colour="white", size=2) +
+#   scale_fill_gradient2("Increase (%)", limits = c(0, 200), 
+#                        mid = "grey95", high = "#B35806") +
+#   geom_point(aes(size = iqr_adusted), data = summarised_flows[summarised_flows$nutrient == 'P',], col = 'grey50') + 
+#   scale_size(range = c(.1, 7), name="IQR (%)") +
+#   theme_bw() +
+#   ylab('Phosporous flow') + xlab('Scenario')+
+#   scale_y_discrete(limits=rev(c('Manure to crops',
+#                                 'Manure export',
+#                                 'Manure biogas substrate',
+#                                 'Import inorganic fertilizers',
+#                                 'Vegetal biogas substrate',
+#                                 'Feed from processed crops',
+#                                 'Animal products import',
+#                                 'Animal products export',
+#                                 'Net food import',
+#                                 'Cultivation losses',
+#                                 'Animal housing and storage losses',
+#                                 'Stock balance animal subsystem')))
+# 
+# ggsave(p2, filename = 'flow_changes_P.jpg', path = 'figures/', device = 'jpeg', height = 20, width = 15, units = 'cm')
+
+
+
+label <- as.character('Numbers in panels\nindicate median nutrient\nflow (K t / year) for\nreference scenario (Ref)\nand changes in median\nfor the other scenarios')
+
+nutrient <- 'K'
+
+p3 <- rel_summarised_flows %>%
+  rbind(summarised_flows_reference) %>% 
+  filter(nutrient == nutrient) %>%
+  ggplot(aes(x = scenario, y = variable)) +
+  geom_tile(fill = 'grey95', color = 'white', size=2)+
+  geom_tile(aes(fill = median_adjusted, x = factor(scenario, levels = c('Ref', 'PS', 'CBS', 'LBS'))),
+            data = rel_summarised_flows[rel_summarised_flows$nutrient == nutrient & rel_summarised_flows$median_adjusted < 0,],
+            colour="white", size=2) +
+  scale_fill_gradient2("Median reduction (%)\ncompared to\nreference scenario", limits = c(-100, -0), 
+                       low = "#a6611a", mid = "grey95") +
+  new_scale("fill") +
+  geom_tile(data = rel_summarised_flows[rel_summarised_flows$nutrient == nutrient & rel_summarised_flows$median_adjusted >= 0,],
+            aes(fill = median_adjusted), colour="white", size=2) +
+  scale_fill_gradient2("Median increase (%)\ncompared to\nreference scenario", limits = c(0, 200), 
+                       mid = "grey95", high = "#018571") +
+  geom_point(aes(size = iqr_adusted, x = factor(scenario, levels = c('Ref', 'PS', 'CBS', 'LBS'))), 
+             data = rel_summarised_flows[rel_summarised_flows$nutrient == nutrient,], 
+             col = 'grey50') + 
+  geom_point(aes(size = iqr_adusted), 
+             data = summarised_flows_reference[summarised_flows_reference$nutrient == nutrient,], col = 'grey50') + 
+  geom_text(data = rel_summarised_flows[rel_summarised_flows$nutrient == nutrient & rel_summarised_flows$median_adjusted >= 0,],
+            aes(label = paste0('+', floor(abs(median_abs)/1000))), nudge_y = -0.3)+
+  geom_text(data = rel_summarised_flows[rel_summarised_flows$nutrient == nutrient & rel_summarised_flows$median_adjusted < 0,],
+            aes(label = paste0('-', floor(abs(median_abs)/1000))), nudge_y = -0.3)+
+  geom_text(data = summarised_flows_reference[summarised_flows_reference$nutrient == nutrient,],
+            aes(label =  floor(abs(median_abs)/1000)), nudge_y = -0.3)+
+  scale_size(range = c(.1, 7), name="Interquartile range (%)") +
+  theme_bw() + ylab('Phosphorous flow') + xlab('Scenario')+
+  scale_y_discrete(limits=rev(c('Manure to crops',
+                                'Manure export',
+                                'Manure biogas substrate',
+                                'Import inorganic fertilizers',
+                                'Vegetal biogas substrate',
+                                'Feed from processed crops',
+                                'Animal products import',
+                                'Animal products export',
+                                'Net food import',
+                                'Cultivation losses',
+                                'Animal housing and storage losses',
+                                'Stock balance animal subsystem')))
+
+p3_annotated <- p3 +
+  geom_text(x = Inf, y = 1,
+            #label = bquote('Numbers median nutrient flow [N t year'~(year^-1)~'] for 
+            #              reference year and median absolute changes for the scenarios'),
+            label = label,
+            hjust = -0.05, size = 4, 
+            #parse=TRUE) 
+  )
+
+# Turn off clipping to the plot panel
+g = ggplotGrob(p3_annotated)
+g$layout$clip[g$layout$name == "panel"] = "off"
+grid.draw(g)
+
+ggsave(g, filename = 'flow_changes_K_test.jpg', path = 'figures/', device = 'jpeg',
+       height = 22, width = 22, units = 'cm')
+
+# p3 <- summarised_flows %>%
+#   filter(nutrient == 'K', median_adjusted >= 0) %>%
+#   ggplot(aes(x = scenario, y = variable)) +
+#   geom_tile(aes(fill = median_adjusted), data = summarised_flows[summarised_flows$nutrient == 'K' & summarised_flows$median_adjusted < 0,],
+#             colour="white", size=2) +
+#   scale_fill_gradient2("Decrease (%)", limits = c(-100, -0), 
+#                        low = "#542788", mid = "grey95") +
+#   new_scale("fill") +
+#   geom_tile(aes(fill = median_adjusted), colour="white", size=2) +
+#   scale_fill_gradient2("Increase (%)", limits = c(0, 200), 
+#                        mid = "grey95", high = "#B35806") +
+#   geom_point(aes(size = iqr_adusted), data = summarised_flows[summarised_flows$nutrient == 'K',], col = 'grey50') + 
+#   scale_size(range = c(.1, 7), name="IQR (%)") +
+#   theme_bw() +  ylab('Potassium flow') + xlab('Scenario')+
+#   scale_y_discrete(limits=rev(c('Manure to crops',
+#                                 'Manure export',
+#                                 'Manure biogas substrate',
+#                                 'Import inorganic fertilizers',
+#                                 'Vegetal biogas substrate',
+#                                 'Feed from processed crops',
+#                                 'Animal products import',
+#                                 'Animal products export',
+#                                 'Net food import',
+#                                 'Cultivation losses',
+#                                 'Animal housing and storage losses',
+#                                 'Stock balance animal subsystem')))
+# 
+# ggsave(p3, filename = 'flow_changes_K.jpg', path = 'figures/', device = 'jpeg', height = 20, width = 15, units = 'cm')
 
 
 
 
-#indicators
-
-#split value into two columns, one for increase, one for decrease?
-summarised_indicators$increase <- ifelse(summarised_indicators$median >= 100,yes = summarised_indicators$median, no = NA)
-summarised_indicators$decrease <- ifelse(summarised_indicators$median < 100,yes = summarised_indicators$median, no = NA)
-
-#iqr for some parameters complete out of range, set to 2
-summarised_indicators$iqr_adusted <- ifelse(summarised_indicators$iqr > 200, yes = 200, no = summarised_indicators$iqr)
-#also have 2 as a limit for median, otherwise the scale is completely off
-summarised_indicators$median_adjusted <- ifelse(summarised_indicators$median > 200, yes = 200, no = summarised_indicators$median)
-summarised_indicators$median_adjusted <- ifelse(summarised_indicators$median_adjusted < -100, yes = -100, no = summarised_indicators$median_adjusted)
 
 
-summarised_indicators$variable <- factor(summarised_indicators$variable, 
-                                           levels = c("total_input", 'losses', "recycling_rate", "share_reuse_to_total_input", "use_efficiency"),
-                                           labels = c('Total Input', 'Losses', 'Recycling Rate', 'Reuse : Total Input', 'Use Efficiency'))
+######bar chart of indicators
+#add another column with the reference year
+
+result_flows <- readRDS('data/model_result_flows.rds')
+
+result_flows <- do.call(rbind, result_flows)
+
+#change names of scenarios
+result_flows$scenario <- factor(result_flows$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted"),
+                                labels = c('Ref', 'PS', 'LBS' ,'CBS'))
+
+result_flows <- na.omit(result_flows)
+
+result_flows$run <- rep(rep(1:10000), length(unique(result_flows$scenario)))
+
+test_long <- reshape2::melt(result_flows, id.vars = c('scenario', 'run'))
+
+summarised_flows <- test_long %>%
+  group_by(scenario, variable) %>%
+  summarise(median = median(value, na.rm = T),
+            iqr = IQR(value, na.rm = T),
+            q_16 = quantile(value, probs = 0.16),
+            q_84 = quantile(value, probs = 0.84)) %>% 
+  mutate(scenario = factor(scenario, levels = c('Ref', 'PS', 'CBS', 'LBS')))
+
+#if relative iqr is na, change it to zero instead
+#(is caused by having reference value (median) equals zero)
+#summarised_flows_reference$iqr_adusted <- ifelse(is.na(summarised_flows_reference$iqr), yes = 0, no = summarised_flows_reference$iqr)
+
+#split nutrient from variable name
+summarised_flows <- tidyr::separate(data = summarised_flows, col = variable, sep = -1, convert = TRUE, into = c('variable', 'nutrient'))
+
+#remove trailing _
+summarised_flows <- summarised_flows %>% 
+  mutate(variable = substring(variable, 1, nchar(variable)-1))
+
+unique(summarised_flows$variable)
+
+#only take flows Bernou wants to see
+summarised_flows <- summarised_flows %>%
+  filter(variable %in% c('total_input', 'use_efficiency', 'share_reuse_to_total_input',
+                         'recycling_rate', 'losses'))
+
+
+summarised_flows_reference$variable <- factor(summarised_flows_reference$variable, 
+                                              levels = c('total_input', 
+                                                         'use_efficiency', 
+                                                         'share_reuse_to_total_input',
+                                                         'recycling_rate', 
+                                                         'losses'), 
+                                              
+                                              labels = c('Total Input',
+                                                         'Nutrient Use Efficiency',
+                                                         'Share of Reuse to Total Input',
+                                                         'Recycling Rate',
+                                                         'Nutrient Losses'
+                                              ))
+
+# factor(summarised_flows_reference$variable, levels = c('Manure to crops',
+#                                                        'Manure export',
+#                                                        'Manure biogas substrate',
+#                                                        'Import inorganic fertilizers',
+#                                                        'Vegetal biogas substrate',
+#                                                        'Feed from processed crops',
+#                                                        'Animal products import',
+#                                                        'Animal products export',
+#                                                        'Net food import',
+#                                                        'Cultivation losses',
+#                                                        'Animal housing and storage losses',
+#                                                        'Stock balance animal subsystem'
+# ))
+
+summarised_flows %>% 
+  filter(nutrient == 'N') %>% 
+  ggplot(aes(x = variable, y = median, fill = scenario)) +
+  geom_bar(stat="identity", position="dodge")
+
+
+
+
+
 
 
 
