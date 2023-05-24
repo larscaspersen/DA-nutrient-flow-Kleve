@@ -28,10 +28,10 @@ is this manure,3,taken IT.NRW for 2016,n_dairy_cow_2016,individuals,51114.6,5679
 ,3,Regionalstatistik 2016,n_heifer_2016,individuals,36754.2,40838,44921.8,posnorm,animal,,
 ,2,fresh mass municipal organic waste,ofmsw_local,ton,29064.3,30594,32123.7,posnorm,waste,,2020
 ,2,,area_grassland,kg area / FM dt,21774,21774,21774,const,crop,no,2020
-,2,fresh matter compost to export,compost_to_export,kg compost / FM dt,22023.85,23183,24342.15,posnorm,waste,,2020
-,2,fresh mass of municipal organic waste imported,ofmsw_import,ton,21945,23100,24255,posnorm,waste,,2020
+,2,fresh matter compost to export,compost_to_export,ton,22023.85,23183,24342.15,posnorm,waste,,2020
+,2,fresh mass of municipal organic waste imported,ofmsw_import,?,21945,23100,24255,posnorm,waste,,2020
 ,3,Regionalstatistik 2016,n_calf_2016,individuals,21962.7,24403,26843.3,posnorm,animal,,
-,2,fresh matter compost to horticulture,compost_to_horticulture,kg compost / FM dt,9630.15,10137,10643.85,posnorm,waste,,2020
+,2,fresh matter compost to horticulture,compost_to_horticulture,ton,9630.15,10137,10643.85,posnorm,waste,,2020
 ,2,green waste local,green_waste_local,ton,8346.7,8786,9225.3,posnorm,waste,,2020
 ,1,calculated based on cow number and milk output,milk_per_cow,kg per cow ,7594.686,7671.4,7748.114,posnorm,animal,,
 ,3,Regionalstatistik 2016,n_bull_2016,individuals,6651.9,7391,8130.1,posnorm,animal,,
@@ -46,7 +46,7 @@ is this manure,3,taken IT.NRW for 2016,n_dairy_cow_2016,individuals,51114.6,5679
 ,3,,n_slaughter_sheep,individuals,1976.4,2196,2415.6,posnorm,animal,no,2020
 ,3,Female cattle (before calving),n_slaughter_female_cattle,individuals,1093.5,1215,1336.5,posnorm,animal,no,2020
 ,3,grey bin garden waste,grey_bin_garden_waste,ton,1036.8,1152,1267.2,posnorm,waste,,2020
-,2,fresh matter compost to consumption,compost_to_consumption,kg compost / FM dt,950,1000,1050,posnorm,waste,,
+,2,fresh matter compost to consumption,compost_to_consumption,ton,9630.15,10137,10643.85,posnorm,waste,,
 ,3,digestate density,digestate_density,kg per m3,884.7,983,1081.3,posnorm,waste,,
 ,3,yearly precipitation sum taken from climate-data.org,precipitation_sum,mm,848,848,848,const,crop,,unchanged
 ,1,,K_content_parsley_gr_100gr,mg K / 100 g product,802.89,811,819.11,posnorm,crop,no,unchanged
@@ -519,23 +519,23 @@ is this variable used?,1,calculated based on total milk,share_milk_other_use,sha
 ,1,,N_content_margarine,g N / 100 gram product,0.0297,0.03,0.0303,posnorm,consumption,,unchanged
 ,1,,N_content_sparkling_wine,g N / 100 gram product,0.0297,0.03,0.0303,posnorm,consumption,,unchanged
 ,1,,P_content_butter,g P / 100 gram product,0.027,0.054,0.081,posnorm,consumption,yes,unchanged
-,3,N content (% of DM) organic solid waste,N_content_ofmsw_waste,kg N / kg DM,0.023,0.0255,0.028,tnorm_0_1,waste,yes,unchanged
+,3,N content (% of DM) organic solid waste,N_content_ofmsw_waste,share,0.023,0.0255,0.028,tnorm_0_1,waste,yes,unchanged
 ,3,,P_leftover_potato,kg P / FM dt,0.018,0.02,0.022,posnorm,crop,no,unchanged
 ,5,from unvermeidbare nährstoffverluste,ammonia_loss_rate_fertilizer,kg ammonia / FM dt,0.015,0.02,0.025,tnorm_0_1,crop,,unchanged
 ,1,Corn mais 2,share_corn,share of total agricultural area,0.01881,0.019,0.01919,tnorm_0_1,crop,no,2020
 ,1,winter koolzaad (raps),share_oilseed_rape,share of total agricultural area,0.01683,0.017,0.01717,tnorm_0_1,crop,no,2020
 ,1,,K_content_potato_starch,g K / 100 gram product,0.01485,0.015,0.01515,posnorm,consumption,no,unchanged
-,2,N content compost horticulture,N_content_compost_horticulture,kg N / kg DM,0.0126825,0.01335,0.0140175,tnorm_0_1,waste,no,2020
+,2,N content compost horticulture,N_content_compost_horticulture,kg N / kg DM,0.0126825,0.0119,0.0140175,tnorm_0_1,waste,no,2020
 ,1,calculated based on total milk,share_milk_fed_farm,share,0.01287,0.013,0.01313,tnorm_0_1,animal,no,2020
-,2,N content compost consumption,N_content_compost_consumption,kg N / kg DM,0.0116375,0.01225,0.0128625,tnorm_0_1,waste,no,
+,2,N content compost consumption,N_content_compost_consumption,kg N / kg DM,0.0116375,0.0119,0.0128625,tnorm_0_1,waste,no,
 ,1,,P_content_citrus_fruits,g P / 100 gram product,0.01,0.016,0.022,posnorm,consumption,yes,unchanged
 ,1,,K_content_butter,g K / 100 gram product,0.0144,0.016,0.0176,posnorm,consumption,yes,unchanged
 ,2,,K_content_compost_horticulture,kg K2O/ kg DM,0.009025,0.0095,0.009975,tnorm_0_1,waste,no,2020
 ,1,Triticale,share_triticale,share of total agricultural area,0.00792,0.008,0.00808,tnorm_0_1,crop,no,2020
-,2,,K_content_compost_consumption,kg K2O/ kg DM,0.0071725,0.00755,0.0079275,tnorm_0_1,waste,no,
+,2,,K_content_compost_consumption,kg K2O/ kg DM,0.0071725,0.0095,0.0079275,tnorm_0_1,waste,no,
 ,1,Fodder peas (erbsen),share_fodder_peas,share of total agricultural area,0.00594,0.006,0.00606,tnorm_0_1,crop,no,2020
-,2,,P_content_compost_horticulture,kg P / kg DM,0.004655,0.0049,0.005145,tnorm_0_1,waste,no,2020
-,2,,P_content_compost_consumption,kg P / kg DM,0.005035,0.0053,0.005565,tnorm_0_1,waste,no,
+,2,,P_content_compost_horticulture,kg PO4 / kg DM,0.004655,0.0049,0.005145,tnorm_0_1,waste,no,2020
+,2,,P_content_compost_consumption,kg PO4 / kg DM,0.004655,0.0049,0.005145,tnorm_0_1,waste,no,
 ,1,,P_content_honey,g P / 100 gram product,0.004,0.012,0.02,posnorm,consumption,yes,unchanged
 ,1,calculated based on total milk,share_milk_direct_sale,share,0.00396,0.004,0.00404,tnorm_0_1,animal,no,2020
 ,3,N content (% of DM) green waste,N_content_green_waste,kg N / kg DM,0.0035,0.00555,0.0076,tnorm_0_1,waste,yes,unchanged
@@ -545,10 +545,10 @@ is this variable used?,1,calculated based on total milk,share_milk_other_use,sha
 ,1,Beans (ackerbohnen),share_beans,share of total agricultural area,0.00297,0.003,0.00303,tnorm_0_1,crop,no,2020
 ,3,,P_content_ofmsw_waste,kg P / kg DM,0.002,0.0035,0.005,tnorm_0_1,waste,yes,unchanged
 ,1,Common oat (hafer),share_oat,share of total agricultural area,0.00198,0.002,0.00202,tnorm_0_1,crop,no,2020
-,3,,K_content_ofmsw_waste,kg K / kg DM,9.00E-04,0.001,0.0011,tnorm_0_1,waste,yes,unchanged
+,3,,K_content_ofmsw_waste,kg K / kg DM,9.00E-03,0.01,0.011,tnorm_0_1,waste,yes,unchanged
 ,1,,P_content_potato_starch,g P / 100 gram product,0.00061,0.00416,0.0077,posnorm,consumption,yes,unchanged
 ,3,,P_content_green_waste,kg P / kg DM,6.00E-04,0.00115,0.0017,tnorm_0_1,waste,yes,unchanged
-,3,,K_content_green_waste,kg K / kg DM,0.00053,0.00097,0.0014,tnorm_0_1,waste,yes,unchanged
+,3,,K_content_green_waste,kg K / kg DM,0.0053,0.0097,0.014,tnorm_0_1,waste,yes,unchanged
 ,1,,K_content_sugar,g K / 100 gram product,6.00E-05,0.00303,0.006,posnorm,consumption,yes,unchanged
 ,1,,P_content_sugar,g P / 100 gram product,5.00E-05,0.00028,5.00E-04,posnorm,consumption,yes,unchanged
 ,1,Mais silage,N_leftover_mais_silage,kg N / FM dt,0,0,0,const,crop,no,unchanged
