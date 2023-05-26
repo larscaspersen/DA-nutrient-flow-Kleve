@@ -1,90 +1,59 @@
-#have a table with median values for how the scenario played out
-
-#number of animals: total Livestock units
-#                   change in livestock units for the scenarios
-
-#number of cows: total livestock units
-#               change in livestock units (%)
-#same for chicken, pig and others
-
-#allocation of crop to biogas
-#allocation of crop to animal
-#allocation of crop to local consumption
-
-#allocation of manure to biogas
-#allocation of manure to crop
-#allocation of manure to export
-
 library(decisionSupport)
 library(tidyverse)
 
-#run nutrient flow simulations
-source('code/06_combine_submodels.R')
+result_flows <- readRDS('data/model_result_flows.rds')
+#result_indicators <- readRDS('data/model_result_indicators.rds')
+result_flows <- do.call(rbind, result_flows)
 
-# decide what to return
-#return_flows <- TRUE
+#change names of scenarios
+result_flows$scenario <- factor(result_flows$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted"),
+                                labels = c('Ref', 'PS', 'LBS' ,'CBS'))
 
-n_runs <- 10000
+result_flows <- na.omit(result_flows)
 
-return_alt_output <- TRUE
-
-# start <- Sys.time()
-# # let mc simulation run, just to test if everything works out
-# nitrogen_mc_simulation <- mcSimulation(
-#   estimate = as.estimate(input),
-#   model_function = combined_function,
-#   numberOfModelRuns = n_runs,
-#   functionSyntax = "plainNames"
-# )
-# end <- Sys.time()
-# end - start
-# 
-# saveRDS(nitrogen_mc_simulation, file = 'data/alternative_output.rds')
-
-nitrogen_mc_simulation <- readRDS('data/alternative_output.rds')
-
-n_outcomes <- sum(grepl('current_share_cattle', colnames(nitrogen_mc_simulation$y)))
-
-#bind items with same characters but different numbers
-flow_names <- unique(gsub('[0-9]+', '', colnames(nitrogen_mc_simulation$y)))
+result_flows$run <- rep(1:10000, 4)
 
 
-#create empty data.frame with the right dimensions
-combined_results <- data.frame(matrix(nrow = n_runs * n_outcomes, ncol = length(flow_names)))
+#bring results in long format, bring differences in long format
+result_flows_long <- reshape2::melt(result_flows, id.var = c('scenario', 'run'))
 
-for(i in 1:length(flow_names)){
-  #take variable names
-  target_names <- colnames(nitrogen_mc_simulation$y)[flow_names[i] == gsub('[0-9]+', '', colnames(nitrogen_mc_simulation$y))]
-  #append to data frame
-  combined_results[,i] <- unlist(nitrogen_mc_simulation$y[target_names],use.names = FALSE)
-}
+result_flows_long <- na.omit(result_flows_long)
 
-#adjust the column names
-colnames(combined_results) <- flow_names
+result_flows_long <- result_flows_long %>% 
+  filter(variable %in% c('manure_to_crop_N',
+                         'manure_as_biogas_substrate_N',
+                         'manure_export_N',
+                         'vegetal_biogas_substrate_N',
+                         'local_vegetal_products_consumed_N',
+                         'feed_from_processed_crops_N',
+                         'feed_crops_N',
+                         'export_vegetable_N',
+                         'current_share_cattle',
+                         'current_share_pig',
+                         'current_share_poultry',
+                         'current_share_others',
+                         'reduction_LLU',
+                         'stakeholder_allocate_crop_biogas_corrected',
+                         'stakeholder_allocate_crop_feed_corrected',
+                         'stakeholder_allocate_crop_food_corrected',
+                         'stakeholder_allocate_manure_biogas_corrected',
+                         'stakeholder_allocate_manure_crop_corrected',
+                         'stakeholder_allocate_manure_export_corrected',
+                         'LLU_total_adjusted'))
 
-combined_results$scenario <- rep(c('Ref', 'PS', 'LBS', 'CBS', 'Trad'), each = n_runs)
-combined_results$run <- rep(1:n_runs, n_outcomes)
 
-#change the name of the scenarios, drop sh2
-#combined_results <- combined_results[!(combined_results$scenario %in% c('all_adjustments_sh_2_stakeholder_reduction', 
-#                                                                        'all_adjustments_sh_2_strict_reduction',
-#                                                                        'buffer_no_herdsize_sh_2')),]
-
-
-combined_results %>% 
-  reshape2::melt(id.vars = c('scenario', 'run')) %>% 
-  reshape2::dcast(run + variable ~ scenario, value.var = 'value') %>% 
-  filter(variable == 'crop_unprocessed_feed')
+# combined_results <- result_flows_long %>% 
+#   reshape2::melt(id.vars = c('scenario', 'run')) %>% 
+#   reshape2::dcast(run + variable ~ scenario, value.var = 'value') 
 
 #bring to long format and summarize
-table_sum <- combined_results %>% 
-  filter(scenario != 'Trad') %>% 
-  reshape2::melt(id.vars = c('scenario', 'run')) %>% 
+table_sum <- result_flows_long %>% 
+  mutate(value = as.numeric(value)) %>% 
   group_by(scenario, variable) %>% 
-  summarise(median = median(value),
-            iqr = IQR(value),
-            q_16 = quantile(value, probs = 0.16),
-            q_86 = quantile(value, probs = 0.84)) 
+  summarise(median = median(value, na.rm = TRUE),
+            iqr = IQR(value, na.rm = TRUE),
+            q_16 = quantile(value, probs = 0.16, na.rm = TRUE),
+            q_86 = quantile(value, probs = 0.84, na.rm = TRUE)) 
 
 test <- table_sum %>%  
   reshape2::melt(id.vars = c('scenario', 'variable'), variable.name = 'measurement') %>%
@@ -99,10 +68,9 @@ write.csv(test, 'data/table_scenario_inputs.csv', row.names = FALSE)
 
 
 
-combined_results %>% 
-  reshape2::melt(id.vars = c('scenario', 'run')) %>% 
+result_flows_long %>% 
   reshape2::dcast(run + variable ~ scenario, value.var = 'value') %>% 
-  filter(variable == 'crop_unprocessed_feed') %>% 
+  filter(variable == 'feed_crops_N') %>% 
   group_by(variable) %>% 
   summarise(same = sum((CBS == LBS & CBS == PS & CBS == Ref )) / n(),
             lower = sum((CBS == LBS & CBS == PS & CBS < Ref )) / n())

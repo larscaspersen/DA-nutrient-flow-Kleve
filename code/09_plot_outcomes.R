@@ -3,7 +3,7 @@ library(tidyverse)
 library(ggridges)
 library(scales) #to have non-scientific numbers for the x and y axis
 
-plot_flows <- FALSE
+plot_flows <- TRUE
 
 #read saved runs for flows and for indicators
 result_flows <- readRDS('data/model_result_flows.rds')
@@ -266,714 +266,724 @@ design <- "
 cbp1 <- c("#999999", "#E69F00", "#56B4E9", "#009E73",
           "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
 
+base_size <- 17
+width <- 24
+height <- 17
 
-#indicators: make two seperatre plots with SHARED y axis:
-p1.1 <- results_indicators_long %>% 
-  filter(nutrient == 'N', variable %in% c('Recycling Rate', 'Reuse to Total Input', 'Use Efficiency')) %>%
-  filter(value >= 0) %>% 
-  na.omit() %>% 
-  ggplot(aes(x = scenario, y = value, fill = scenario)) +
-  geom_boxplot(outlier.alpha = 0.1) +
-  scale_fill_manual(name = "Modelled Scenario", 
-                    labels = c("Reference Year 2020", "Participatory Scenario", 
-                               "Crop Buffered Scenario", "Livestock Buffered Scenario"),
-                    values=cbp1) +
-  ylab('Circularity indicator (%)') +
-  xlab('')+
-  ylim(0,100)+
-  facet_wrap(~variable) + 
-  theme_bw(base_size = 15) +
-  theme(axis.text.x=element_blank(),
-        axis.ticks.x=element_blank(),
-        legend.position="none")
+make_indicator_plots <- TRUE
 
-p1.2 <- results_indicators_long %>% 
-  filter(nutrient == 'N', variable %in% c('Total Input', 'Losses')) %>%
-  filter(value >= 0) %>% 
-  mutate(value = floor(value / 1000)) %>% 
-  na.omit() %>% 
-  ggplot(aes(x = scenario, y = value, fill = scenario)) +
-  geom_boxplot(outlier.alpha = 0.1) +
-  ylab(bquote('Circularity indicator (t N'~year^-1*')')) +
-  xlab('')+
-  scale_fill_manual(name = "Modelled Scenario", 
+if(make_indicator_plots){
+  #indicators: make two seperatre plots with SHARED y axis:
+  p1.1 <- results_indicators_long %>% 
+    filter(nutrient == 'N', variable %in% c('Recycling Rate', 'Reuse to Total Input', 'Use Efficiency')) %>%
+    filter(value >= 0) %>% 
+    na.omit() %>% 
+    ggplot(aes(x = scenario, y = value, fill = scenario)) +
+    geom_boxplot(outlier.alpha = 0.1) +
+    scale_fill_manual(name = "Modelled Scenario", 
                       labels = c("Reference Year 2020", "Participatory Scenario", 
                                  "Crop Buffered Scenario", "Livestock Buffered Scenario"),
                       values=cbp1) +
-  scale_y_continuous(labels = scales::comma)+
-  expand_limits(y=0)+
-  facet_wrap(~variable) + 
-  theme_bw(base_size = 15) +
-  theme(
-    axis.text.x=element_blank(),
-    axis.ticks.x=element_blank()
+    ylab('Circularity indicator (%)') +
+    xlab('')+
+    ylim(0,100)+
+    facet_wrap(~variable) + 
+    theme_bw(base_size = base_size) +
+    theme(axis.text.x=element_blank(),
+          axis.ticks.x=element_blank(),
+          legend.position="none")
+  
+  p1.2 <- results_indicators_long %>% 
+    filter(nutrient == 'N', variable %in% c('Total Input', 'Losses')) %>%
+    filter(value >= 0) %>% 
+    mutate(value = floor(value / 1000)) %>% 
+    na.omit() %>% 
+    ggplot(aes(x = scenario, y = value, fill = scenario)) +
+    geom_boxplot(outlier.alpha = 0.1) +
+    ylab(bquote('Circularity indicator (t N'~year^-1*')')) +
+    xlab('')+
+    scale_fill_manual(name = "Modelled Scenario", 
+                      labels = c("Reference Year 2020", "Participatory Scenario", 
+                                 "Crop Buffered Scenario", "Livestock Buffered Scenario"),
+                      values=cbp1) +
+    scale_y_continuous(labels = scales::comma)+
+    expand_limits(y=0)+
+    facet_wrap(~variable) + 
+    theme_bw(base_size = base_size) +
+    theme(
+      axis.text.x=element_blank(),
+      axis.ticks.x=element_blank()
     )
-
-
-p1 <- p1.2 + guide_area() + p1.1  + plot_layout(design=design, guides = "collect") 
-
-#p1 <- (((p1.2  | plot_spacer()) + plot_layout(widths = c(2,1))) / p1.1) + plot_layout(guides = 'collect')
-
-
-
-
-p2.1 <- results_indicators_long %>% 
-  filter(nutrient == 'P', variable %in% c('Recycling Rate', 'Reuse to Total Input', 'Use Efficiency')) %>%
-  filter(value >= 0) %>% 
-  na.omit() %>% 
-  ggplot(aes(x = scenario, y = value, fill = scenario)) +
-  geom_boxplot(outlier.alpha = 0.1) +
-  scale_fill_manual(name = "Modelled Scenario", 
-                    labels = c("Reference Year 2020", "Participatory Scenario", 
-                               "Crop Buffered Scenario", "Livestock Buffered Scenario"),
-                    values=cbp1) +
-  ylab('Circularity indicator (%)') +
-  xlab('')+
-  ylim(0,100)+
-  facet_wrap(~variable) + 
-  theme_bw(base_size = 15) +
-  theme(axis.text.x=element_blank(),
-        axis.ticks.x=element_blank(),
-        legend.position="none")
-
-
-p2.2 <- results_indicators_long %>% 
-  filter(nutrient == 'P', variable %in% c('Total Input', 'Losses')) %>%
-  filter(value >= 0) %>% 
-  na.omit() %>% 
-  mutate(value = value / 1000) %>% 
-  ggplot(aes(x = scenario, y = value, fill = scenario)) +
-  geom_boxplot(outlier.alpha = 0.1) +
-  ylab(bquote('Circularity indicator (t P'~year^-1*')')) +
-  xlab('')+
-  expand_limits(y=0)+
-  scale_fill_manual(name = "Modelled Scenario", 
+  
+  
+  p1 <- p1.2 + guide_area() + p1.1  + plot_layout(design=design, guides = "collect") 
+  
+  #p1 <- (((p1.2  | plot_spacer()) + plot_layout(widths = c(2,1))) / p1.1) + plot_layout(guides = 'collect')
+  
+  
+  
+  
+  p2.1 <- results_indicators_long %>% 
+    filter(nutrient == 'P', variable %in% c('Recycling Rate', 'Reuse to Total Input', 'Use Efficiency')) %>%
+    filter(value >= 0) %>% 
+    na.omit() %>% 
+    ggplot(aes(x = scenario, y = value, fill = scenario)) +
+    geom_boxplot(outlier.alpha = 0.1) +
+    scale_fill_manual(name = "Modelled Scenario", 
                       labels = c("Reference Year 2020", "Participatory Scenario", 
                                  "Crop Buffered Scenario", "Livestock Buffered Scenario"),
                       values=cbp1) +
-  scale_y_continuous(labels = scales::comma)+
-  facet_wrap(~variable) + 
-  theme_bw(base_size = 15) +
-  theme(    axis.text.x=element_blank(),
-            axis.ticks.x=element_blank()
-  )
-p2 <- p2.2 + guide_area() + p2.1  + plot_layout(design=design, guides = "collect") 
-
-p3.1 <- results_indicators_long %>% 
-  filter(nutrient == 'K', variable %in% c('Recycling Rate', 'Reuse to Total Input', 'Use Efficiency')) %>%
-  filter(value >= 0) %>% 
-  na.omit() %>% 
-  ggplot(aes(x = scenario, y = value, fill = scenario)) +
-  geom_boxplot(outlier.alpha = 0.1) +
-  scale_fill_manual(name = "Modelled Scenario", 
-                    labels = c("Reference Year 2020", "Participatory Scenario", 
-                               "Crop Buffered Scenario", "Livestock Buffered Scenario"),
-                    values=cbp1) +
-  ylab('Circularity indicator (%)') +
-  xlab('')+
-  ylim(0,100)+
-  facet_wrap(~variable) + 
-  theme_bw(base_size = 15) +
-  theme(axis.text.x=element_blank(),
-        axis.ticks.x=element_blank(),
-        legend.position="none")
-
-
-p3.2 <- results_indicators_long %>% 
-  filter(nutrient == 'K', variable %in% c('Total Input', 'Losses')) %>%
-  filter(value >= 0) %>% 
-  mutate(value = value / 1000) %>% 
-  na.omit() %>% 
-  ggplot(aes(x = scenario, y = value, fill = scenario)) +
-  geom_boxplot(outlier.alpha = 0.1) +
-  ylab(bquote('Circularity indicator (t K'~year^-1*')')) +
-  scale_fill_manual(name = "Modelled Scenario", 
+    ylab('Circularity indicator (%)') +
+    xlab('')+
+    ylim(0,100)+
+    facet_wrap(~variable) + 
+    theme_bw(base_size = base_size) +
+    theme(axis.text.x=element_blank(),
+          axis.ticks.x=element_blank(),
+          legend.position="none")
+  
+  
+  p2.2 <- results_indicators_long %>% 
+    filter(nutrient == 'P', variable %in% c('Total Input', 'Losses')) %>%
+    filter(value >= 0) %>% 
+    na.omit() %>% 
+    mutate(value = value / 1000) %>% 
+    ggplot(aes(x = scenario, y = value, fill = scenario)) +
+    geom_boxplot(outlier.alpha = 0.1) +
+    ylab(bquote('Circularity indicator (t P'~year^-1*')')) +
+    xlab('')+
+    expand_limits(y=0)+
+    scale_fill_manual(name = "Modelled Scenario", 
                       labels = c("Reference Year 2020", "Participatory Scenario", 
                                  "Crop Buffered Scenario", "Livestock Buffered Scenario"),
                       values=cbp1) +
-  xlab('')+
-  expand_limits(y=0)+
-  scale_y_continuous(labels = scales::comma)+
-  facet_wrap(~variable) + 
-  theme_bw(base_size = 15) +
-  theme(    axis.text.x=element_blank(),
-            axis.ticks.x=element_blank()
-  )
-p3 <- p3.2 + guide_area() + p3.1  + plot_layout(design=design, guides = "collect") 
+    scale_y_continuous(labels = scales::comma)+
+    facet_wrap(~variable) + 
+    theme_bw(base_size = base_size) +
+    theme(    axis.text.x=element_blank(),
+              axis.ticks.x=element_blank()
+    )
+  p2 <- p2.2 + guide_area() + p2.1  + plot_layout(design=design, guides = "collect") 
+  
+  p3.1 <- results_indicators_long %>% 
+    filter(nutrient == 'K', variable %in% c('Recycling Rate', 'Reuse to Total Input', 'Use Efficiency')) %>%
+    filter(value >= 0) %>% 
+    na.omit() %>% 
+    ggplot(aes(x = scenario, y = value, fill = scenario)) +
+    geom_boxplot(outlier.alpha = 0.1) +
+    scale_fill_manual(name = "Modelled Scenario", 
+                      labels = c("Reference Year 2020", "Participatory Scenario", 
+                                 "Crop Buffered Scenario", "Livestock Buffered Scenario"),
+                      values=cbp1) +
+    ylab('Circularity indicator (%)') +
+    xlab('')+
+    ylim(0,100)+
+    facet_wrap(~variable) + 
+    theme_bw(base_size = base_size) +
+    theme(axis.text.x=element_blank(),
+          axis.ticks.x=element_blank(),
+          legend.position="none")
+  
+  
+  p3.2 <- results_indicators_long %>% 
+    filter(nutrient == 'K', variable %in% c('Total Input', 'Losses')) %>%
+    filter(value >= 0) %>% 
+    mutate(value = value / 1000) %>% 
+    na.omit() %>% 
+    ggplot(aes(x = scenario, y = value, fill = scenario)) +
+    geom_boxplot(outlier.alpha = 0.1) +
+    ylab(bquote('Circularity indicator (t K'~year^-1*')')) +
+    scale_fill_manual(name = "Modelled Scenario", 
+                      labels = c("Reference Year 2020", "Participatory Scenario", 
+                                 "Crop Buffered Scenario", "Livestock Buffered Scenario"),
+                      values=cbp1) +
+    xlab('')+
+    expand_limits(y=0)+
+    scale_y_continuous(labels = scales::comma)+
+    facet_wrap(~variable) + 
+    theme_bw(base_size = base_size) +
+    theme(    axis.text.x=element_blank(),
+              axis.ticks.x=element_blank()
+    )
+  p3 <- p3.2 + guide_area() + p3.1  + plot_layout(design=design, guides = "collect") 
+  
+  
+  ggsave(p1, filename = 'figures/boxplot_indicators_N.jpeg', device = 'jpeg', width = width, height = height, units = 'cm')
+  ggsave(p2, filename = 'figures/boxplot_indicators_P.jpeg', device = 'jpeg', width = width, height = height, units = 'cm')
+  ggsave(p3, filename = 'figures/boxplot_indicators_K.jpeg', device = 'jpeg', width = width, height = height, units = 'cm')
+  
+  
+  
+  #same boxplot with patterns
+  library(ggpattern)
+  
+  pattern_choice <- c('gray100', 'left30',
+                      'rightshingle', 'gray50')
+  
+  p1.1 <- results_indicators_long %>% 
+    filter(nutrient == 'N', variable %in% c('Recycling Rate', 'Reuse to Total Input', 'Use Efficiency')) %>%
+    filter(value >= 0) %>% 
+    na.omit() %>% 
+    ggplot(aes(x = scenario, y = value, fill = scenario)) +
+    geom_boxplot_pattern(aes(pattern_type = scenario),
+                         pattern              = 'magick',
+                         pattern_fill         = 'black',
+                         pattern_aspect_ratio = 1.75,
+                         fill                 = 'white',
+                         colour               = 'black',
+                         outlier.alpha = 0.1) +
+    ylab('Circularity indicator (%)') +
+    xlab('')+
+    ylim(0,100)+
+    facet_wrap(~variable) + 
+    scale_pattern_type_discrete(choices = pattern_choice) +
+    theme_bw(base_size = base_size) +
+    theme(axis.text.x=element_blank(),
+          axis.ticks.x=element_blank(),
+          legend.position="none")
+  
+  p1.2 <- results_indicators_long %>% 
+    filter(nutrient == 'N', variable %in% c('Total Input', 'Losses')) %>%
+    filter(value >= 0) %>% 
+    mutate(value = floor(value / 1000)) %>% 
+    na.omit() %>% 
+    ggplot(aes(x = scenario, y = value, fill = scenario)) +
+    geom_boxplot_pattern(aes(pattern_type = scenario),
+                         pattern              = 'magick',
+                         pattern_fill         = 'black',
+                         pattern_aspect_ratio = 1.75,
+                         fill                 = 'white',
+                         colour               = 'black',
+                         outlier.alpha = 0.1) +
+    ylab(bquote('Circularity indicator (t N'~year^-1*')')) +
+    xlab('')+
+    scale_pattern_type_discrete(choices = pattern_choice,
+                                name = "Modelled Scenario", 
+                                labels = c("Reference Year 2020", "Participatory Scenario", 
+                                           "Crop Buffered Scenario", "Livestock Buffered Scenario")) +
+    scale_y_continuous(labels = scales::comma)+
+    expand_limits(y=0)+
+    facet_wrap(~variable) + 
+    theme_bw(base_size = base_size) +
+    theme(
+      axis.text.x=element_blank(),
+      axis.ticks.x=element_blank()
+    )
+  
+  
+  p1 <- p1.2 + guide_area() + p1.1  + plot_layout(design=design, guides = "collect") 
+  
+  #p1 <- (((p1.2  | plot_spacer()) + plot_layout(widths = c(2,1))) / p1.1) + plot_layout(guides = 'collect')
+  
+  
+  
+  
+  p2.1 <- results_indicators_long %>% 
+    filter(nutrient == 'P', variable %in% c('Recycling Rate', 'Reuse to Total Input', 'Use Efficiency')) %>%
+    filter(value >= 0) %>% 
+    na.omit() %>% 
+    ggplot(aes(x = scenario, y = value, fill = scenario)) +
+    geom_boxplot_pattern(aes(pattern_type = scenario),
+                         pattern              = 'magick',
+                         pattern_fill         = 'black',
+                         pattern_aspect_ratio = 1.75,
+                         fill                 = 'white',
+                         colour               = 'black',
+                         outlier.alpha = 0.1) +
+    scale_pattern_type_discrete(choices = pattern_choice,
+                                name = "Modelled Scenario", 
+                                labels = c("Reference Year 2020", "Participatory Scenario", 
+                                           "Crop Buffered Scenario", "Livestock Buffered Scenario")) +
+    ylab('Circularity indicator (%)') +
+    xlab('')+
+    ylim(0,100)+
+    facet_wrap(~variable) + 
+    theme_bw(base_size = base_size) +
+    theme(axis.text.x=element_blank(),
+          axis.ticks.x=element_blank(),
+          legend.position="none")
+  
+  
+  p2.2 <- results_indicators_long %>% 
+    filter(nutrient == 'P', variable %in% c('Total Input', 'Losses')) %>%
+    filter(value >= 0) %>% 
+    na.omit() %>% 
+    mutate(value = value / 1000) %>% 
+    ggplot(aes(x = scenario, y = value, fill = scenario)) +
+    geom_boxplot_pattern(aes(pattern_type = scenario),
+                         pattern              = 'magick',
+                         pattern_fill         = 'black',
+                         pattern_aspect_ratio = 1.75,
+                         fill                 = 'white',
+                         colour               = 'black',
+                         outlier.alpha = 0.1) +
+    ylab(bquote('Circularity indicator (t P'~year^-1*')')) +
+    xlab('')+
+    expand_limits(y=0)+
+    scale_pattern_type_discrete(choices = pattern_choice,
+                                name = "Modelled Scenario", 
+                                labels = c("Reference Year 2020", "Participatory Scenario", 
+                                           "Crop Buffered Scenario", "Livestock Buffered Scenario")) +
+    scale_y_continuous(labels = scales::comma)+
+    facet_wrap(~variable) + 
+    theme_bw(base_size = base_size) +
+    theme(    axis.text.x=element_blank(),
+              axis.ticks.x=element_blank()
+    )
+  p2 <- p2.2 + guide_area() + p2.1  + plot_layout(design=design, guides = "collect") 
+  
+  p3.1 <- results_indicators_long %>% 
+    filter(nutrient == 'K', variable %in% c('Recycling Rate', 'Reuse to Total Input', 'Use Efficiency')) %>%
+    filter(value >= 0) %>% 
+    na.omit() %>% 
+    ggplot(aes(x = scenario, y = value, fill = scenario)) +
+    geom_boxplot_pattern(aes(pattern_type = scenario),
+                         pattern              = 'magick',
+                         pattern_fill         = 'black',
+                         pattern_aspect_ratio = 1.75,
+                         fill                 = 'white',
+                         colour               = 'black',
+                         outlier.alpha = 0.1) +
+    scale_pattern_type_discrete(choices = pattern_choice,
+                                name = "Modelled Scenario", 
+                                labels = c("Reference Year 2020", "Participatory Scenario", 
+                                           "Crop Buffered Scenario", "Livestock Buffered Scenario")) +
+    ylab('Circularity indicator (%)') +
+    xlab('')+
+    ylim(0,100)+
+    facet_wrap(~variable) + 
+    theme_bw(base_size = base_size) +
+    theme(axis.text.x=element_blank(),
+          axis.ticks.x=element_blank(),
+          legend.position="none")
+  
+  
+  p3.2 <- results_indicators_long %>% 
+    filter(nutrient == 'K', variable %in% c('Total Input', 'Losses')) %>%
+    filter(value >= 0) %>% 
+    mutate(value = value / 1000) %>% 
+    na.omit() %>% 
+    ggplot(aes(x = scenario, y = value, fill = scenario)) +
+    geom_boxplot_pattern(aes(pattern_type = scenario),
+                         pattern              = 'magick',
+                         pattern_fill         = 'black',
+                         pattern_aspect_ratio = 1.75,
+                         fill                 = 'white',
+                         colour               = 'black',
+                         outlier.alpha = 0.1) +
+    ylab(bquote('Circularity indicator (t K'~year^-1*')')) +
+    scale_pattern_type_discrete(choices = pattern_choice,
+                                name = "Modelled Scenario", 
+                                labels = c("Reference Year 2020", "Participatory Scenario", 
+                                           "Crop Buffered Scenario", "Livestock Buffered Scenario")) +
+    xlab('')+
+    expand_limits(y=0)+
+    scale_y_continuous(labels = scales::comma)+
+    facet_wrap(~variable) + 
+    theme_bw(base_size = base_size) +
+    theme(    axis.text.x=element_blank(),
+              axis.ticks.x=element_blank()
+    )
+  p3 <- p3.2 + guide_area() + p3.1  + plot_layout(design=design, guides = "collect") 
+  
+  
+  ggsave(p1, filename = 'figures/boxplot_indicators_N_pattern.jpeg', device = 'jpeg', width = width, height = height, units = 'cm')
+  ggsave(p2, filename = 'figures/boxplot_indicators_P_pattern.jpeg', device = 'jpeg', width = width, height = height, units = 'cm')
+  ggsave(p3, filename = 'figures/boxplot_indicators_K_pattern.jpeg', device = 'jpeg', width = width, height = height, units = 'cm')
+  
+  
+  
+  
+  
+  
+  #now make barplots
+  p1.1 <- results_indicators_long %>% 
+    filter(nutrient == 'N', variable %in% c('Recycling Rate', 'Reuse to Total Input', 'Use Efficiency')) %>%
+    filter(value >= 0) %>% 
+    group_by(scenario, variable) %>% 
+    summarise(median = median(value),
+              q_16 = quantile(value, probs = 0.16),
+              q_84 = quantile(value, probs = 0.84)) %>% 
+    na.omit() %>% 
+    ggplot(aes(x = scenario, y = median, fill = scenario)) +
+    geom_bar_pattern(aes(pattern_type = scenario),
+                     pattern              = 'magick',
+                     pattern_fill         = 'black',
+                     pattern_aspect_ratio = 1.75,
+                     fill                 = 'white',
+                     colour               = 'black',
+                     stat = 'identity') +
+    geom_errorbar(aes(ymin = q_16, ymax = q_84),
+                  width = 0.5)+
+    ylab('Circularity indicator (%)') +
+    xlab('')+
+    ylim(0,100)+
+    facet_wrap(~variable) + 
+    scale_pattern_type_discrete(choices = pattern_choice) +
+    theme_bw(base_size = base_size) +
+    theme(axis.text.x=element_blank(),
+          axis.ticks.x=element_blank(),
+          legend.position="none")
+  
+  p1.2 <- results_indicators_long %>% 
+    filter(nutrient == 'N', variable %in% c('Total Input', 'Losses')) %>%
+    filter(value >= 0) %>% 
+    mutate(value = floor(value / 1000)) %>% 
+    group_by(scenario, variable) %>% 
+    summarise(median = median(value),
+              q_16 = quantile(value, probs = 0.16),
+              q_84 = quantile(value, probs = 0.84)) %>% 
+    na.omit() %>% 
+    ggplot(aes(x = scenario, y = median, fill = scenario)) +
+    geom_bar_pattern(aes(pattern_type = scenario),
+                     pattern              = 'magick',
+                     pattern_fill         = 'black',
+                     pattern_aspect_ratio = 1.75,
+                     fill                 = 'white',
+                     colour               = 'black',
+                     stat = 'identity') +
+    geom_errorbar(aes(ymin = q_16, ymax = q_84),
+                  width = 0.5)+
+    ylab(bquote('Circularity indicator (t N'~year^-1*')')) +
+    xlab('')+
+    scale_pattern_type_discrete(choices = pattern_choice,
+                                name = "Modelled Scenario", 
+                                labels = c("Reference Year 2020", "Participatory Scenario", 
+                                           "Crop Buffered Scenario", "Livestock Buffered Scenario")) +
+    scale_y_continuous(labels = scales::comma)+
+    expand_limits(y=0)+
+    facet_wrap(~variable) + 
+    theme_bw(base_size = base_size) +
+    theme(
+      axis.text.x=element_blank(),
+      axis.ticks.x=element_blank()
+    )
+  
+  
+  p1 <- p1.2 + guide_area() + p1.1  + plot_layout(design=design, guides = "collect")
+  
+  
+  p2.1 <- results_indicators_long %>% 
+    filter(nutrient == 'P', variable %in% c('Recycling Rate', 'Reuse to Total Input', 'Use Efficiency')) %>%
+    filter(value >= 0) %>% 
+    group_by(scenario, variable) %>% 
+    summarise(median = median(value),
+              q_16 = quantile(value, probs = 0.16),
+              q_84 = quantile(value, probs = 0.84)) %>% 
+    na.omit() %>% 
+    ggplot(aes(x = scenario, y = median, fill = scenario)) +
+    geom_bar_pattern(aes(pattern_type = scenario),
+                     pattern              = 'magick',
+                     pattern_fill         = 'black',
+                     pattern_aspect_ratio = 1.75,
+                     fill                 = 'white',
+                     colour               = 'black',
+                     stat = 'identity') +
+    geom_errorbar(aes(ymin = q_16, ymax = q_84),
+                  width = 0.5)+
+    ylab('Circularity indicator (%)') +
+    xlab('')+
+    ylim(0,100)+
+    facet_wrap(~variable) + 
+    scale_pattern_type_discrete(choices = pattern_choice) +
+    theme_bw(base_size = base_size) +
+    theme(axis.text.x=element_blank(),
+          axis.ticks.x=element_blank(),
+          legend.position="none")
+  
+  p2.2 <- results_indicators_long %>% 
+    filter(nutrient == 'P', variable %in% c('Total Input', 'Losses')) %>%
+    filter(value >= 0) %>% 
+    mutate(value = floor(value / 1000)) %>% 
+    group_by(scenario, variable) %>% 
+    summarise(median = median(value),
+              q_16 = quantile(value, probs = 0.16),
+              q_84 = quantile(value, probs = 0.84)) %>% 
+    na.omit() %>% 
+    ggplot(aes(x = scenario, y = median, fill = scenario)) +
+    geom_bar_pattern(aes(pattern_type = scenario),
+                     pattern              = 'magick',
+                     pattern_fill         = 'black',
+                     pattern_aspect_ratio = 1.75,
+                     fill                 = 'white',
+                     colour               = 'black',
+                     stat = 'identity') +
+    geom_errorbar(aes(ymin = q_16, ymax = q_84),
+                  width = 0.5)+
+    ylab(bquote('Circularity indicator (t P'~year^-1*')')) +
+    xlab('')+
+    scale_pattern_type_discrete(choices = pattern_choice,
+                                name = "Modelled Scenario", 
+                                labels = c("Reference Year 2020", "Participatory Scenario", 
+                                           "Crop Buffered Scenario", "Livestock Buffered Scenario")) +
+    scale_y_continuous(labels = scales::comma)+
+    expand_limits(y=0)+
+    facet_wrap(~variable) + 
+    theme_bw(base_size = base_size) +
+    theme(
+      axis.text.x=element_blank(),
+      axis.ticks.x=element_blank()
+    )
+  
+  
+  p2 <- p2.2 + guide_area() + p2.1  + plot_layout(design=design, guides = "collect")
+  
+  
+  p3.1 <- results_indicators_long %>% 
+    filter(nutrient == 'K', variable %in% c('Recycling Rate', 'Reuse to Total Input', 'Use Efficiency')) %>%
+    filter(value >= 0) %>% 
+    group_by(scenario, variable) %>% 
+    summarise(median = median(value),
+              q_16 = quantile(value, probs = 0.16),
+              q_84 = quantile(value, probs = 0.84)) %>% 
+    na.omit() %>% 
+    ggplot(aes(x = scenario, y = median, fill = scenario)) +
+    geom_bar_pattern(aes(pattern_type = scenario),
+                     pattern              = 'magick',
+                     pattern_fill         = 'black',
+                     pattern_aspect_ratio = 1.75,
+                     fill                 = 'white',
+                     colour               = 'black',
+                     stat = 'identity') +
+    geom_errorbar(aes(ymin = q_16, ymax = q_84),
+                  width = 0.5)+
+    ylab('Circularity indicator (%)') +
+    xlab('')+
+    ylim(0,100)+
+    facet_wrap(~variable) + 
+    scale_pattern_type_discrete(choices = pattern_choice) +
+    theme_bw(base_size = base_size) +
+    theme(axis.text.x=element_blank(),
+          axis.ticks.x=element_blank(),
+          legend.position="none")
+  
+  p3.2 <- results_indicators_long %>% 
+    filter(nutrient == 'K', variable %in% c('Total Input', 'Losses')) %>%
+    filter(value >= 0) %>% 
+    mutate(value = floor(value / 1000)) %>% 
+    group_by(scenario, variable) %>% 
+    summarise(median = median(value),
+              q_16 = quantile(value, probs = 0.16),
+              q_84 = quantile(value, probs = 0.84)) %>% 
+    na.omit() %>% 
+    ggplot(aes(x = scenario, y = median, fill = scenario)) +
+    geom_bar_pattern(aes(pattern_type = scenario),
+                     pattern              = 'magick',
+                     pattern_fill         = 'black',
+                     pattern_aspect_ratio = 1.75,
+                     fill                 = 'white',
+                     colour               = 'black',
+                     stat = 'identity') +
+    geom_errorbar(aes(ymin = q_16, ymax = q_84),
+                  width = 0.5)+
+    ylab(bquote('Circularity indicator (t K'~year^-1*')')) +
+    xlab('')+
+    scale_pattern_type_discrete(choices = pattern_choice,
+                                name = "Modelled Scenario", 
+                                labels = c("Reference Year 2020", "Participatory Scenario", 
+                                           "Crop Buffered Scenario", "Livestock Buffered Scenario")) +
+    scale_y_continuous(labels = scales::comma)+
+    expand_limits(y=0)+
+    facet_wrap(~variable) + 
+    theme_bw(base_size = base_size) +
+    theme(
+      axis.text.x=element_blank(),
+      axis.ticks.x=element_blank()
+    )
+  
+  
+  p3 <- p3.2 + guide_area() + p3.1  + plot_layout(design=design, guides = "collect")
+  
+  ggsave(p1, filename = 'figures/barplot_indicators_N_pattern.jpeg', device = 'jpeg', width = width, height = height, units = 'cm')
+  ggsave(p2, filename = 'figures/barplot_indicators_P_pattern.jpeg', device = 'jpeg', width = width, height = height, units = 'cm')
+  ggsave(p3, filename = 'figures/barplot_indicators_K_pattern.jpeg', device = 'jpeg', width = width, height = height, units = 'cm')
+  
+  
+  
+  
+  p1.1 <- results_indicators_long %>% 
+    filter(nutrient == 'N', variable %in% c('Recycling Rate', 'Reuse to Total Input', 'Use Efficiency')) %>%
+    filter(value >= 0) %>% 
+    group_by(scenario, variable) %>% 
+    summarise(median = median(value),
+              q_16 = quantile(value, probs = 0.16),
+              q_84 = quantile(value, probs = 0.84)) %>% 
+    na.omit() %>% 
+    ggplot(aes(x = scenario, y = median, fill = scenario)) +
+    geom_bar(aes(fill = scenario),
+             stat = 'identity', col = 'black') +
+    geom_errorbar(aes(ymin = q_16, ymax = q_84),
+                  width = 0.5)+
+    ylab('Circularity indicator (%)') +
+    xlab('')+
+    ylim(0,100)+
+    facet_wrap(~variable) + 
+    scale_fill_manual(name = "Modelled Scenario", 
+                      labels = c("Reference Year 2020", "Participatory Scenario", 
+                                 "Crop Buffered Scenario", "Livestock Buffered Scenario"),
+                      values=cbp1) +
+    theme_bw(base_size = base_size) +
+    theme(axis.text.x=element_blank(),
+          axis.ticks.x=element_blank(),
+          legend.position="none")
+  
+  p1.2 <- results_indicators_long %>% 
+    filter(nutrient == 'N', variable %in% c('Total Input', 'Losses')) %>%
+    filter(value >= 0) %>% 
+    mutate(value = floor(value / 1000)) %>% 
+    group_by(scenario, variable) %>% 
+    summarise(median = median(value),
+              q_16 = quantile(value, probs = 0.16),
+              q_84 = quantile(value, probs = 0.84)) %>% 
+    na.omit() %>% 
+    ggplot(aes(x = scenario, y = median, fill = scenario)) +
+    geom_bar(aes(fill = scenario),
+             stat = 'identity', col = 'black') +
+    geom_errorbar(aes(ymin = q_16, ymax = q_84),
+                  width = 0.5)+
+    ylab(bquote('Circularity indicator (t N'~year^-1*')')) +
+    xlab('')+
+    scale_fill_manual(name = "Modelled Scenario", 
+                      labels = c("Reference Year 2020", "Participatory Scenario", 
+                                 "Crop Buffered Scenario", "Livestock Buffered Scenario"),
+                      values=cbp1) +
+    scale_y_continuous(labels = scales::comma)+
+    expand_limits(y=0)+
+    facet_wrap(~variable) + 
+    theme_bw(base_size = base_size) +
+    theme(
+      axis.text.x=element_blank(),
+      axis.ticks.x=element_blank()
+    )
+  
+  
+  p1 <- p1.2 + guide_area() + p1.1  + plot_layout(design=design, guides = "collect")
+  
+  
+  p2.1 <- results_indicators_long %>% 
+    filter(nutrient == 'P', variable %in% c('Recycling Rate', 'Reuse to Total Input', 'Use Efficiency')) %>%
+    filter(value >= 0) %>% 
+    group_by(scenario, variable) %>% 
+    summarise(median = median(value),
+              q_16 = quantile(value, probs = 0.16),
+              q_84 = quantile(value, probs = 0.84)) %>% 
+    na.omit() %>% 
+    ggplot(aes(x = scenario, y = median, fill = scenario)) +
+    geom_bar(aes(fill = scenario),
+             stat = 'identity', col = 'black') +
+    geom_errorbar(aes(ymin = q_16, ymax = q_84),
+                  width = 0.5)+
+    ylab('Circularity indicator (%)') +
+    xlab('')+
+    ylim(0,100)+
+    facet_wrap(~variable) + 
+    scale_fill_manual(name = "Modelled Scenario", 
+                      labels = c("Reference Year 2020", "Participatory Scenario", 
+                                 "Crop Buffered Scenario", "Livestock Buffered Scenario"),
+                      values=cbp1) +
+    theme_bw(base_size = base_size) +
+    theme(axis.text.x=element_blank(),
+          axis.ticks.x=element_blank(),
+          legend.position="none")
+  
+  p2.2 <- results_indicators_long %>% 
+    filter(nutrient == 'P', variable %in% c('Total Input', 'Losses')) %>%
+    filter(value >= 0) %>% 
+    mutate(value = floor(value / 1000)) %>% 
+    group_by(scenario, variable) %>% 
+    summarise(median = median(value),
+              q_16 = quantile(value, probs = 0.16),
+              q_84 = quantile(value, probs = 0.84)) %>% 
+    na.omit() %>% 
+    ggplot(aes(x = scenario, y = median, fill = scenario)) +
+    geom_bar(aes(fill = scenario),
+             stat = 'identity', col = 'black') +
+    geom_errorbar(aes(ymin = q_16, ymax = q_84),
+                  width = 0.5)+
+    ylab(bquote('Circularity indicator (t P'~year^-1*')')) +
+    xlab('')+
+    scale_fill_manual(name = "Modelled Scenario", 
+                      labels = c("Reference Year 2020", "Participatory Scenario", 
+                                 "Crop Buffered Scenario", "Livestock Buffered Scenario"),
+                      values=cbp1) +
+    scale_y_continuous(labels = scales::comma)+
+    expand_limits(y=0)+
+    facet_wrap(~variable) + 
+    theme_bw(base_size = base_size) +
+    theme(
+      axis.text.x=element_blank(),
+      axis.ticks.x=element_blank()
+    )
+  
+  
+  p2 <- p2.2 + guide_area() + p2.1  + plot_layout(design=design, guides = "collect")
+  
+  
+  p3.1 <- results_indicators_long %>% 
+    filter(nutrient == 'K', variable %in% c('Recycling Rate', 'Reuse to Total Input', 'Use Efficiency')) %>%
+    filter(value >= 0) %>% 
+    group_by(scenario, variable) %>% 
+    summarise(median = median(value),
+              q_16 = quantile(value, probs = 0.16),
+              q_84 = quantile(value, probs = 0.84)) %>% 
+    na.omit() %>% 
+    ggplot(aes(x = scenario, y = median, fill = scenario)) +
+    geom_bar(aes(fill = scenario),
+             stat = 'identity', col = 'black') +
+    geom_errorbar(aes(ymin = q_16, ymax = q_84),
+                  width = 0.5)+
+    ylab('Circularity indicator (%)') +
+    xlab('')+
+    ylim(0,100)+
+    facet_wrap(~variable) + 
+    scale_fill_manual(name = "Modelled Scenario", 
+                      labels = c("Reference Year 2020", "Participatory Scenario", 
+                                 "Crop Buffered Scenario", "Livestock Buffered Scenario"),
+                      values=cbp1) +
+    theme_bw(base_size = base_size) +
+    theme(axis.text.x=element_blank(),
+          axis.ticks.x=element_blank(),
+          legend.position="none")
+  
+  p3.2 <- results_indicators_long %>% 
+    filter(nutrient == 'K', variable %in% c('Total Input', 'Losses')) %>%
+    filter(value >= 0) %>% 
+    mutate(value = floor(value / 1000)) %>% 
+    group_by(scenario, variable) %>% 
+    summarise(median = median(value),
+              q_16 = quantile(value, probs = 0.16),
+              q_84 = quantile(value, probs = 0.84)) %>% 
+    na.omit() %>% 
+    ggplot(aes(x = scenario, y = median, fill = scenario)) +
+    geom_bar(aes(fill = scenario),
+             stat = 'identity', col = 'black') +
+    geom_errorbar(aes(ymin = q_16, ymax = q_84),
+                  width = 0.5)+
+    ylab(bquote('Circularity indicator (t K'~year^-1*')')) +
+    xlab('')+
+    scale_fill_manual(name = "Modelled Scenario", 
+                      labels = c("Reference Year 2020", "Participatory Scenario", 
+                                 "Crop Buffered Scenario", "Livestock Buffered Scenario"),
+                      values=cbp1) +
+    scale_y_continuous(labels = scales::comma)+
+    expand_limits(y=0)+
+    facet_wrap(~variable) + 
+    theme_bw(base_size = base_size) +
+    theme(
+      axis.text.x=element_blank(),
+      axis.ticks.x=element_blank()
+    )
+  
+  
+  p3 <- p3.2 + guide_area() + p3.1  + plot_layout(design=design, guides = "collect")
+  
+  ggsave(p1, filename = 'figures/barplot_indicators_N.jpeg', device = 'jpeg', width = width, height = height, units = 'cm')
+  ggsave(p2, filename = 'figures/barplot_indicators_P.jpeg', device = 'jpeg', width = width, height = height, units = 'cm')
+  ggsave(p3, filename = 'figures/barplot_indicators_K.jpeg', device = 'jpeg', width = width, height = height, units = 'cm')
+  
+}
 
 
-ggsave(p1, filename = 'figures/boxplot_indicators_N.jpeg', device = 'jpeg', width = 22, height = 17, units = 'cm')
-ggsave(p2, filename = 'figures/boxplot_indicators_P.jpeg', device = 'jpeg', width = 22, height = 17, units = 'cm')
-ggsave(p3, filename = 'figures/boxplot_indicators_K.jpeg', device = 'jpeg', width = 22, height = 17, units = 'cm')
-
-
-
-#same boxplot with patterns
-library(ggpattern)
-
-pattern_choice <- c('gray100', 'left30',
-                    'rightshingle', 'gray50')
-
-p1.1 <- results_indicators_long %>% 
-  filter(nutrient == 'N', variable %in% c('Recycling Rate', 'Reuse to Total Input', 'Use Efficiency')) %>%
-  filter(value >= 0) %>% 
-  na.omit() %>% 
-  ggplot(aes(x = scenario, y = value, fill = scenario)) +
-  geom_boxplot_pattern(aes(pattern_type = scenario),
-                       pattern              = 'magick',
-                       pattern_fill         = 'black',
-                       pattern_aspect_ratio = 1.75,
-                       fill                 = 'white',
-                       colour               = 'black',
-                       outlier.alpha = 0.1) +
-  ylab('Circularity indicator (%)') +
-  xlab('')+
-  ylim(0,100)+
-  facet_wrap(~variable) + 
-  scale_pattern_type_discrete(choices = pattern_choice) +
-  theme_bw(base_size = 15) +
-  theme(axis.text.x=element_blank(),
-        axis.ticks.x=element_blank(),
-        legend.position="none")
-
-p1.2 <- results_indicators_long %>% 
-  filter(nutrient == 'N', variable %in% c('Total Input', 'Losses')) %>%
-  filter(value >= 0) %>% 
-  mutate(value = floor(value / 1000)) %>% 
-  na.omit() %>% 
-  ggplot(aes(x = scenario, y = value, fill = scenario)) +
-  geom_boxplot_pattern(aes(pattern_type = scenario),
-                       pattern              = 'magick',
-                       pattern_fill         = 'black',
-                       pattern_aspect_ratio = 1.75,
-                       fill                 = 'white',
-                       colour               = 'black',
-                       outlier.alpha = 0.1) +
-  ylab(bquote('Circularity indicator (t N'~year^-1*')')) +
-  xlab('')+
-  scale_pattern_type_discrete(choices = pattern_choice,
-                              name = "Modelled Scenario", 
-                              labels = c("Reference Year 2020", "Participatory Scenario", 
-                                         "Crop Buffered Scenario", "Livestock Buffered Scenario")) +
-  scale_y_continuous(labels = scales::comma)+
-  expand_limits(y=0)+
-  facet_wrap(~variable) + 
-  theme_bw(base_size = 15) +
-  theme(
-    axis.text.x=element_blank(),
-    axis.ticks.x=element_blank()
-  )
-
-
-p1 <- p1.2 + guide_area() + p1.1  + plot_layout(design=design, guides = "collect") 
-
-#p1 <- (((p1.2  | plot_spacer()) + plot_layout(widths = c(2,1))) / p1.1) + plot_layout(guides = 'collect')
-
-
-
-
-p2.1 <- results_indicators_long %>% 
-  filter(nutrient == 'P', variable %in% c('Recycling Rate', 'Reuse to Total Input', 'Use Efficiency')) %>%
-  filter(value >= 0) %>% 
-  na.omit() %>% 
-  ggplot(aes(x = scenario, y = value, fill = scenario)) +
-  geom_boxplot_pattern(aes(pattern_type = scenario),
-                       pattern              = 'magick',
-                       pattern_fill         = 'black',
-                       pattern_aspect_ratio = 1.75,
-                       fill                 = 'white',
-                       colour               = 'black',
-                       outlier.alpha = 0.1) +
-  scale_pattern_type_discrete(choices = pattern_choice,
-                              name = "Modelled Scenario", 
-                              labels = c("Reference Year 2020", "Participatory Scenario", 
-                                         "Crop Buffered Scenario", "Livestock Buffered Scenario")) +
-  ylab('Circularity indicator (%)') +
-  xlab('')+
-  ylim(0,100)+
-  facet_wrap(~variable) + 
-  theme_bw(base_size = 15) +
-  theme(axis.text.x=element_blank(),
-        axis.ticks.x=element_blank(),
-        legend.position="none")
-
-
-p2.2 <- results_indicators_long %>% 
-  filter(nutrient == 'P', variable %in% c('Total Input', 'Losses')) %>%
-  filter(value >= 0) %>% 
-  na.omit() %>% 
-  mutate(value = value / 1000) %>% 
-  ggplot(aes(x = scenario, y = value, fill = scenario)) +
-  geom_boxplot_pattern(aes(pattern_type = scenario),
-                       pattern              = 'magick',
-                       pattern_fill         = 'black',
-                       pattern_aspect_ratio = 1.75,
-                       fill                 = 'white',
-                       colour               = 'black',
-                       outlier.alpha = 0.1) +
-  ylab(bquote('Circularity indicator (t P'~year^-1*')')) +
-  xlab('')+
-  expand_limits(y=0)+
-  scale_pattern_type_discrete(choices = pattern_choice,
-                              name = "Modelled Scenario", 
-                              labels = c("Reference Year 2020", "Participatory Scenario", 
-                                         "Crop Buffered Scenario", "Livestock Buffered Scenario")) +
-  scale_y_continuous(labels = scales::comma)+
-  facet_wrap(~variable) + 
-  theme_bw(base_size = 15) +
-  theme(    axis.text.x=element_blank(),
-            axis.ticks.x=element_blank()
-  )
-p2 <- p2.2 + guide_area() + p2.1  + plot_layout(design=design, guides = "collect") 
-
-p3.1 <- results_indicators_long %>% 
-  filter(nutrient == 'K', variable %in% c('Recycling Rate', 'Reuse to Total Input', 'Use Efficiency')) %>%
-  filter(value >= 0) %>% 
-  na.omit() %>% 
-  ggplot(aes(x = scenario, y = value, fill = scenario)) +
-  geom_boxplot_pattern(aes(pattern_type = scenario),
-                       pattern              = 'magick',
-                       pattern_fill         = 'black',
-                       pattern_aspect_ratio = 1.75,
-                       fill                 = 'white',
-                       colour               = 'black',
-                       outlier.alpha = 0.1) +
-  scale_pattern_type_discrete(choices = pattern_choice,
-                              name = "Modelled Scenario", 
-                              labels = c("Reference Year 2020", "Participatory Scenario", 
-                                         "Crop Buffered Scenario", "Livestock Buffered Scenario")) +
-  ylab('Circularity indicator (%)') +
-  xlab('')+
-  ylim(0,100)+
-  facet_wrap(~variable) + 
-  theme_bw(base_size = 15) +
-  theme(axis.text.x=element_blank(),
-        axis.ticks.x=element_blank(),
-        legend.position="none")
-
-
-p3.2 <- results_indicators_long %>% 
-  filter(nutrient == 'K', variable %in% c('Total Input', 'Losses')) %>%
-  filter(value >= 0) %>% 
-  mutate(value = value / 1000) %>% 
-  na.omit() %>% 
-  ggplot(aes(x = scenario, y = value, fill = scenario)) +
-  geom_boxplot_pattern(aes(pattern_type = scenario),
-                       pattern              = 'magick',
-                       pattern_fill         = 'black',
-                       pattern_aspect_ratio = 1.75,
-                       fill                 = 'white',
-                       colour               = 'black',
-                       outlier.alpha = 0.1) +
-  ylab(bquote('Circularity indicator (t K'~year^-1*')')) +
-  scale_pattern_type_discrete(choices = pattern_choice,
-                              name = "Modelled Scenario", 
-                              labels = c("Reference Year 2020", "Participatory Scenario", 
-                                         "Crop Buffered Scenario", "Livestock Buffered Scenario")) +
-  xlab('')+
-  expand_limits(y=0)+
-  scale_y_continuous(labels = scales::comma)+
-  facet_wrap(~variable) + 
-  theme_bw(base_size = 15) +
-  theme(    axis.text.x=element_blank(),
-            axis.ticks.x=element_blank()
-  )
-p3 <- p3.2 + guide_area() + p3.1  + plot_layout(design=design, guides = "collect") 
-
-
-ggsave(p1, filename = 'figures/boxplot_indicators_N_pattern.jpeg', device = 'jpeg', width = 22, height = 17, units = 'cm')
-ggsave(p2, filename = 'figures/boxplot_indicators_P_pattern.jpeg', device = 'jpeg', width = 22, height = 17, units = 'cm')
-ggsave(p3, filename = 'figures/boxplot_indicators_K_pattern.jpeg', device = 'jpeg', width = 22, height = 17, units = 'cm')
-
-
-
-
-
-
-#now make barplots
-p1.1 <- results_indicators_long %>% 
-  filter(nutrient == 'N', variable %in% c('Recycling Rate', 'Reuse to Total Input', 'Use Efficiency')) %>%
-  filter(value >= 0) %>% 
-  group_by(scenario, variable) %>% 
-  summarise(median = median(value),
-            q_16 = quantile(value, probs = 0.16),
-            q_84 = quantile(value, probs = 0.84)) %>% 
-  na.omit() %>% 
-  ggplot(aes(x = scenario, y = median, fill = scenario)) +
-  geom_bar_pattern(aes(pattern_type = scenario),
-                       pattern              = 'magick',
-                       pattern_fill         = 'black',
-                       pattern_aspect_ratio = 1.75,
-                       fill                 = 'white',
-                       colour               = 'black',
-                   stat = 'identity') +
-  geom_errorbar(aes(ymin = q_16, ymax = q_84),
-                width = 0.5)+
-  ylab('Circularity indicator (%)') +
-  xlab('')+
-  ylim(0,100)+
-  facet_wrap(~variable) + 
-  scale_pattern_type_discrete(choices = pattern_choice) +
-  theme_bw(base_size = 15) +
-  theme(axis.text.x=element_blank(),
-        axis.ticks.x=element_blank(),
-        legend.position="none")
-
-p1.2 <- results_indicators_long %>% 
-  filter(nutrient == 'N', variable %in% c('Total Input', 'Losses')) %>%
-  filter(value >= 0) %>% 
-  mutate(value = floor(value / 1000)) %>% 
-  group_by(scenario, variable) %>% 
-  summarise(median = median(value),
-            q_16 = quantile(value, probs = 0.16),
-            q_84 = quantile(value, probs = 0.84)) %>% 
-  na.omit() %>% 
-  ggplot(aes(x = scenario, y = median, fill = scenario)) +
-  geom_bar_pattern(aes(pattern_type = scenario),
-                   pattern              = 'magick',
-                   pattern_fill         = 'black',
-                   pattern_aspect_ratio = 1.75,
-                   fill                 = 'white',
-                   colour               = 'black',
-                   stat = 'identity') +
-  geom_errorbar(aes(ymin = q_16, ymax = q_84),
-                width = 0.5)+
-  ylab(bquote('Circularity indicator (t N'~year^-1*')')) +
-  xlab('')+
-  scale_pattern_type_discrete(choices = pattern_choice,
-                              name = "Modelled Scenario", 
-                              labels = c("Reference Year 2020", "Participatory Scenario", 
-                                         "Crop Buffered Scenario", "Livestock Buffered Scenario")) +
-  scale_y_continuous(labels = scales::comma)+
-  expand_limits(y=0)+
-  facet_wrap(~variable) + 
-  theme_bw(base_size = 15) +
-  theme(
-    axis.text.x=element_blank(),
-    axis.ticks.x=element_blank()
-  )
-
-
-p1 <- p1.2 + guide_area() + p1.1  + plot_layout(design=design, guides = "collect")
-
-
-p2.1 <- results_indicators_long %>% 
-  filter(nutrient == 'P', variable %in% c('Recycling Rate', 'Reuse to Total Input', 'Use Efficiency')) %>%
-  filter(value >= 0) %>% 
-  group_by(scenario, variable) %>% 
-  summarise(median = median(value),
-            q_16 = quantile(value, probs = 0.16),
-            q_84 = quantile(value, probs = 0.84)) %>% 
-  na.omit() %>% 
-  ggplot(aes(x = scenario, y = median, fill = scenario)) +
-  geom_bar_pattern(aes(pattern_type = scenario),
-                   pattern              = 'magick',
-                   pattern_fill         = 'black',
-                   pattern_aspect_ratio = 1.75,
-                   fill                 = 'white',
-                   colour               = 'black',
-                   stat = 'identity') +
-  geom_errorbar(aes(ymin = q_16, ymax = q_84),
-                width = 0.5)+
-  ylab('Circularity indicator (%)') +
-  xlab('')+
-  ylim(0,100)+
-  facet_wrap(~variable) + 
-  scale_pattern_type_discrete(choices = pattern_choice) +
-  theme_bw(base_size = 15) +
-  theme(axis.text.x=element_blank(),
-        axis.ticks.x=element_blank(),
-        legend.position="none")
-
-p2.2 <- results_indicators_long %>% 
-  filter(nutrient == 'P', variable %in% c('Total Input', 'Losses')) %>%
-  filter(value >= 0) %>% 
-  mutate(value = floor(value / 1000)) %>% 
-  group_by(scenario, variable) %>% 
-  summarise(median = median(value),
-            q_16 = quantile(value, probs = 0.16),
-            q_84 = quantile(value, probs = 0.84)) %>% 
-  na.omit() %>% 
-  ggplot(aes(x = scenario, y = median, fill = scenario)) +
-  geom_bar_pattern(aes(pattern_type = scenario),
-                   pattern              = 'magick',
-                   pattern_fill         = 'black',
-                   pattern_aspect_ratio = 1.75,
-                   fill                 = 'white',
-                   colour               = 'black',
-                   stat = 'identity') +
-  geom_errorbar(aes(ymin = q_16, ymax = q_84),
-                width = 0.5)+
-  ylab(bquote('Circularity indicator (t P'~year^-1*')')) +
-  xlab('')+
-  scale_pattern_type_discrete(choices = pattern_choice,
-                              name = "Modelled Scenario", 
-                              labels = c("Reference Year 2020", "Participatory Scenario", 
-                                         "Crop Buffered Scenario", "Livestock Buffered Scenario")) +
-  scale_y_continuous(labels = scales::comma)+
-  expand_limits(y=0)+
-  facet_wrap(~variable) + 
-  theme_bw(base_size = 15) +
-  theme(
-    axis.text.x=element_blank(),
-    axis.ticks.x=element_blank()
-  )
-
-
-p2 <- p2.2 + guide_area() + p2.1  + plot_layout(design=design, guides = "collect")
-
-
-p3.1 <- results_indicators_long %>% 
-  filter(nutrient == 'K', variable %in% c('Recycling Rate', 'Reuse to Total Input', 'Use Efficiency')) %>%
-  filter(value >= 0) %>% 
-  group_by(scenario, variable) %>% 
-  summarise(median = median(value),
-            q_16 = quantile(value, probs = 0.16),
-            q_84 = quantile(value, probs = 0.84)) %>% 
-  na.omit() %>% 
-  ggplot(aes(x = scenario, y = median, fill = scenario)) +
-  geom_bar_pattern(aes(pattern_type = scenario),
-                   pattern              = 'magick',
-                   pattern_fill         = 'black',
-                   pattern_aspect_ratio = 1.75,
-                   fill                 = 'white',
-                   colour               = 'black',
-                   stat = 'identity') +
-  geom_errorbar(aes(ymin = q_16, ymax = q_84),
-                width = 0.5)+
-  ylab('Circularity indicator (%)') +
-  xlab('')+
-  ylim(0,100)+
-  facet_wrap(~variable) + 
-  scale_pattern_type_discrete(choices = pattern_choice) +
-  theme_bw(base_size = 15) +
-  theme(axis.text.x=element_blank(),
-        axis.ticks.x=element_blank(),
-        legend.position="none")
-
-p3.2 <- results_indicators_long %>% 
-  filter(nutrient == 'K', variable %in% c('Total Input', 'Losses')) %>%
-  filter(value >= 0) %>% 
-  mutate(value = floor(value / 1000)) %>% 
-  group_by(scenario, variable) %>% 
-  summarise(median = median(value),
-            q_16 = quantile(value, probs = 0.16),
-            q_84 = quantile(value, probs = 0.84)) %>% 
-  na.omit() %>% 
-  ggplot(aes(x = scenario, y = median, fill = scenario)) +
-  geom_bar_pattern(aes(pattern_type = scenario),
-                   pattern              = 'magick',
-                   pattern_fill         = 'black',
-                   pattern_aspect_ratio = 1.75,
-                   fill                 = 'white',
-                   colour               = 'black',
-                   stat = 'identity') +
-  geom_errorbar(aes(ymin = q_16, ymax = q_84),
-                width = 0.5)+
-  ylab(bquote('Circularity indicator (t K'~year^-1*')')) +
-  xlab('')+
-  scale_pattern_type_discrete(choices = pattern_choice,
-                              name = "Modelled Scenario", 
-                              labels = c("Reference Year 2020", "Participatory Scenario", 
-                                         "Crop Buffered Scenario", "Livestock Buffered Scenario")) +
-  scale_y_continuous(labels = scales::comma)+
-  expand_limits(y=0)+
-  facet_wrap(~variable) + 
-  theme_bw(base_size = 15) +
-  theme(
-    axis.text.x=element_blank(),
-    axis.ticks.x=element_blank()
-  )
-
-
-p3 <- p3.2 + guide_area() + p3.1  + plot_layout(design=design, guides = "collect")
-
-ggsave(p1, filename = 'figures/barplot_indicators_N_pattern.jpeg', device = 'jpeg', width = 22, height = 17, units = 'cm')
-ggsave(p2, filename = 'figures/barplot_indicators_P_pattern.jpeg', device = 'jpeg', width = 22, height = 17, units = 'cm')
-ggsave(p3, filename = 'figures/barplot_indicators_K_pattern.jpeg', device = 'jpeg', width = 22, height = 17, units = 'cm')
-
-
-
-
-p1.1 <- results_indicators_long %>% 
-  filter(nutrient == 'N', variable %in% c('Recycling Rate', 'Reuse to Total Input', 'Use Efficiency')) %>%
-  filter(value >= 0) %>% 
-  group_by(scenario, variable) %>% 
-  summarise(median = median(value),
-            q_16 = quantile(value, probs = 0.16),
-            q_84 = quantile(value, probs = 0.84)) %>% 
-  na.omit() %>% 
-  ggplot(aes(x = scenario, y = median, fill = scenario)) +
-  geom_bar(aes(fill = scenario),
-                   stat = 'identity', col = 'black') +
-  geom_errorbar(aes(ymin = q_16, ymax = q_84),
-                width = 0.5)+
-  ylab('Circularity indicator (%)') +
-  xlab('')+
-  ylim(0,100)+
-  facet_wrap(~variable) + 
-  scale_fill_manual(name = "Modelled Scenario", 
-                    labels = c("Reference Year 2020", "Participatory Scenario", 
-                               "Crop Buffered Scenario", "Livestock Buffered Scenario"),
-                    values=cbp1) +
-  theme_bw(base_size = 15) +
-  theme(axis.text.x=element_blank(),
-        axis.ticks.x=element_blank(),
-        legend.position="none")
-
-p1.2 <- results_indicators_long %>% 
-  filter(nutrient == 'N', variable %in% c('Total Input', 'Losses')) %>%
-  filter(value >= 0) %>% 
-  mutate(value = floor(value / 1000)) %>% 
-  group_by(scenario, variable) %>% 
-  summarise(median = median(value),
-            q_16 = quantile(value, probs = 0.16),
-            q_84 = quantile(value, probs = 0.84)) %>% 
-  na.omit() %>% 
-  ggplot(aes(x = scenario, y = median, fill = scenario)) +
-  geom_bar(aes(fill = scenario),
-           stat = 'identity', col = 'black') +
-  geom_errorbar(aes(ymin = q_16, ymax = q_84),
-                width = 0.5)+
-  ylab(bquote('Circularity indicator (t N'~year^-1*')')) +
-  xlab('')+
-  scale_fill_manual(name = "Modelled Scenario", 
-                    labels = c("Reference Year 2020", "Participatory Scenario", 
-                               "Crop Buffered Scenario", "Livestock Buffered Scenario"),
-                    values=cbp1) +
-  scale_y_continuous(labels = scales::comma)+
-  expand_limits(y=0)+
-  facet_wrap(~variable) + 
-  theme_bw(base_size = 15) +
-  theme(
-    axis.text.x=element_blank(),
-    axis.ticks.x=element_blank()
-  )
-
-
-p1 <- p1.2 + guide_area() + p1.1  + plot_layout(design=design, guides = "collect")
-
-
-p2.1 <- results_indicators_long %>% 
-  filter(nutrient == 'P', variable %in% c('Recycling Rate', 'Reuse to Total Input', 'Use Efficiency')) %>%
-  filter(value >= 0) %>% 
-  group_by(scenario, variable) %>% 
-  summarise(median = median(value),
-            q_16 = quantile(value, probs = 0.16),
-            q_84 = quantile(value, probs = 0.84)) %>% 
-  na.omit() %>% 
-  ggplot(aes(x = scenario, y = median, fill = scenario)) +
-  geom_bar(aes(fill = scenario),
-           stat = 'identity', col = 'black') +
-  geom_errorbar(aes(ymin = q_16, ymax = q_84),
-                width = 0.5)+
-  ylab('Circularity indicator (%)') +
-  xlab('')+
-  ylim(0,100)+
-  facet_wrap(~variable) + 
-  scale_fill_manual(name = "Modelled Scenario", 
-                    labels = c("Reference Year 2020", "Participatory Scenario", 
-                               "Crop Buffered Scenario", "Livestock Buffered Scenario"),
-                    values=cbp1) +
-  theme_bw(base_size = 15) +
-  theme(axis.text.x=element_blank(),
-        axis.ticks.x=element_blank(),
-        legend.position="none")
-
-p2.2 <- results_indicators_long %>% 
-  filter(nutrient == 'P', variable %in% c('Total Input', 'Losses')) %>%
-  filter(value >= 0) %>% 
-  mutate(value = floor(value / 1000)) %>% 
-  group_by(scenario, variable) %>% 
-  summarise(median = median(value),
-            q_16 = quantile(value, probs = 0.16),
-            q_84 = quantile(value, probs = 0.84)) %>% 
-  na.omit() %>% 
-  ggplot(aes(x = scenario, y = median, fill = scenario)) +
-  geom_bar(aes(fill = scenario),
-           stat = 'identity', col = 'black') +
-  geom_errorbar(aes(ymin = q_16, ymax = q_84),
-                width = 0.5)+
-  ylab(bquote('Circularity indicator (t P'~year^-1*')')) +
-  xlab('')+
-  scale_fill_manual(name = "Modelled Scenario", 
-                    labels = c("Reference Year 2020", "Participatory Scenario", 
-                               "Crop Buffered Scenario", "Livestock Buffered Scenario"),
-                    values=cbp1) +
-  scale_y_continuous(labels = scales::comma)+
-  expand_limits(y=0)+
-  facet_wrap(~variable) + 
-  theme_bw(base_size = 15) +
-  theme(
-    axis.text.x=element_blank(),
-    axis.ticks.x=element_blank()
-  )
-
-
-p2 <- p2.2 + guide_area() + p2.1  + plot_layout(design=design, guides = "collect")
-
-
-p3.1 <- results_indicators_long %>% 
-  filter(nutrient == 'K', variable %in% c('Recycling Rate', 'Reuse to Total Input', 'Use Efficiency')) %>%
-  filter(value >= 0) %>% 
-  group_by(scenario, variable) %>% 
-  summarise(median = median(value),
-            q_16 = quantile(value, probs = 0.16),
-            q_84 = quantile(value, probs = 0.84)) %>% 
-  na.omit() %>% 
-  ggplot(aes(x = scenario, y = median, fill = scenario)) +
-  geom_bar(aes(fill = scenario),
-           stat = 'identity', col = 'black') +
-  geom_errorbar(aes(ymin = q_16, ymax = q_84),
-                width = 0.5)+
-  ylab('Circularity indicator (%)') +
-  xlab('')+
-  ylim(0,100)+
-  facet_wrap(~variable) + 
-  scale_fill_manual(name = "Modelled Scenario", 
-                    labels = c("Reference Year 2020", "Participatory Scenario", 
-                               "Crop Buffered Scenario", "Livestock Buffered Scenario"),
-                    values=cbp1) +
-  theme_bw(base_size = 15) +
-  theme(axis.text.x=element_blank(),
-        axis.ticks.x=element_blank(),
-        legend.position="none")
-
-p3.2 <- results_indicators_long %>% 
-  filter(nutrient == 'K', variable %in% c('Total Input', 'Losses')) %>%
-  filter(value >= 0) %>% 
-  mutate(value = floor(value / 1000)) %>% 
-  group_by(scenario, variable) %>% 
-  summarise(median = median(value),
-            q_16 = quantile(value, probs = 0.16),
-            q_84 = quantile(value, probs = 0.84)) %>% 
-  na.omit() %>% 
-  ggplot(aes(x = scenario, y = median, fill = scenario)) +
-  geom_bar(aes(fill = scenario),
-           stat = 'identity', col = 'black') +
-  geom_errorbar(aes(ymin = q_16, ymax = q_84),
-                width = 0.5)+
-  ylab(bquote('Circularity indicator (t K'~year^-1*')')) +
-  xlab('')+
-  scale_fill_manual(name = "Modelled Scenario", 
-                    labels = c("Reference Year 2020", "Participatory Scenario", 
-                               "Crop Buffered Scenario", "Livestock Buffered Scenario"),
-                    values=cbp1) +
-  scale_y_continuous(labels = scales::comma)+
-  expand_limits(y=0)+
-  facet_wrap(~variable) + 
-  theme_bw(base_size = 15) +
-  theme(
-    axis.text.x=element_blank(),
-    axis.ticks.x=element_blank()
-  )
-
-
-p3 <- p3.2 + guide_area() + p3.1  + plot_layout(design=design, guides = "collect")
-
-ggsave(p1, filename = 'figures/barplot_indicators_N.jpeg', device = 'jpeg', width = 22, height = 17, units = 'cm')
-ggsave(p2, filename = 'figures/barplot_indicators_P.jpeg', device = 'jpeg', width = 22, height = 17, units = 'cm')
-ggsave(p3, filename = 'figures/barplot_indicators_K.jpeg', device = 'jpeg', width = 22, height = 17, units = 'cm')
 
 
 
@@ -1325,7 +1335,7 @@ p1 <- rel_summarised_flows %>%
   geom_text(data = summarised_flows_reference[summarised_flows_reference$nutrient == 'N',],
             aes(label =  floor(abs(median_abs)/1000)), nudge_y = -0.3)+
   scale_size(range = c(.1, 7), name="IQR (%)") +
-  theme_bw() + ylab('Nitrogen flow') + xlab('Scenario')+
+  theme_bw(base_size =  15) + ylab('Nitrogen flow') + xlab('Scenario')+
   scale_y_discrete(limits=rev(c('Manure to crops',
                             'Manure export',
                             'Manure biogas substrate',
@@ -1339,13 +1349,12 @@ p1 <- rel_summarised_flows %>%
                             'Animal housing and storage losses',
                             'Stock balance animal subsystem')))
 
-p1
-
 label <- paste0('Numbers indicate median\nnutrient flow (N t ',
                 as.character(expression("year"^-{1})),
                 ")\nfor reference year and\nchanges in median\nfor the scenarios")
 
-label <- as.character('Numbers in panels\nindicate median nutrient\nflow (N t / year) for\nreference scenario (Ref)\nand changes in median\nfor the other scenarios')
+#label <- as.character('Numbers in panels\nindicate median nutrient\nflow (N t / year) for\nreference scenario (Ref)\nand changes in median\nfor the other scenarios')
+label <- as.character('Numbers in panels indicate median\nnutrient flow (N t / year) for      \nreference scenario and median\nchanges for other scenarios         ')
 
 
 p1 <- rel_summarised_flows %>%
@@ -1375,7 +1384,7 @@ p1 <- rel_summarised_flows %>%
   geom_text(data = summarised_flows_reference[summarised_flows_reference$nutrient == 'N',],
             aes(label =  floor(abs(median_abs)/1000)), nudge_y = -0.3)+
   scale_size(range = c(.1, 7), name="Interquartile range (%)") +
-  theme_bw() + ylab('Nitrogen flow') + xlab('Scenario')+
+  theme_bw(base_size = 15) + ylab('Nitrogen flow') + xlab('Scenario')+
   scale_y_discrete(limits=rev(c('Manure to crops',
                                 'Manure export',
                                 'Manure biogas substrate',
@@ -1390,7 +1399,7 @@ p1 <- rel_summarised_flows %>%
                                 'Stock balance animal subsystem')))
 
 p1_annotated <- p1 +
-  geom_text(x = Inf, y = 1,
+  geom_text(x = Inf, y = 0.5,
            #label = bquote('Numbers median nutrient flow [N t year'~(year^-1)~'] for 
             #              reference year and median absolute changes for the scenarios'),
            label = label,
@@ -1415,7 +1424,7 @@ ggsave(g, filename = 'flow_changes_N_test.jpg', path = 'figures/', device = 'jpe
 
 
 
-label <- as.character('Numbers in panels\nindicate median nutrient\nflow (P t / year) for\nreference scenario (Ref)\nand changes in median\nfor the other scenarios')
+label <- as.character('Numbers in panels indicate median\nnutrient flow (P t / year) for      \nreference scenario and median\nchanges for other scenarios         ')
 
 nutrient <- 'P'
 
@@ -1446,7 +1455,7 @@ p2 <- rel_summarised_flows %>%
   geom_text(data = summarised_flows_reference[summarised_flows_reference$nutrient == nutrient,],
             aes(label =  floor(abs(median_abs)/1000)), nudge_y = -0.3)+
   scale_size(range = c(.1, 7), name="Interquartile range (%)") +
-  theme_bw() + ylab('Phosphorous flow') + xlab('Scenario')+
+  theme_bw(base_size = 15) + ylab('Phosphorous flow') + xlab('Scenario')+
   scale_y_discrete(limits=rev(c('Manure to crops',
                                 'Manure export',
                                 'Manure biogas substrate',
@@ -1461,7 +1470,7 @@ p2 <- rel_summarised_flows %>%
                                 'Stock balance animal subsystem')))
 
 p2_annotated <- p2 +
-  geom_text(x = Inf, y = 1,
+  geom_text(x = Inf, y = 0.5,
             #label = bquote('Numbers median nutrient flow [N t year'~(year^-1)~'] for 
             #              reference year and median absolute changes for the scenarios'),
             label = label,
@@ -1511,7 +1520,7 @@ ggsave(g, filename = 'flow_changes_P_test.jpg', path = 'figures/', device = 'jpe
 
 
 
-label <- as.character('Numbers in panels\nindicate median nutrient\nflow (K t / year) for\nreference scenario (Ref)\nand changes in median\nfor the other scenarios')
+label <- as.character('Numbers in panels indicate median\nnutrient flow (K t / year) for      \nreference scenario and median\nchanges for other scenarios         ')
 
 nutrient <- 'K'
 
@@ -1542,7 +1551,7 @@ p3 <- rel_summarised_flows %>%
   geom_text(data = summarised_flows_reference[summarised_flows_reference$nutrient == nutrient,],
             aes(label =  floor(abs(median_abs)/1000)), nudge_y = -0.3)+
   scale_size(range = c(.1, 7), name="Interquartile range (%)") +
-  theme_bw() + ylab('Phosphorous flow') + xlab('Scenario')+
+  theme_bw(base_size = 15) + ylab('Phosphorous flow') + xlab('Scenario')+
   scale_y_discrete(limits=rev(c('Manure to crops',
                                 'Manure export',
                                 'Manure biogas substrate',
@@ -1557,7 +1566,7 @@ p3 <- rel_summarised_flows %>%
                                 'Stock balance animal subsystem')))
 
 p3_annotated <- p3 +
-  geom_text(x = Inf, y = 1,
+  geom_text(x = Inf, y = 0.5,
             #label = bquote('Numbers median nutrient flow [N t year'~(year^-1)~'] for 
             #              reference year and median absolute changes for the scenarios'),
             label = label,
@@ -1678,86 +1687,86 @@ summarised_flows_reference$variable <- factor(summarised_flows_reference$variabl
 #                                                        'Animal housing and storage losses',
 #                                                        'Stock balance animal subsystem'
 # ))
-
-summarised_flows %>% 
-  filter(nutrient == 'N') %>% 
-  ggplot(aes(x = variable, y = median, fill = scenario)) +
-  geom_bar(stat="identity", position="dodge")
-
-
-
-
-
-
-
-
-p4 <- summarised_indicators %>%
-  filter(nutrient == 'N', median_adjusted >= 0) %>%
-  ggplot(aes(x = scenario, y = variable)) +
-  geom_tile(aes(fill = median_adjusted), data = summarised_indicators[summarised_indicators$nutrient == 'N' & summarised_indicators$median_adjusted < 0,],
-            colour="white", size=2) +
-  scale_fill_gradient2("Decrease (%)", limits = c(-100, -0), 
-                       low = "#542788", mid = "grey95") +
-  new_scale("fill") +
-  geom_tile(aes(fill = median_adjusted), colour="white", size=2) +
-  scale_fill_gradient2("Increase (%)", limits = c(0, 100), 
-                       mid = "grey95", high = "#B35806") +
-  geom_point(aes(size = iqr_adusted), data = summarised_indicators[summarised_indicators$nutrient == 'N',], col = 'grey50') + 
-  scale_size(range = c(.1, 7), name="IQR (%)") +
-  theme_bw() +
-  ylab('Circularity Indicators') + xlab('Scenario')+
-  scale_y_discrete(limits=rev(c('Total Input',
-                                'Losses',
-                                'Use Efficiency',
-                                'Recycling Rate',
-                                'Reuse : Total Input')))
-
-ggsave(p4, filename = 'indicators_changes_N.jpg', path = 'figures/', device = 'jpeg', height = 20, width = 15, units = 'cm')
-
-
-p5 <- summarised_indicators %>%
-  filter(nutrient == 'P', median_adjusted >= 0) %>%
-  ggplot(aes(x = scenario, y = variable)) +
-  geom_tile(aes(fill = median_adjusted), data = summarised_indicators[summarised_indicators$nutrient == 'N' & summarised_indicators$median_adjusted < 0,],
-            colour="white", size=2) +
-  scale_fill_gradient2("Decrease (%)", limits = c(-100, -0), 
-                       low = "#542788", mid = "grey95") +
-  new_scale("fill") +
-  geom_tile(aes(fill = median_adjusted), colour="white", size=2) +
-  scale_fill_gradient2("Increase (%)", limits = c(0, 100), 
-                       mid = "grey95", high = "#B35806") +
-  geom_point(aes(size = iqr_adusted), data = summarised_indicators[summarised_indicators$nutrient == 'P',], col = 'grey50') + 
-  scale_size(range = c(.1, 7), name="IQR (%)") +
-  theme_bw() +
-  ylab('Circularity Indicators') + xlab('Scenario')+
-  scale_y_discrete(limits=rev(c('Total Input',
-                                'Losses',
-                                'Use Efficiency',
-                                'Recycling Rate',
-                                'Reuse : Total Input')))
-
-ggsave(p5, filename = 'indicators_changes_P.jpg', path = 'figures/', device = 'jpeg', height = 20, width = 15, units = 'cm')
-
-
-p6 <- summarised_indicators %>%
-  filter(nutrient == 'K', median_adjusted >= 0) %>%
-  ggplot(aes(x = scenario, y = variable)) +
-  geom_tile(aes(fill = median_adjusted), data = summarised_indicators[summarised_indicators$nutrient == 'N' & summarised_indicators$median_adjusted < 0,],
-            colour="white", size=2) +
-  scale_fill_gradient2("Decrease (%)", limits = c(-100, -0), 
-                       low = "#542788", mid = "grey95") +
-  new_scale("fill") +
-  geom_tile(aes(fill = median_adjusted), colour="white", size=2) +
-  scale_fill_gradient2("Increase (%)", limits = c(0, 100), 
-                       mid = "grey95", high = "#B35806") +
-  geom_point(aes(size = iqr_adusted), data = summarised_indicators[summarised_indicators$nutrient == 'K',], col = 'grey50') + 
-  scale_size(range = c(.1, 7), name="IQR (%)") +
-  theme_bw() +
-  ylab('Circularity Indicators') + xlab('Scenario')+
-  scale_y_discrete(limits=rev(c('Total Input',
-                                'Losses',
-                                'Use Efficiency',
-                                'Recycling Rate',
-                                'Reuse : Total Input'))) 
-
-ggsave(p6, filename = 'indicators_changes_K.jpg', path = 'figures/', device = 'jpeg', height = 20, width = 15, units = 'cm')
+# 
+# summarised_flows %>% 
+#   filter(nutrient == 'N') %>% 
+#   ggplot(aes(x = variable, y = median, fill = scenario)) +
+#   geom_bar(stat="identity", position="dodge")
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# p4 <- summarised_indicators %>%
+#   filter(nutrient == 'N', median_adjusted >= 0) %>%
+#   ggplot(aes(x = scenario, y = variable)) +
+#   geom_tile(aes(fill = median_adjusted), data = summarised_indicators[summarised_indicators$nutrient == 'N' & summarised_indicators$median_adjusted < 0,],
+#             colour="white", size=2) +
+#   scale_fill_gradient2("Decrease (%)", limits = c(-100, -0), 
+#                        low = "#542788", mid = "grey95") +
+#   new_scale("fill") +
+#   geom_tile(aes(fill = median_adjusted), colour="white", size=2) +
+#   scale_fill_gradient2("Increase (%)", limits = c(0, 100), 
+#                        mid = "grey95", high = "#B35806") +
+#   geom_point(aes(size = iqr_adusted), data = summarised_indicators[summarised_indicators$nutrient == 'N',], col = 'grey50') + 
+#   scale_size(range = c(.1, 7), name="IQR (%)") +
+#   theme_bw(base_size = 15) +
+#   ylab('Circularity Indicators') + xlab('Scenario')+
+#   scale_y_discrete(limits=rev(c('Total Input',
+#                                 'Losses',
+#                                 'Use Efficiency',
+#                                 'Recycling Rate',
+#                                 'Reuse : Total Input')))
+# 
+# ggsave(p4, filename = 'indicators_changes_N.jpg', path = 'figures/', device = 'jpeg', height = 20, width = 15, units = 'cm')
+# 
+# 
+# p5 <- summarised_indicators %>%
+#   filter(nutrient == 'P', median_adjusted >= 0) %>%
+#   ggplot(aes(x = scenario, y = variable)) +
+#   geom_tile(aes(fill = median_adjusted), data = summarised_indicators[summarised_indicators$nutrient == 'N' & summarised_indicators$median_adjusted < 0,],
+#             colour="white", size=2) +
+#   scale_fill_gradient2("Decrease (%)", limits = c(-100, -0), 
+#                        low = "#542788", mid = "grey95") +
+#   new_scale("fill") +
+#   geom_tile(aes(fill = median_adjusted), colour="white", size=2) +
+#   scale_fill_gradient2("Increase (%)", limits = c(0, 100), 
+#                        mid = "grey95", high = "#B35806") +
+#   geom_point(aes(size = iqr_adusted), data = summarised_indicators[summarised_indicators$nutrient == 'P',], col = 'grey50') + 
+#   scale_size(range = c(.1, 7), name="IQR (%)") +
+#   theme_bw(base_size = 15) +
+#   ylab('Circularity Indicators') + xlab('Scenario')+
+#   scale_y_discrete(limits=rev(c('Total Input',
+#                                 'Losses',
+#                                 'Use Efficiency',
+#                                 'Recycling Rate',
+#                                 'Reuse : Total Input')))
+# 
+# ggsave(p5, filename = 'indicators_changes_P.jpg', path = 'figures/', device = 'jpeg', height = 20, width = 15, units = 'cm')
+# 
+# 
+# p6 <- summarised_indicators %>%
+#   filter(nutrient == 'K', median_adjusted >= 0) %>%
+#   ggplot(aes(x = scenario, y = variable)) +
+#   geom_tile(aes(fill = median_adjusted), data = summarised_indicators[summarised_indicators$nutrient == 'N' & summarised_indicators$median_adjusted < 0,],
+#             colour="white", size=2) +
+#   scale_fill_gradient2("Decrease (%)", limits = c(-100, -0), 
+#                        low = "#542788", mid = "grey95") +
+#   new_scale("fill") +
+#   geom_tile(aes(fill = median_adjusted), colour="white", size=2) +
+#   scale_fill_gradient2("Increase (%)", limits = c(0, 100), 
+#                        mid = "grey95", high = "#B35806") +
+#   geom_point(aes(size = iqr_adusted), data = summarised_indicators[summarised_indicators$nutrient == 'K',], col = 'grey50') + 
+#   scale_size(range = c(.1, 7), name="IQR (%)") +
+#   theme_bw(base_size = 15) +
+#   ylab('Circularity Indicators') + xlab('Scenario')+
+#   scale_y_discrete(limits=rev(c('Total Input',
+#                                 'Losses',
+#                                 'Use Efficiency',
+#                                 'Recycling Rate',
+#                                 'Reuse : Total Input'))) 
+# 
+# ggsave(p6, filename = 'indicators_changes_K.jpg', path = 'figures/', device = 'jpeg', height = 20, width = 15, units = 'cm')

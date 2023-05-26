@@ -83,38 +83,38 @@ write.csv(indicator_sum, file = 'data/result_indicator_summarized.csv', row.name
 write.csv(flow_sum, file = 'data/result_flow_summarized.csv', row.names = F)
 
 #remove the import egg and dairy and import meat
-flow_sum <- flow_sum %>% 
-  filter(!variable %in% c('import_dairy_egg', 'import_meat', 'animal_balance'))
+# flow_sum <- flow_sum %>% 
+#   filter(!variable %in% c('import_dairy_egg', 'import_meat', 'animal_balance'))
 
 
 #write.csv(unique(flow_sum$variable), file = 'flow_names.csv')
 #modify
 
-senky_df <- read.csv('flow_names.csv')
-
-senky_df <- merge(senky_df, flow_sum, by = 'variable', all.x = TRUE)
-
-library(networkD3)
-
-
-links_df_1 <- senky_df %>% 
-  mutate(value = median) %>% 
-  filter(scenario == 'Ref', nutrient == 'N')
-
-
-# From these flows we need to create a node data frame: it lists every entities involved in the flow
-nodes <- data.frame(
-  name=c(as.character(links_df_1$source), 
-         as.character(links_df_1$target)) %>% unique()
-)
-
-# With networkD3, connection must be provided using id, not using real name like in the links dataframe.. So we need to reformat it.
-links_df_1$IDsource <- match(links_df_1$source, nodes$name)-1 
-links_df_1$IDtarget <- match(links_df_1$target, nodes$name)-1
-
-# Make the Network
-p <- sankeyNetwork(Links = links_df_1, Nodes = nodes,
-                   Source = "IDsource", Target = "IDtarget",
-                   Value = "value", NodeID = "name", 
-                   sinksRight=FALSE)
-p
+# senky_df <- read.csv('flow_names.csv')
+# 
+# senky_df <- merge(senky_df, flow_sum, by = 'variable', all.x = TRUE)
+# 
+# library(networkD3)
+# 
+# 
+# links_df_1 <- senky_df %>% 
+#   mutate(value = median) %>% 
+#   filter(scenario == 'Ref', nutrient == 'N')
+# 
+# 
+# # From these flows we need to create a node data frame: it lists every entities involved in the flow
+# nodes <- data.frame(
+#   name=c(as.character(links_df_1$source), 
+#          as.character(links_df_1$target)) %>% unique()
+# )
+# 
+# # With networkD3, connection must be provided using id, not using real name like in the links dataframe.. So we need to reformat it.
+# links_df_1$IDsource <- match(links_df_1$source, nodes$name)-1 
+# links_df_1$IDtarget <- match(links_df_1$target, nodes$name)-1
+# 
+# # Make the Network
+# p <- sankeyNetwork(Links = links_df_1, Nodes = nodes,
+#                    Source = "IDsource", Target = "IDtarget",
+#                    Value = "value", NodeID = "name", 
+#                    sinksRight=FALSE)
+# p

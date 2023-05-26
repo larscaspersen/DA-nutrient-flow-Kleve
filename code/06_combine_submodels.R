@@ -1506,8 +1506,7 @@ combined_function <- function() {
           )
         
         
-        #
-
+        
        # end animal output calculation under local feed
 
 
@@ -1529,6 +1528,8 @@ combined_function <- function() {
           animal_output$K_to_slaughter
       } # end animal output with changed herdsize / composition 
       
+      #calculate the LLU after all the reductions
+      LLU_total_adjusted <- LLU_total * rf_local_feed
       
       #####stop#######
       
@@ -2264,32 +2265,36 @@ combined_function <- function() {
         scenario_allocate_manure_biogas_a = c(combined_output$scenario_allocate_manure_biogas_a, scenario_allocate_manure_biogas_a),
         import_animal_products_N = c(combined_output$import_animal_products_N, N_animal_product_import),
         import_animal_products_P = c(combined_output$import_animal_products_P, P_animal_product_import),
-        import_animal_products_K = c(combined_output$import_animal_products_K, K_animal_product_import)
+        import_animal_products_K = c(combined_output$import_animal_products_K, K_animal_product_import),
+        current_share_cattle = c(combined_output$current_share_cattle, current_share_cattle),
+        current_share_pig = c(combined_output$current_share_pig, current_share_pig),
+        current_share_poultry = c(combined_output$current_share_poultry, current_share_poultry),
+        current_share_others = c(combined_output$current_share_others, current_share_others),
+        reduction_LLU = c(combined_output$reduction_LLU, 1- rf_local_feed),
+        allocate_crop_biogas_corrected = c(combined_output$scenario_allocate_crop_biogas_corrected, scenario_allocate_crop_biogas_corrected),
+        stakeholder_allocate_crop_feed_corrected = c(combined_output$scenario_allocate_crop_feed_corrected, scenario_allocate_crop_feed_corrected),
+        stakeholder_allocate_crop_food_corrected = c(combined_output$scenario_allocate_crop_food_corrected, scenario_allocate_crop_food_corrected),
+        stakeholder_allocate_manure_biogas_corrected = c(combined_output$scenario_allocate_manure_biogas_corrected, scenario_allocate_manure_biogas_corrected),
+        stakeholder_allocate_manure_crop_corrected = c(combined_output$scenario_allocate_manure_crop_corrected, scenario_allocate_manure_crop_corrected),
+        stakeholder_allocate_manure_export_corrected = c(combined_output$scenario_allocate_manure_export_corrected, scenario_allocate_manure_export_corrected),
+        LLU_total_adjusted = c(combined_output$LLU_total_adjusted, LLU_total_adjusted)
       )
       
       
-      alt_output <- list(current_share_cattle = c(alt_output$current_share_cattle, current_share_cattle),
-                         current_share_pig = c(alt_output$current_share_pig, current_share_pig),
-                         current_share_poultry = c(alt_output$current_share_poultry, current_share_poultry),
-                         current_share_others = c(alt_output$current_share_others, current_share_others),
-                         reduction_LLU = c(alt_output$reduction_LLU, 1- rf_local_feed),
-                         manure_crop = c(alt_output$manure_crop, animal_output$N_manure_crop),
-                         manure_biogas = c(alt_output$manure_biogas, animal_output$N_manure_biogas),
-                         manure_export = c(alt_output$manure_export, animal_output$export_manure_N_kg),
-                         crop_biogas = c(alt_output$crop_biogas, crop_output$N_crop_biogas),
-                         local_crop_human = c(alt_output$local_crop_human, N_local_vegetal_products_consumed),
-                         crop_processed_feed = c(alt_output$crop_processed_feed, crop_output$N_crop_animal_feeding_processed),
-                         crop_unprocessed_feed = c(alt_output$crop_unprocessed_feed, crop_output$N_crop_animal_feeding_unprocessed),
-                         scenario_allocate_crop_biogas_corrected = c(alt_output$scenario_allocate_crop_biogas_corrected, scenario_allocate_crop_biogas_corrected),
-                         scenario_allocate_crop_feed_corrected = c(alt_output$scenario_allocate_crop_feed_corrected, scenario_allocate_crop_feed_corrected),
-                         scenario_allocate_crop_food_corrected = c(alt_output$scenario_allocate_crop_food_corrected, scenario_allocate_crop_food_corrected),
-                         scenario_allocate_manure_biogas_corrected = c(alt_output$scenario_allocate_manure_biogas_corrected, scenario_allocate_manure_biogas_corrected),
-                         scenario_allocate_manure_crop_corrected = c(alt_output$scenario_allocate_manure_crop_corrected, scenario_allocate_manure_crop_corrected),
-                         scenario_allocate_manure_export_corrected = c(alt_output$scenario_allocate_manure_export_corrected, scenario_allocate_manure_export_corrected),
-                         N_vegetable_export = c(alt_output$N_vegetable_export, N_vegetable_export)
-                         
-        
-      )
+      # alt_output <- list(current_share_cattle = c(alt_output$current_share_cattle, current_share_cattle),
+      #                    current_share_pig = c(alt_output$current_share_pig, current_share_pig),
+      #                    current_share_poultry = c(alt_output$current_share_poultry, current_share_poultry),
+      #                    current_share_others = c(alt_output$current_share_others, current_share_others),
+      #                    reduction_LLU = c(alt_output$reduction_LLU, 1- rf_local_feed),
+      #                    scenario_allocate_crop_biogas_corrected = c(alt_output$scenario_allocate_crop_biogas_corrected, scenario_allocate_crop_biogas_corrected),
+      #                    scenario_allocate_crop_feed_corrected = c(alt_output$scenario_allocate_crop_feed_corrected, scenario_allocate_crop_feed_corrected),
+      #                    scenario_allocate_crop_food_corrected = c(alt_output$scenario_allocate_crop_food_corrected, scenario_allocate_crop_food_corrected),
+      #                    scenario_allocate_manure_biogas_corrected = c(alt_output$scenario_allocate_manure_biogas_corrected, scenario_allocate_manure_biogas_corrected),
+      #                    scenario_allocate_manure_crop_corrected = c(alt_output$scenario_allocate_manure_crop_corrected, scenario_allocate_manure_crop_corrected),
+      #                    scenario_allocate_manure_export_corrected = c(alt_output$scenario_allocate_manure_export_corrected, scenario_allocate_manure_export_corrected)
+      #                    
+      #   
+      # )
     } # end of loop for different stakeholders answers
   } # end of the loop for the different scenarios   
   
@@ -2596,11 +2601,13 @@ combined_function <- function() {
   #   scenario_allocate_manure_biogas_a = c(model_evaluation$scenario_allocate_manure_biogas_a, scenario_allocate_manure_biogas_a)
   # )
   
-  if(return_alt_output == FALSE){
-    return(combined_output)
-  } else{
-    return(alt_output)
-  }
+  return(combined_output)
+  
+  # if(return_alt_output == FALSE){
+  #   return(combined_output)
+  # } else{
+  #   return(alt_output)
+  # }
 
 
 
