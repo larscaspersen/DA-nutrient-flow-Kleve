@@ -1551,7 +1551,7 @@ p3 <- rel_summarised_flows %>%
   geom_text(data = summarised_flows_reference[summarised_flows_reference$nutrient == nutrient,],
             aes(label =  floor(abs(median_abs)/1000)), nudge_y = -0.3)+
   scale_size(range = c(.1, 7), name="Interquartile range (%)") +
-  theme_bw(base_size = 15) + ylab('Phosphorous flow') + xlab('Scenario')+
+  theme_bw(base_size = 15) + ylab('Potassium flow') + xlab('Scenario')+
   scale_y_discrete(limits=rev(c('Manure to crops',
                                 'Manure export',
                                 'Manure biogas substrate',
