@@ -50,7 +50,10 @@ drop_col <-  which(colnames(nitrogen_mc_simulation$y) %in% c('scenario_allocate_
 nitrogen_mc_simulation$y <- subset(nitrogen_mc_simulation$y, select = -drop_col)
 
 
-saveRDS(nitrogen_mc_simulation, file = 'data/model_output_flows.rds')
+
+#saveRDS(nitrogen_mc_simulation, file = 'data/model_output_flows.rds')
+
+saveRDS(nitrogen_mc_simulation, file = 'data/new_run_model_output_flows.rds')
 
 #nitrogen_mc_simulation <- readRDS('data/model_output_flows.rds')
 
@@ -105,4 +108,5 @@ result_list$interventions_crop_adjusted[,-1] <- lapply(result_list$interventions
 result_list$traditional_agriculture[,-1] <- lapply(result_list$traditional_agriculture[,-1], as.numeric)
 
 #save result list
-saveRDS(result_list, file = 'data/model_result_flows.rds')
+#saveRDS(result_list, file = 'data/model_result_flows.rds')
+saveRDS(result_list, file = 'data/new_run_model_result_flows.rds')

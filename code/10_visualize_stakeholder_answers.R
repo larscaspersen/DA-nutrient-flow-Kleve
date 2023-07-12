@@ -66,13 +66,16 @@ answers <- read.csv('data/stakeholder_answers.csv')
 
 
 answers$stakeholder_group <- factor(answers$stakeholder_group,
-                                    levels = c('nature', 'waste', 'farming',
-                                               'science', 'food processing'),
-                                    labels = c('Nature Conservation',
-                                               'Waste Management',
-                                               'Farming',
+                                    levels = c('farming',
+                                               'food processing',
+                                               'nature', 
+                                               'science', 'waste'),
+                                    labels = c('Farming',
+                                               'Food Processing',
+                                      'Nature Conservation',
                                                'Research',
-                                               'Food Processing'))
+                                      'Waste Management'
+                                               ))
 
 answers$var <- factor(answers$var, 
                       levels = c('crop_biogas',
@@ -89,7 +92,7 @@ answers$var <- factor(answers$var,
                       labels = c('Biogas',
                                  'Animal Feeding',
                                  'Human Consumption',
-                                 'Total LLU',
+                                 ' ',
                                  'Cattle',
                                  'Pig',
                                  'Poultry',
@@ -103,10 +106,10 @@ answers$category <- factor(answers$category,
                                       'manure',
                                       'livestock_reduction',
                                       'livestock_compostion'),
-                           labels = c('Allocation of crops to:',
-                                      'Allocation of manure to:',
-                                      'Reduction in Livestock Units (LLU)',
-                                      'Composition of Livestock Units'))
+                           labels = c('Crop allocation',
+                                      'Manure allocation',
+                                      'Livestock reduction',
+                                      'Livestock composition'))
 
 unique(answers$category)
 
@@ -114,18 +117,31 @@ unique(answers$var)
 
 library(ggtext)
 
+base_size <- 17
+width <- 24
+height <- 17
+
+cbp1 <- c("#999999", "#E69F00", "#56B4E9", "#009E73",
+          "#CC79A7")
+
+#make an invisible point at 000000 for all answers
+
 ggplot(answers, aes(x = var, y = middle)) + 
+  geom_point(size = 0.001, col = 'grey94', aes(y = 0)) +
+  geom_point(size = 0.001, col = 'grey94', aes(y = 100)) +
   facet_wrap(~category, scales = 'free') +
-  geom_point(size = 0.001, col = 'white')+
-  geom_point(position=position_dodge(width=0.5), size = 1.5, aes(col = stakeholder_group)) +
+  geom_point(size = 0.001, col = 'grey94')+
+  geom_point(position=position_dodge(width=0.5), size = 2, aes(col = stakeholder_group)) +
   geom_errorbar(aes(ymin=lower, ymax=upper, col = stakeholder_group), width=.2,
                 position=position_dodge(0.5))+
-  ylab('Stakeholder answers (%)') +
+  ylab('Stakeholder estimates for the levers, given in %') +
   xlab('') +
-  theme_bw() +
+  scale_color_manual(values=cbp1) +
   labs(colour='Stakeholder Group')+
+  theme_bw(base_size = base_size) +
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1), 
         axis.text = element_textbox_simple())
+ggsave(filename = 'figures/stakeholder_answers.jpg', device = 'jpeg', width = width, height = height, units = 'cm')
 
 
 

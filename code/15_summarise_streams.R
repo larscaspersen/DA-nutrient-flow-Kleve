@@ -6,8 +6,99 @@ library(ggridges)
 library(scales) #to have non-scientific numbers for the x and y axis
 
 #read saved runs for flows and for indicators
+
 result_flows <- readRDS('data/model_result_flows.rds')
-#result_indicators <- readRDS('data/model_result_indicators.rds')
+
+
+#combine meat and dairy stuff
+result_flows <- purrr::map(result_flows, function(x){
+  #x$import_animal_products_N <- x$import_dairy_egg_N + x$import_meat_N
+  x$export_animal_products_N <- x$export_dairy_egg_N + x$export_meat_N
+  
+  #x$import_animal_products_P <- x$import_dairy_egg_P + x$import_meat_P
+  x$export_animal_products_P <- x$export_dairy_egg_P + x$export_meat_P
+  
+  #x$import_animal_products_K <- x$import_dairy_egg_K + x$import_meat_K
+  x$export_animal_products_K <- x$export_dairy_egg_K + x$export_meat_K
+  
+  
+  
+  
+  
+  #adjust the use efficiency calculations
+  x$use_efficiency_N <- ((x$feed_crops_N +
+                            x$straw_N +
+                            x$grassbased_feed_N +
+                            x$food_and_feed_crops_N +
+                            x$fruit_and_vegetable_N +
+                            x$egg_and_dairy_N +
+                            x$vegetal_biogas_substrate_N +
+                            x$slaughter_animal_N) /
+                           (x$manure_to_crop_N +
+                              x$net_feed_import_N +
+                              x$import_inorganic_fertilizer_N +
+                              x$feed_crops_N +
+                              x$grassbased_feed_N +
+                              x$digestate_N +
+                              x$import_organic_fertilizer_N +
+                              x$feed_from_processed_crops_N +
+                              x$fresh_compost_crop_N +
+                              x$sewage_N +
+                              x$straw_N)) * 100
+  
+  x$use_efficiency_P <- ((x$feed_crops_P +
+                            x$straw_P +
+                            x$grassbased_feed_P +
+                            x$food_and_feed_crops_P +
+                            x$fruit_and_vegetable_P +
+                            x$egg_and_dairy_P +
+                            x$vegetal_biogas_substrate_P +
+                            x$slaughter_animal_P) /
+                           (x$manure_to_crop_P +
+                              x$net_feed_import_P +
+                              x$import_inorganic_fertilizer_P +
+                              x$feed_crops_P +
+                              x$grassbased_feed_P +
+                              x$digestate_P +
+                              x$import_organic_fertilizer_P +
+                              x$feed_from_processed_crops_P +
+                              x$fresh_compost_crop_P +
+                              x$sewage_P +
+                              x$straw_P)) * 100
+  
+  x$use_efficiency_K <- ((x$feed_crops_K +
+                            x$straw_K +
+                            x$grassbased_feed_K +
+                            x$food_and_feed_crops_K +
+                            x$fruit_and_vegetable_K +
+                            x$egg_and_dairy_K +
+                            x$vegetal_biogas_substrate_K +
+                            x$slaughter_animal_K) /
+                           (x$manure_to_crop_K +
+                              x$net_feed_import_K +
+                              x$import_inorganic_fertilizer_K +
+                              x$feed_crops_K +
+                              x$grassbased_feed_K +
+                              x$digestate_K +
+                              x$import_organic_fertilizer_K +
+                              x$feed_from_processed_crops_K +
+                              x$fresh_compost_crop_K +
+                              x$sewage_K +
+                              x$straw_K)) * 100
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  return(x)
+})
 
 diff_flows_df <- rbind.data.frame(result_flows$interventions[-1] - result_flows$reference_year[-1],
                                   result_flows$interventions_animal_adjusted[-1] - result_flows$reference_year[-1],
@@ -60,6 +151,10 @@ result_flows_long <- result_flows_long %>%
 results_indicators_long$variable <- factor(results_indicators_long$variable, 
                                            levels = c("total_input", 'losses', "recycling_rate", "share_reuse_to_total_input", "use_efficiency"),
                                            labels = c('Total Input', 'Losses', 'Recycling Rate', 'Reuse to Total Input', 'Use Efficiency'))
+
+
+
+
 
 flow_sum <-  result_flows_long %>% 
   mutate(value = round(value  / 1000, digits = 3)) %>% 
