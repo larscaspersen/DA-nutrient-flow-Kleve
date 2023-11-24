@@ -42,10 +42,6 @@ result_flows_long <- result_flows_long %>%
                          'LLU_total_adjusted'))
 
 
-# combined_results <- result_flows_long %>% 
-#   reshape2::melt(id.vars = c('scenario', 'run')) %>% 
-#   reshape2::dcast(run + variable ~ scenario, value.var = 'value') 
-
 #bring to long format and summarize
 table_sum <- result_flows_long %>% 
   mutate(value = as.numeric(value)) %>% 
@@ -64,16 +60,3 @@ test <- table_sum %>%
          PS_percent_change = round(((PS - Ref) / Ref) * 100))
 
 write.csv(test, 'data/table_scenario_inputs.csv', row.names = FALSE)
-
-
-
-
-result_flows_long %>% 
-  reshape2::dcast(run + variable ~ scenario, value.var = 'value') %>% 
-  filter(variable == 'feed_crops_N') %>% 
-  group_by(variable) %>% 
-  summarise(same = sum((CBS == LBS & CBS == PS & CBS == Ref )) / n(),
-            lower = sum((CBS == LBS & CBS == PS & CBS < Ref )) / n())
-
-#in 51% of the cases the values are the same
-#in rest of the cases the values are lower (because we reduced the animal numbers so much that we had to reduce the unprocessed feed)

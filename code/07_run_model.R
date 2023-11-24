@@ -3,9 +3,6 @@ library(decisionSupport)
 #run nutrient flow simulations
 source('code/06_combine_submodels.R')
 
-# decide what to return
-#return_flows <- TRUE
-
 n_runs <- 10000
 
 

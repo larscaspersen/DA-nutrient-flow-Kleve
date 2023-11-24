@@ -1,19 +1,3 @@
-# library(decisionSupport)
-# 
-#read input table
-# consumption_input <- read.csv('data/input-all.csv')
-# 
-# #function to draw random variables from input and create global variables
-# make_variables<-function(est,n=1)
-# { x<-random(rho=est, n=n)
-# for(i in colnames(x)) assign(i,
-#                              as.numeric(x[1,i]),envir=.GlobalEnv)
-# }
-# 
-# #create variable so I can test the function
-# make_variables(as.estimate(consumption_input),n=1)
-
-#function to calcualte consumption rate of products
 calc_consume <- function(population, 
                          consume_beef, N_content_beef,
                          consume_beer, N_content_beer,
@@ -329,8 +313,3 @@ calc_consume <- function(population,
               consumed_P_vegetable = consumed_P_vegetable,
               consumed_K_vegetable = consumed_K_vegetable))  
 }
-# 
-# nitrogen_mc_simulation <- mcSimulation(estimate = as.estimate(combined_input),
-#                                        model_function = calc_consume,
-#                                        numberOfModelRuns = 10000,
-#                                        functionSyntax = "plainNames")
