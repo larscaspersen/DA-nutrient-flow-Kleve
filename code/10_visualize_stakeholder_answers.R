@@ -71,10 +71,10 @@ answers$stakeholder_group <- factor(answers$stakeholder_group,
                                                'nature', 
                                                'science', 'waste'),
                                     labels = c('Farming',
-                                               'Food Processing',
-                                      'Nature Conservation',
+                                               'Food processing',
+                                      'Nature conservation',
                                                'Research',
-                                      'Waste Management'
+                                      'Waste management'
                                                ))
 
 answers$var <- factor(answers$var, 
@@ -89,16 +89,16 @@ answers$var <- factor(answers$var,
                                   'manure_biogas',
                                   'manure_crop',
                                  'manure_export'),
-                      labels = c('Biogas',
-                                 'Animal Feeding',
-                                 'Human Consumption',
+                      labels = c('Biogas\nsubstrate',
+                                 'Feed',
+                                 'Food',
                                  ' ',
                                  'Cattle',
-                                 'Pig',
+                                 'Pigs',
                                  'Poultry',
-                                 'Other',
-                                 'Biogas',
-                                 'Field Application',
+                                 'Others',
+                                 'Biogas\nsubstrate',
+                                 'Local\napplication',
                                  'Export'))
 
 answers$category <- factor(answers$category,
@@ -134,13 +134,14 @@ ggplot(answers, aes(x = var, y = middle)) +
   geom_point(position=position_dodge(width=0.5), size = 2, aes(col = stakeholder_group)) +
   geom_errorbar(aes(ymin=lower, ymax=upper, col = stakeholder_group), width=.2,
                 position=position_dodge(0.5))+
-  ylab('Stakeholder estimates for the levers, given in %') +
+  ylab('Stakeholder estimates for the aspects, given in %') +
   xlab('') +
   scale_color_manual(values=cbp1) +
-  labs(colour='Stakeholder Group')+
+  labs(colour='Stakeholder groups')+
   theme_bw(base_size = base_size) +
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1), 
-        axis.text = element_textbox_simple())
+  # theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1), 
+  #       axis.text = element_textbox_simple())
+  theme(axis.text = element_textbox_simple())
 ggsave(filename = 'figures/stakeholder_answers.jpg', device = 'jpeg', width = width, height = height, units = 'cm')
 
 

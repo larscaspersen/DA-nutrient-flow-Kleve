@@ -174,7 +174,13 @@ rel_summarised_flows <- rel_summarised_flows %>%
                          'feed_from_processed_crops', 
                          'net_food_import', 'crop_cultivation_losses', 'import_animal_products', 
                          'export_animal_products',
-                         'animal_housing_and_storage_losses', 'animal_balance'))
+                         'animal_housing_and_storage_losses', 'animal_balance',
+                         
+                         'import_organic_fertilizer',
+                         'feed_crops',
+                         'grassbased_feed',
+                         'digestate'
+                         ))
 
 
 rel_summarised_flows$variable <- factor(rel_summarised_flows$variable, 
@@ -189,12 +195,17 @@ rel_summarised_flows$variable <- factor(rel_summarised_flows$variable,
                   'net_food_import',
                   'crop_cultivation_losses',
                   'animal_housing_and_storage_losses',
-                  'animal_balance'), 
+                  'animal_balance',
+                  
+                  'import_organic_fertilizer',
+                  'feed_crops',
+                  'grassbased_feed',
+                  'digestate'), 
        
        labels = c('Manure to crops',
                   'Manure export',
                   'Manure biogas substrate',
-                  'Import inorganic fertilizers',
+                  'Inorganic fertilizer import',
                   'Vegetal biogas substrate',
                   'Feed from processed crops',
                   'Animal products import',
@@ -202,15 +213,24 @@ rel_summarised_flows$variable <- factor(rel_summarised_flows$variable,
                   'Net food import',
                   'Cultivation losses',
                   'Animal housing and storage losses',
-                  'Stock balance animal subsystem'
+                  'Stock balance animal subsystem',
+                  
+                  'Organic fertilizer import',
+                  'Feed crops',
+                  'Grass-based feed',
+                  'Digestate'
                   ))
 
 factor(rel_summarised_flows$variable, levels = c('Manure to crops',
                                              'Manure export',
                                              'Manure biogas substrate',
-                                             'Import inorganic fertilizers',
+                                             'Inorganic fertilizer import',
+                                             'Organic fertilizer import',
                                              'Vegetal biogas substrate',
+                                             'Digestate',
                                              'Feed from processed crops',
+                                             'Feed crops',
+                                             'Grass-based feed',
                                              'Animal products import',
                                              'Animal products export',
                                              'Net food import',
@@ -287,7 +307,12 @@ summarised_flows_reference <- summarised_flows_reference %>%
                          'feed_from_processed_crops', 
                          'net_food_import', 'crop_cultivation_losses', 'import_animal_products', 
                          'export_animal_products',
-                         'animal_housing_and_storage_losses', 'animal_balance'))
+                         'animal_housing_and_storage_losses', 'animal_balance',
+                         
+                         'import_organic_fertilizer',
+                         'feed_crops',
+                         'grassbased_feed',
+                         'digestate'))
 
 
 summarised_flows_reference$variable <- factor(summarised_flows_reference$variable, 
@@ -302,12 +327,17 @@ summarised_flows_reference$variable <- factor(summarised_flows_reference$variabl
                                                    'net_food_import',
                                                    'crop_cultivation_losses',
                                                    'animal_housing_and_storage_losses',
-                                                   'animal_balance'), 
+                                                   'animal_balance',
+                                                   
+                                                   'import_organic_fertilizer',
+                                                   'feed_crops',
+                                                   'grassbased_feed',
+                                                   'digestate'), 
                                         
                                         labels = c('Manure to crops',
                                                    'Manure export',
                                                    'Manure biogas substrate',
-                                                   'Import inorganic fertilizers',
+                                                   'Inorganic fertilizer import',
                                                    'Vegetal biogas substrate',
                                                    'Feed from processed crops',
                                                    'Animal products import',
@@ -315,21 +345,30 @@ summarised_flows_reference$variable <- factor(summarised_flows_reference$variabl
                                                    'Net food import',
                                                    'Cultivation losses',
                                                    'Animal housing and storage losses',
-                                                   'Stock balance animal subsystem'
+                                                   'Stock balance animal subsystem',
+                                                   
+                                                   'Organic fertilizer import',
+                                                   'Feed crops',
+                                                   'Grass-based feed',
+                                                   'Digestate'
                                         ))
 
 factor(summarised_flows_reference$variable, levels = c('Manure to crops',
-                                                 'Manure export',
-                                                 'Manure biogas substrate',
-                                                 'Import inorganic fertilizers',
-                                                 'Vegetal biogas substrate',
-                                                 'Feed from processed crops',
-                                                 'Animal products import',
-                                                 'Animal products export',
-                                                 'Net food import',
-                                                 'Cultivation losses',
-                                                 'Animal housing and storage losses',
-                                                 'Stock balance animal subsystem'
+                                                       'Manure export',
+                                                       'Manure biogas substrate',
+                                                       'Inorganic fertilizer import',
+                                                       'Organic fertilizer import',
+                                                       'Vegetal biogas substrate',
+                                                       'Digestate',
+                                                       'Feed from processed crops',
+                                                       'Feed crops',
+                                                       'Grass-based feed',
+                                                       'Animal products import',
+                                                       'Animal products export',
+                                                       'Net food import',
+                                                       'Cultivation losses',
+                                                       'Animal housing and storage losses',
+                                                       'Stock balance animal subsystem'
 ))
 
 
@@ -378,9 +417,13 @@ p1 <- rel_summarised_flows %>%
   scale_y_discrete(limits=rev(c('Manure to crops',
                             'Manure export',
                             'Manure biogas substrate',
-                            'Import inorganic fertilizers',
+                            'Inorganic fertilizer import',
+                            'Organic fertilizer import',
                             'Vegetal biogas substrate',
+                            'Digestate',
                             'Feed from processed crops',
+                            'Feed crops',
+                            'Grass-based feed',
                             'Animal products import',
                             'Animal products export',
                             'Net food import',
@@ -427,9 +470,13 @@ p1 <- rel_summarised_flows %>%
   scale_y_discrete(limits=rev(c('Manure to crops',
                                 'Manure export',
                                 'Manure biogas substrate',
-                                'Import inorganic fertilizers',
+                                'Inorganic fertilizer import',
+                                'Organic fertilizer import',
                                 'Vegetal biogas substrate',
+                                'Digestate',
                                 'Feed from processed crops',
+                                'Feed crops',
+                                'Grass-based feed',
                                 'Animal products import',
                                 'Animal products export',
                                 'Net food import',
@@ -456,6 +503,24 @@ grid.draw(g)
 
 ggsave(g, filename = 'flow_changes_N_test.jpg', path = 'figures/', device = 'jpeg',
        height = 22, width = 22, units = 'cm')
+
+
+
+
+
+
+
+
+
+
+#composition of feed 
+
+
+
+
+
+
+
 
 
 

@@ -102,6 +102,10 @@ height <- 17
 make_indicator_plots <- TRUE
 
 if(make_indicator_plots){
+  
+  #express the circularity indicators per ha agricultural area
+  ha_ag_land <- 73014
+  
   #indicators: make two seperatre plots with SHARED y axis:
   p1.1 <- results_indicators_long %>% 
     filter(nutrient == 'N', variable %in% c('Recycling Rate', 'Reuse to Total Input', 'Use Efficiency')) %>%
@@ -113,7 +117,7 @@ if(make_indicator_plots){
                       labels = c("Reference Year 2020", "Participatory Scenario", 
                                  "Crop Buffered Scenario", "Livestock Buffered Scenario"),
                       values=cbp1) +
-    ylab('Circularity indicator (%)') +
+    ylab('N Circularity Indicator (%)') +
     xlab('')+
     ylim(0,100)+
     facet_wrap(~variable) + 
@@ -127,11 +131,12 @@ if(make_indicator_plots){
     filter(value >= 0) %>% 
     mutate(value = floor(value / 1000)) %>% 
     na.omit() %>% 
+    mutate(value = value / ha_ag_land) %>% 
     ggplot(aes(x = scenario, y = value, fill = scenario)) +
     geom_boxplot(outlier.alpha = 0.1) +
-    ylab(bquote('Circularity indicator (t N'~year^-1*')')) +
+    ylab(bquote('N Circularity Indicator (t N'~ha^-1~year^-1*')')) +
     xlab('')+
-    scale_fill_manual(name = "Modelled Scenario", 
+    scale_fill_manual(name = "Modelled Scenarios", 
                       labels = c("Reference Year 2020", "Participatory Scenario", 
                                  "Crop Buffered Scenario", "Livestock Buffered Scenario"),
                       values=cbp1) +
@@ -237,7 +242,7 @@ if(make_indicator_plots){
   p3 <- p3.2 + guide_area() + p3.1  + plot_layout(design=design, guides = "collect") 
   
   
-  ggsave(p1, filename = 'figures/boxplot_indicators_N.jpeg', device = 'jpeg', width = width, height = height, units = 'cm')
+  ggsave(p1, filename = 'figures/boxplot_indicators_N.jpeg', device = 'jpeg', width = width, height = height +4, units = 'cm')
   ggsave(p2, filename = 'figures/boxplot_indicators_P.jpeg', device = 'jpeg', width = width, height = height, units = 'cm')
   ggsave(p3, filename = 'figures/boxplot_indicators_K.jpeg', device = 'jpeg', width = width, height = height, units = 'cm')
   
