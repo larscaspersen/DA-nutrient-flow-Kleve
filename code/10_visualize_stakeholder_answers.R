@@ -103,13 +103,13 @@ answers$var <- factor(answers$var,
 
 answers$category <- factor(answers$category,
                            levels = c('crop',
-                                      'manure',
+                                      'livestock_compostion',
                                       'livestock_reduction',
-                                      'livestock_compostion'),
+                                      'manure'),
                            labels = c('Crop allocation',
-                                      'Manure allocation',
+                                      'Livestock composition',
                                       'Livestock reduction',
-                                      'Livestock composition'))
+                                      'Manure allocation'))
 
 unique(answers$category)
 

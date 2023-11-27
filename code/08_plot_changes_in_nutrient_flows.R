@@ -111,9 +111,9 @@ abs_change_flows$run <- rel_change_flows$run <- rep(1:10000, 3)
 
 
 rel_change_flows$scenario <- factor(rel_change_flows$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted"),
-                                      labels = c('Ref', 'PS', 'LBS' ,'CBS'))
+                                      labels = c('Reference\nyear 2020', 'PS', 'LBS' ,'CBS'))
 abs_change_flows$scenario <- factor(abs_change_flows$scenario, levels = c("reference_year","interventions","interventions_animal_adjusted", "interventions_crop_adjusted"),
-                                    labels = c('Ref', 'PS', 'LBS' ,'CBS'))
+                                    labels = c('Reference\nyear 2020', 'PS', 'LBS' ,'CBS'))
 
 
 #summarise results similar to eduardos banana paper
@@ -168,7 +168,8 @@ rel_summarised_flows <- rel_summarised_flows %>%
                          'import_organic_fertilizer',
                          'feed_crops',
                          'grassbased_feed',
-                         'digestate'
+                         'digestate',
+                         'export_vegetable'
                          ))
 
 
@@ -189,43 +190,46 @@ rel_summarised_flows$variable <- factor(rel_summarised_flows$variable,
                   'import_organic_fertilizer',
                   'feed_crops',
                   'grassbased_feed',
-                  'digestate'), 
+                  'digestate',
+                  'export_vegetable'), 
        
-       labels = c('Manure: Local application',
-                  'Manure: Export',
-                  'Manure: Biogas substrate',
+       labels = c('Local application of manure',
+                  'Manure export',
+                  'Manure as biogas substrate',
                   'Inorganic fertilizer import',
-                  'Crops: Biogas substrate',
+                  'Vegetal biogas substrate',
                   'Feed from processed crops',
-                  'Animal-based food import',
-                  'Animal-based food export',
-                  'Plant-based food import',
+                  'Imported animal products',
+                  'Exported animal products',
+                  'Imported vegetal products',
                   'Losses during cultivation',
                   'Animal housing and\nstorage losses',
-                  'Nutrient balance animal\nproduction system',
+                  'Nutrient balance animal\nproduction subsystem',
                   
                   'Organic fertilizer import',
                   'Feed crops',
                   'Grass-based feed',
-                  'Digestate'))
+                  'Digestate',
+                  'Exported vegetal products'))
 
-factor(rel_summarised_flows$variable, levels = c('Manure: Local application',
-                                                 'Manure: Export',
-                                                 'Manure: Biogas substrate',
+factor(rel_summarised_flows$variable, levels = c('Local application of manure',
+                                                 'Manure export',
+                                                 'Manure as biogas substrate',
                                                  'Inorganic fertilizer import',
-                                                 'Crops: Biogas substrate',
+                                                 'Vegetal biogas substrate',
                                                  'Feed from processed crops',
-                                                 'Animal-based food import',
-                                                 'Animal-based food export',
-                                                 'Plant-based food import',
+                                                 'Imported animal products',
+                                                 'Exported animal products',
+                                                 'Imported vegetal products',
                                                  'Losses during cultivation',
                                                  'Animal housing and\nstorage losses',
-                                                 'Nutrient balance animal\nproduction system',
+                                                 'Nutrient balance animal\nproduction subsystem',
                                                  
                                                  'Organic fertilizer import',
                                                  'Feed crops',
                                                  'Grass-based feed',
-                                                 'Digestate'))
+                                                 'Digestate',
+                                                 'Exported vegetal products'))
 
 
 
@@ -251,7 +255,7 @@ library(ggnewscale)
 #RColorBrewer::brewer.pal(7, 'PuOr')
 
 rel_summarised_flows <- rel_summarised_flows %>%
-  mutate(scenario = factor(scenario, levels = c('Ref', 'PS', 'CBS', 'LBS')))
+  mutate(scenario = factor(scenario, levels = c('Reference\nyear 2020', 'PS', 'CBS', 'LBS')))
 
 #animal balance values are missleading, because the reference is zero
 rel_summarised_flows %>% 
@@ -302,7 +306,8 @@ summarised_flows_reference <- summarised_flows_reference %>%
                          'import_organic_fertilizer',
                          'feed_crops',
                          'grassbased_feed',
-                         'digestate'))
+                         'digestate',
+                         'export_vegetable'))
 
 
 summarised_flows_reference$variable <- factor(summarised_flows_reference$variable, 
@@ -322,43 +327,48 @@ summarised_flows_reference$variable <- factor(summarised_flows_reference$variabl
                                                    'import_organic_fertilizer',
                                                    'feed_crops',
                                                    'grassbased_feed',
-                                                   'digestate'), 
+                                                   'digestate',
+                                                   'export_vegetable'), 
                                         
-                                        labels = c('Manure: Local application',
-                                                   'Manure: Export',
-                                                   'Manure: Biogas substrate',
+                                        labels = c('Local application of manure',
+                                                   'Manure export',
+                                                   'Manure as biogas substrate',
                                                    'Inorganic fertilizer import',
-                                                   'Crops: Biogas substrate',
+                                                   'Vegetal biogas substrate',
                                                    'Feed from processed crops',
-                                                   'Animal-based food import',
-                                                   'Animal-based food export',
-                                                   'Plant-based food import',
+                                                   'Imported animal products',
+                                                   'Exported animal products',
+                                                   'Imported vegetal products',
                                                    'Losses during cultivation',
                                                    'Animal housing and\nstorage losses',
-                                                   'Nutrient balance animal\nproduction system',
+                                                   'Nutrient balance animal\nproduction subsystem',
                                                    
                                                    'Organic fertilizer import',
                                                    'Feed crops',
                                                    'Grass-based feed',
-                                                   'Digestate')
+                                                   'Digestate',
+                                                   'Exported vegetal products')
                                         )
 
-label_order <- rev(c('Manure: Local application',
-                     'Manure: Export',
-                     'Manure: Biogas substrate',
+label_order <- rev(c('Local application of manure',
+                     'Manure export',
+                     'Manure as biogas substrate',
                      'Inorganic fertilizer import',
                      'Organic fertilizer import',
-                     'Crops: Biogas substrate',
+                     'Vegetal biogas substrate',
                      'Digestate',
                      'Feed from processed crops',
                      'Feed crops',
                      'Grass-based feed',
-                     'Animal-based food import',
-                     'Animal-based food export',
-                     'Plant-based food import',
+                     'Imported animal products',
+                     'Imported vegetal products',
+                     'Exported animal products',
+                     'Exported vegetal products',
                      'Losses during cultivation',
                      'Animal housing and\nstorage losses',
-                     'Nutrient balance animal\nproduction system'))
+                     'Nutrient balance animal\nproduction subsystem'))
+
+
 
 
 
@@ -368,11 +378,11 @@ summarised_flows_reference$iqr_abs <- summarised_flows_reference$increase <- sum
 colnames(rel_summarised_flows)
 colnames(summarised_flows_reference)
 
-summarised_flows_reference$scenario <- 'Ref'
+summarised_flows_reference$scenario <- 'Reference\nyear 2020'
 summarised_flows_reference$scenario <- factor(summarised_flows_reference$scenario, 
-                                              levels = c('Ref', 'PS', 'CBS', 'LBS'))
+                                              levels = c('Reference\nyear 2020', 'PS', 'CBS', 'LBS'))
 
-#label <- as.character('Numbers in panels\nindicate median nutrient\nflow (N t / year) for\nreference scenario (Ref)\nand changes in median\nfor the other scenarios')
+#label <- as.character('Numbers in panels\nindicate median nutrient\nflow (N t / year) for\nreference scenario (Reference\nyear 2020)\nand changes in median\nfor the other scenarios')
 label <- as.character('Numbers in panels indicate median\nnutrient flow (N t / year) for      \nreference year 2020 and median\nchanges for other scenarios         ')
 
 
@@ -381,7 +391,7 @@ p1 <- rel_summarised_flows %>%
   filter(nutrient == 'N') %>%
   ggplot(aes(x = scenario, y = variable)) +
   geom_tile(fill = 'grey95', color = 'white', size=2)+
-  geom_tile(aes(fill = median_adjusted, x = factor(scenario, levels = c('Ref', 'PS', 'CBS', 'LBS'))),
+  geom_tile(aes(fill = median_adjusted, x = factor(scenario, levels = c('Reference\nyear 2020', 'PS', 'CBS', 'LBS'))),
             data = rel_summarised_flows[rel_summarised_flows$nutrient == 'N' & rel_summarised_flows$median_adjusted < 0,],
             colour="white", size=2) +
   scale_fill_gradient2("Median reduction (%)\ncompared to\nreference year 2020", limits = c(-100, -0), 
@@ -391,7 +401,7 @@ p1 <- rel_summarised_flows %>%
             aes(fill = median_adjusted), colour="white", size=2) +
   scale_fill_gradient2("Median increase (%)\ncompared to\nreference year 2020", limits = c(0, 200), 
                        mid = "grey95", high = "#018571") +
-  geom_point(aes(size = iqr_adusted, x = factor(scenario, levels = c('Ref', 'PS', 'CBS', 'LBS'))), 
+  geom_point(aes(size = iqr_adusted, x = factor(scenario, levels = c('Reference\nyear 2020', 'PS', 'CBS', 'LBS'))), 
              data = rel_summarised_flows[rel_summarised_flows$nutrient == 'N',], 
              col = 'grey50') + 
   geom_point(aes(size = iqr_adusted), 
@@ -438,7 +448,7 @@ p2 <- rel_summarised_flows %>%
   filter(nutrient == nutrient) %>%
   ggplot(aes(x = scenario, y = variable)) +
   geom_tile(fill = 'grey95', color = 'white', size=2)+
-  geom_tile(aes(fill = median_adjusted, x = factor(scenario, levels = c('Ref', 'PS', 'CBS', 'LBS'))),
+  geom_tile(aes(fill = median_adjusted, x = factor(scenario, levels = c('Reference\nyear 2020', 'PS', 'CBS', 'LBS'))),
             data = rel_summarised_flows[rel_summarised_flows$nutrient == nutrient & rel_summarised_flows$median_adjusted < 0,],
             colour="white", size=2) +
   scale_fill_gradient2("Median reduction (%)\ncompared to\nreference year 202", limits = c(-100, -0), 
@@ -448,7 +458,7 @@ p2 <- rel_summarised_flows %>%
             aes(fill = median_adjusted), colour="white", size=2) +
   scale_fill_gradient2("Median increase (%)\ncompared to\nreference year 2020", limits = c(0, 200), 
                        mid = "grey95", high = "#018571") +
-  geom_point(aes(size = iqr_adusted, x = factor(scenario, levels = c('Ref', 'PS', 'CBS', 'LBS'))), 
+  geom_point(aes(size = iqr_adusted, x = factor(scenario, levels = c('Reference\nyear 2020', 'PS', 'CBS', 'LBS'))), 
              data = rel_summarised_flows[rel_summarised_flows$nutrient == nutrient,], 
              col = 'grey50') + 
   geom_point(aes(size = iqr_adusted), 
@@ -490,7 +500,7 @@ p3 <- rel_summarised_flows %>%
   filter(nutrient == nutrient) %>%
   ggplot(aes(x = scenario, y = variable)) +
   geom_tile(fill = 'grey95', color = 'white', size=2)+
-  geom_tile(aes(fill = median_adjusted, x = factor(scenario, levels = c('Ref', 'PS', 'CBS', 'LBS'))),
+  geom_tile(aes(fill = median_adjusted, x = factor(scenario, levels = c('Reference\nyear 2020', 'PS', 'CBS', 'LBS'))),
             data = rel_summarised_flows[rel_summarised_flows$nutrient == nutrient & rel_summarised_flows$median_adjusted < 0,],
             colour="white", size=2) +
   scale_fill_gradient2("Median reduction (%)\ncompared to\nreference year 2020", limits = c(-100, -0), 
@@ -500,7 +510,7 @@ p3 <- rel_summarised_flows %>%
             aes(fill = median_adjusted), colour="white", size=2) +
   scale_fill_gradient2("Median increase (%)\ncompared to\nreference year 2020", limits = c(0, 200), 
                        mid = "grey95", high = "#018571") +
-  geom_point(aes(size = iqr_adusted, x = factor(scenario, levels = c('Ref', 'PS', 'CBS', 'LBS'))), 
+  geom_point(aes(size = iqr_adusted, x = factor(scenario, levels = c('Reference\nyear 2020', 'PS', 'CBS', 'LBS'))), 
              data = rel_summarised_flows[rel_summarised_flows$nutrient == nutrient,], 
              col = 'grey50') + 
   geom_point(aes(size = iqr_adusted), 

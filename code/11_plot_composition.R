@@ -176,6 +176,9 @@ loss_streams <- result_flows_median %>%
   mutate(indicator = 'losses',
          label_ypos = cumsum(med_value))
 
+
+#import animal is always zero, so drop it
+
 import_streams <- result_flows_median %>% 
   filter(name %in%c ('import_OFMSW',
                      'import_dairy_egg',
@@ -184,21 +187,22 @@ import_streams <- result_flows_median %>%
                      'import_inorganic_fertilizer',
                      'import_organic_fertilizer',
                      'net_feed_import')) %>% 
+  filter(!(name %in% c('import_dairy_egg', 'import_meat'))) %>% 
   arrange(desc(name)) %>% 
   mutate(indicator = 'import',
          label_ypos = cumsum(med_value))
 
 
-loss_streams %>% 
-  rbind(feed_streams) %>% 
-  rbind(import_streams) %>% 
-  mutate(rounded_value = round(med_value, digits = 1)) %>% 
-  ggplot(aes(x=scenario, y=med_value, fill=name)) +
-  geom_bar(stat="identity")+
-  facet_grid(~indicator)+
-  geom_label(aes(y=label_ypos, label=rounded_value), vjust=1.6, 
-            color="white", size=3.5, position=position_dodge(width=1))+
-  theme_bw()
+# loss_streams %>% 
+#   rbind(feed_streams) %>% 
+#   rbind(import_streams) %>% 
+#   mutate(rounded_value = round(med_value, digits = 1)) %>% 
+#   ggplot(aes(x=scenario, y=med_value, fill=name)) +
+#   geom_bar(stat="identity")+
+#   facet_grid(~indicator)+
+#   geom_label(aes(y=label_ypos, label=rounded_value), vjust=1.6, 
+#             color="white", size=3.5, position=position_dodge(width=1))+
+#   theme_bw()
 
 
 library(ggrepel)
@@ -206,57 +210,58 @@ library(ggrepel)
 
 
 
-loss_streams %>% 
-  rbind(feed_streams) %>% 
-  rbind(import_streams) %>% 
-  mutate(rounded_value = round(med_value, digits = 1),
-         label_name = recode(name, 
-                             feed_crops = 'Feed crops',
-                             grassbased_feed = 'Grass-based feed',
-                             feed_from_processed_crops = 'Feed from processed crops',
-                             net_feed_import = 'Imported feed',
-                             import_OFMSW = 'Imported OFMSW',
-                             import_dairy_egg = 'Imported dairy and eggs',
-                             imported_vegetal_products = 'Imported vegetal products',
-                             import_meat = 'Imported meat',
-                             import_inorganic_fertilizer = 'Imported inorganic fertilizer',
-                             import_organic_fertilizer = 'Imported organic fertilizer',
-                             crop_cultivation_losses = 'Losses during cultivation',
-                             animal_housing_and_storage_losses = 'Animal housing and storage losses',
-                             wastewater_effluent_gaseous_losses = 'Effluent gaseous losses in wastewater')) %>% 
-  filter(!(name %in% c('import_dairy_egg', 'import_meat'))) %>% 
-  ggplot(aes(x=scenario, y=med_value, fill=label_name)) +
-  geom_bar(stat="identity")+
-  # geom_text_repel(aes(label = str_wrap(paste0(label_name, ': ', rounded_value), 15),
-  #                     y = label_ypos))+
-  # geom_text_repel(aes(label = rounded_value,
-  #                     y = label_ypos))+
-  geom_text(aes(label = rounded_value,
-                      y = label_ypos), nudge_y = -10)+
-  scale_fill_manual(values = cbp1_extended) +
-  facet_grid(~indicator)+
-  theme_bw()+
-  theme(legend.position = "none")
+# loss_streams %>% 
+#   rbind(feed_streams) %>% 
+#   rbind(import_streams) %>% 
+#   mutate(rounded_value = round(med_value, digits = 1),
+#          label_name = recode(name, 
+#                              feed_crops = 'Feed crops',
+#                              grassbased_feed = 'Grass-based feed',
+#                              feed_from_processed_crops = 'Feed from processed crops',
+#                              net_feed_import = 'Imported feed',
+#                              import_OFMSW = 'OFMSW import',
+#                              import_dairy_egg = 'Dairy and egg import',
+#                              imported_vegetal_products = 'Vegetal products import',
+#                              import_meat = 'Meat import',
+#                              import_inorganic_fertilizer = 'Inorganic fertilizer import',
+#                              import_organic_fertilizer = 'Organic fertilizer import',
+#                              crop_cultivation_losses = 'Losses during cultivation',
+#                              animal_housing_and_storage_losses = 'Animal housing and storage losses',
+#                              wastewater_effluent_gaseous_losses = 'Effluent gaseous losses in wastewater')) %>% 
+#   filter(!(name %in% c('import_dairy_egg', 'import_meat'))) %>% 
+#   ggplot(aes(x=scenario, y=med_value, fill=label_name)) +
+#   geom_bar(stat="identity")+
+#   # geom_text_repel(aes(label = str_wrap(paste0(label_name, ': ', rounded_value), 15),
+#   #                     y = label_ypos))+
+#   # geom_text_repel(aes(label = rounded_value,
+#   #                     y = label_ypos))+
+#   geom_text(aes(label = rounded_value,
+#                       y = label_ypos), nudge_y = -10)+
+#   scale_fill_manual(values = cbp1_extended) +
+#   facet_grid(~indicator)+
+#   theme_bw()+
+#   theme(legend.position = "none")
 
 
-stream_names <- c('Imported inorganic\nfertilizer', 
-                  'Imported organic\nfertilizer',
-                  'Imported vegetal\nproducts',  
-                  'Imported OFMSW',
+stream_names <- c('Inorganic fertilizer\nimport', 
+                  'Organic fertilizer\nimport',
+                  'Vegetal product\nimport',  
+                  'OFMSW import\n',
                   'Effluent gaseous\nlosses in wastewater', 
                   'Losses during\ncultivation', 
                   'Animal housing and\nstorage losses',
-                  'Grass-based feed',
-                  'Feed crops', 
+                  'Grass-based feed\n',
+                  'Feed crops\n', 
                   'Feed from\nprocessed crops',
-                  'Imported feed'
+                  'Feed import\n'
                   )
 
 
 
 cbp1_extended <- c("#999999", "#E69F00", "#56B4E9", "#009E73",
                    "#0072B2", "#D55E00", "#CC79A7",
-                   '#9652a5', '#85a244', '#ae523a', "#F0E442")
+                   '#9652a5', '#85a244', '#ae523a', "#F0E442",
+                   "#c48e42")
 
 base_size <- 17
 width <- 24
@@ -268,16 +273,16 @@ input_df <- loss_streams %>%
   rbind(import_streams) %>% 
   mutate(rounded_value = round(med_value, digits = 1),
          label_name = recode(name, 
-                             feed_crops = 'Feed crops',
-                             grassbased_feed = 'Grass-based feed',
+                             feed_crops = 'Feed crops\n',
+                             grassbased_feed = 'Grass-based feed\n',
                              feed_from_processed_crops = 'Feed from\nprocessed crops',
-                             net_feed_import = 'Imported feed',
-                             import_OFMSW = 'Imported OFMSW',
+                             net_feed_import = 'Feed import\n',
+                             import_OFMSW = 'OFMSW import\n',
                              import_dairy_egg = 'Imported dairy and eggs',
-                             imported_vegetal_products = 'Imported vegetal\nproducts',
+                             imported_vegetal_products = 'Vegetal product\nimport',
                              import_meat = 'Imported meat',
-                             import_inorganic_fertilizer = 'Imported inorganic\nfertilizer',
-                             import_organic_fertilizer = 'Imported organic\nfertilizer',
+                             import_inorganic_fertilizer = 'Inorganic fertilizer\nimport',
+                             import_organic_fertilizer = 'Organic fertilizer\nimport',
                              crop_cultivation_losses = 'Losses during\ncultivation',
                              animal_housing_and_storage_losses = 'Animal housing and\nstorage losses',
                              wastewater_effluent_gaseous_losses = 'Effluent gaseous\nlosses in wastewater')) %>% 
