@@ -75,7 +75,7 @@ crop buffered scenario, and livestock buffered scenario.
 We also mapped the median composition of the total input, the nutrient
 losses and of the feed allocated to livestock.
 
-<img src="example_figures/composition_indicator_and_feed_legend-by-hand-v2.jpeg" alt="Total input, Losses and feed composition for the reference year and the different scenarios, expressed in t N year-1 ha-1 agricultural land." width="70%" style="display: block; margin: auto;" />
+<img src="example_figures/composition_indicator_and_feed_legend-by-hand-v3.jpeg" alt="Total input, Losses and feed composition for the reference year and the different scenarios, expressed in t N year-1 ha-1 agricultural land." width="70%" style="display: block; margin: auto;" />
 
 The model also provides estimates on potassium (K) and phosphorous (P)
 nutrient flows, which we decieded to not take into the final analysis,
