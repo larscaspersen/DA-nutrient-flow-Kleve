@@ -3,6 +3,8 @@ Investigating nutrient flows in Kleve using decision analysis tools
 Lars Caspersen
 28/11/2023
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10222535.svg)](https://doi.org/10.5281/zenodo.10222535)
+
 ## What is this repo about?
 
 As the title already says, we want to investigate nutrient flows for the

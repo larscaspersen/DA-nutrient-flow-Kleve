@@ -10,6 +10,8 @@ bibliography: references.bib
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10222535.svg)](https://doi.org/10.5281/zenodo.10222535)
+
 ## What is this repo about?
 
 As the title already says, we want to investigate nutrient flows for the district of Kleve, Germany. The agricultural sector of Kleve is intense and often export oriented. Animal husbandry (especially dairy cows) plays an important role along side with other intense farming systems like cropping (for example potatos) or ornamental production. Furthermore, Kleve is home to many food processors. 
