@@ -325,7 +325,7 @@ p1 <- input_df %>%
   scale_fill_manual(values = cbp1_extended, 
                     name = 'Nutrient flow', breaks = stream_names) +
   xlab("") +
-  ylab(bquote('Modelled median nutrient flow (t N'~ha^-1~year^-1*')'))+
+  ylab(bquote('Modelled median nutrient flow (kg N'~ha^-1~year^-1*')'))+
   facet_grid(~indicator)+
   theme_bw(base_size = base_size) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
@@ -335,6 +335,13 @@ p1 +
   theme(legend.position = 'None')
 
 ggsave(filename = 'figures/composition_indicator_and_feed_no_legend.jpeg', device = 'jpeg', width = width, height = height, units = 'cm')
+
+
+sum_df <- input_df %>% 
+  group_by(indicator, scenario) %>% 
+  summarise(sum = sum(med_value) / 1000) 
+
+write.csv(sum_df, file = 'data/indicator_composition_median.csv', row.names = FALSE)
 
 
 
