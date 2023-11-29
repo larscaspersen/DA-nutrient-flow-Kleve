@@ -47,7 +47,7 @@ knitr::include_graphics('example_figures/boxplot_indicators_N.jpeg')
 We also mapped the median composition of the total input, the nutrient losses and of the feed allocated to livestock. 
 
 ```{r,out.width = "70%", echo = FALSE,fig.align='center', fig.show='hold', fig.cap="Total input, Losses and feed composition for the reference year and the different scenarios, expressed in t N year-1 ha-1 agricultural land."}
-knitr::include_graphics('example_figures/composition_indicator_and_feed_legend-by-hand-v2.jpeg')
+knitr::include_graphics('example_figures/composition_indicator_and_feed_legend-by-hand-v3.jpeg')
 
 ```
 
