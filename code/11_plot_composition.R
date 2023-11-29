@@ -144,6 +144,7 @@ result_flows <- readRDS('data/model_result_flows.rds') %>%
                          'import_dairy_egg',
                          'imported_vegetal_products',
                          'import_meat',
+                         'import_animal_products',
                          'import_inorganic_fertilizer',
                          'import_organic_fertilizer',
                          
@@ -184,6 +185,7 @@ import_streams <- result_flows_median %>%
                      'import_dairy_egg',
                      'imported_vegetal_products',
                      'import_meat',
+                     'import_animal_products',
                      'import_inorganic_fertilizer',
                      'import_organic_fertilizer',
                      'net_feed_import')) %>% 
@@ -246,8 +248,9 @@ library(ggrepel)
 stream_names <- c('Inorganic fertilizer\nimport', 
                   'Organic fertilizer\nimport',
                   'Vegetal product\nimport',  
+                  'Animal product\nimport',
                   'OFMSW import\n',
-                  'Effluent gaseous\nlosses in wastewater', 
+                  'Effluent/gaseous\nlosses during WwT', 
                   'Losses during\ncultivation', 
                   'Animal housing and\nstorage losses',
                   'Grass-based feed\n',
@@ -258,15 +261,13 @@ stream_names <- c('Inorganic fertilizer\nimport',
 
 
 
-cbp1_extended <- c("#999999", "#E69F00", "#56B4E9", "#009E73",
+cbp1_extended <- c("#999999", "#E69F00", "#56B4E9", "#c48e42", "#009E73",
                    "#0072B2", "#D55E00", "#CC79A7",
-                   '#9652a5', '#85a244', '#ae523a', "#F0E442",
-                   "#c48e42")
+                   '#9652a5', '#85a244', '#ae523a', "#F0E442")
 
 base_size <- 17
 width <- 24
 height <- 17
-
 
 input_df <- loss_streams %>% 
   rbind(feed_streams) %>% 
@@ -278,6 +279,7 @@ input_df <- loss_streams %>%
                              feed_from_processed_crops = 'Feed from\nprocessed crops',
                              net_feed_import = 'Feed import\n',
                              import_OFMSW = 'OFMSW import\n',
+                             import_animal_products = 'Animal product\nimport',
                              import_dairy_egg = 'Imported dairy and eggs',
                              imported_vegetal_products = 'Vegetal product\nimport',
                              import_meat = 'Imported meat',
@@ -285,7 +287,7 @@ input_df <- loss_streams %>%
                              import_organic_fertilizer = 'Organic fertilizer\nimport',
                              crop_cultivation_losses = 'Losses during\ncultivation',
                              animal_housing_and_storage_losses = 'Animal housing and\nstorage losses',
-                             wastewater_effluent_gaseous_losses = 'Effluent gaseous\nlosses in wastewater')) %>% 
+                             wastewater_effluent_gaseous_losses = 'Effluent/gaseous\nlosses during WwT')) %>% 
   filter(!(name %in% c('import_dairy_egg', 'import_meat'))) %>% 
   mutate(label_name = factor(label_name, levels = rev(stream_names)),
          indicator = factor(indicator, 
@@ -301,9 +303,10 @@ input_df <- loss_streams %>%
   ungroup()
 
 #change some position values by hand
-input_df$label_ypos[input_df$name == 'import_OFMSW'] <- input_df$label_ypos[input_df$name == 'import_OFMSW'] + 5
-input_df$label_ypos[input_df$name == 'imported_vegetal_products' & input_df$scenario %in% c('Ref', 'PS', 'LBS')] <- input_df$label_ypos[input_df$name == 'imported_vegetal_products'  & input_df$scenario %in% c('Ref', 'PS', 'LBS')] - 5
-input_df$label_ypos[input_df$name == 'feed_from_processed_crops' & input_df$scenario %in% c('PS', 'LBS')] <- input_df$label_ypos[input_df$name == 'feed_from_processed_crops'  & input_df$scenario %in% c('PS', 'LBS')] + 5
+input_df$label_ypos[input_df$name == 'import_OFMSW'] <- input_df$label_ypos[input_df$name == 'import_OFMSW'] + 6
+input_df$label_ypos[input_df$name == 'imported_vegetal_products' & input_df$scenario %in% c('Ref', 'PS', 'LBS')] <- input_df$label_ypos[input_df$name == 'imported_vegetal_products'  & input_df$scenario %in% c('Ref', 'PS', 'LBS')] - 6
+input_df$label_ypos[input_df$name == 'imported_vegetal_products' & input_df$scenario %in% c('CBS')] <- input_df$label_ypos[input_df$name == 'imported_vegetal_products'  & input_df$scenario %in% c('CBS')] - 2
+input_df$label_ypos[input_df$name == 'feed_from_processed_crops' & input_df$scenario %in% c('PS', 'LBS')] <- input_df$label_ypos[input_df$name == 'feed_from_processed_crops'  & input_df$scenario %in% c('PS', 'LBS')] + 6
 
 
 
