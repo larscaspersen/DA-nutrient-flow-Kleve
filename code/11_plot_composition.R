@@ -156,6 +156,39 @@ result_flows <- readRDS('data/model_result_flows.rds') %>%
   pivot_longer(cols = -c(run, scenario, nutrient)) 
 
 
+result_flows %>% 
+  filter(name == 'import_animal_products') %>% 
+  ggplot(aes(x = scenario, y = value)) +
+  geom_boxplot()
+
+result_flows %>% 
+  filter(name == 'import_meat') %>% 
+  ggplot(aes(x = scenario, y = value)) +
+  geom_boxplot()
+
+result_flows %>% 
+  filter(name == 'import_meat') %>% 
+  group_by(scenario) %>% 
+  summarise(med = median(value),
+            n_zero = (sum(value == 0) / n())* 100)
+
+result_flows %>% 
+  filter(name == 'import_dairy_egg') %>% 
+  group_by(scenario) %>% 
+  summarise(med = median(value),
+            n_zero = (sum(value == 0) / n())* 100)
+
+#cases import animal products changed
+test <- result_flows %>% 
+  filter(name == 'import_animal_products') %>% 
+  pivot_wider(names_from = scenario) %>% 
+  mutate(eq_all = (LBS == Ref & LBS == PS & LBS == CBS),
+         eq_scen = (LBS == PS & LBS == CBS)) 
+
+sum(test$eq_all) / nrow(test)
+sum(test$eq_scen) / nrow(test)
+
+
 result_flows_median <- result_flows %>% 
   group_by(scenario, name) %>% 
   summarise(med_value = median(value) / ha_ag_land) 
@@ -272,7 +305,7 @@ height <- 17
 input_df <- loss_streams %>% 
   rbind(feed_streams) %>% 
   rbind(import_streams) %>% 
-  mutate(rounded_value = round(med_value, digits = 1),
+  mutate(rounded_value = round(med_value, digits = 0),
          label_name = recode(name, 
                              feed_crops = 'Feed crops\n',
                              grassbased_feed = 'Grass-based feed\n',
